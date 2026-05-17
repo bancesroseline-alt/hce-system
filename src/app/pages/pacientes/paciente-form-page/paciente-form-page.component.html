@@ -1,0 +1,197 @@
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+
+    <div>
+      <h1>Nuevo paciente</h1>
+
+      <div class="breadcrumb">
+        <a routerLink="/pacientes">Pacientes</a>
+        <span>></span>
+        <span>Nuevo paciente</span>
+      </div>
+    </div>
+
+    <div class="system-status">
+      Sistema: <span>Offline</span>
+    </div>
+
+  </div>
+
+  <!-- ALERT -->
+  <div class="alert-success" *ngIf="mensaje">
+    {{ mensaje }}
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+
+    <!-- INFORMACION PERSONAL -->
+    <div class="section">
+
+      <h2>Información personal</h2>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Tipo de documento *</label>
+
+          <select [(ngModel)]="paciente.tipoDocumento">
+            <option value="DNI">DNI</option>
+            <option value="CE">CE</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Número de documento *</label>
+
+          <input
+            type="text"
+            [(ngModel)]="paciente.numeroDocumento"
+          >
+        </div>
+
+        <div class="field">
+          <label>Nombres *</label>
+
+          <input
+            type="text"
+            [(ngModel)]="paciente.nombres"
+          >
+        </div>
+
+        <div class="field">
+          <label>Apellidos *</label>
+
+          <input
+            type="text"
+            [(ngModel)]="paciente.apellidos"
+          >
+        </div>
+
+        <div class="field">
+          <label>Fecha de nacimiento *</label>
+
+          <input
+    type="date"
+    [(ngModel)]="paciente.fechaNacimiento"
+    (change)="calcularEdad()"
+         >
+        </div>
+
+        <div class="field">
+          <input
+             type="number"
+             [(ngModel)]="paciente.edad"
+            readonly
+        >
+        </div>
+
+        <div class="field">
+          <label>Sexo *</label>
+
+          <select [(ngModel)]="paciente.sexo">
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Estado civil *</label>
+
+          <select [(ngModel)]="paciente.estadoCivil">
+            <option value="SOLTERO">Soltera</option>
+            <option value="CASADO">Casada</option>
+            <option value="DIVORCIADO">Divorciada</option>
+            <option value="VIUDO">Viuda</option>
+          </select>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- CONTACTO -->
+    <div class="section">
+
+      <h2>Información de contacto</h2>
+
+      <div class="form-grid">
+
+        <div class="field full">
+          <label>Dirección</label>
+
+          <input
+            type="text"
+            [(ngModel)]="paciente.direccion"
+          >
+        </div>
+
+        <div class="field">
+          <label>Teléfono</label>
+
+          <input
+            type="text"
+            [(ngModel)]="paciente.telefono"
+          >
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ESTADO -->
+    <div class="section">
+
+      <h2>Estado del paciente</h2>
+
+      <div class="estado-box">
+
+        <label class="switch">
+
+          <input
+            type="checkbox"
+            [(ngModel)]="paciente.estado"
+          >
+
+          <span class="slider"></span>
+
+        </label>
+
+        <span>
+          {{ paciente.estado ? 'Activo' : 'Inactivo' }}
+        </span>
+
+      </div>
+
+    </div>
+
+    <!-- ANTECEDENTES -->
+    <div class="section">
+
+      <h2>Antecedentes</h2>
+
+      <textarea
+        rows="5"
+        [(ngModel)]="paciente.antecedentes"
+      ></textarea>
+
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="buttons">
+
+      <button class="btn-cancel" routerLink="/pacientes">
+        Cancelar
+      </button>
+
+      <button class="btn-save" (click)="guardar()">
+        Guardar paciente
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

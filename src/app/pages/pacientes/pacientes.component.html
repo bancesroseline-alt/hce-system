@@ -1,0 +1,74 @@
+<div class="top-bar">
+
+  <input
+  type="text"
+  placeholder="Buscar paciente por nombre o DNI ..."
+  [(ngModel)]="buscarTexto"
+  (input)="buscar()"
+/>
+
+  <div class="actions">
+
+    <button class="btn-filter">Filtros</button>
+
+    <button class="btn-new" routerLink="/pacientes/nuevo">
+      + Nuevo Paciente
+    </button>
+
+  </div>
+
+</div>
+
+<div class="table-container">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>DNI</th>
+        <th>Edad</th>
+        <th>Teléfono</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <tr *ngFor="let p of pacientes">
+
+        <td>{{ p.nombres }} {{ p.apellidos }}</td>
+        <td>{{ p.numeroDocumento }}</td>
+        <td>{{ p.edad }}</td>
+        <td>{{ p.telefono }}</td>
+
+        <td>
+          <span class="estado" [class.activo]="p.estado" [class.inactivo]="!p.estado">
+            {{ p.estado ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+
+        <td class="acciones">
+
+          <button
+    class="btn-icon view"
+    [routerLink]="['/pacientes', p.id]"
+    >
+    👁
+    </button>
+
+          <button class="btn-icon edit">
+            ✏
+          </button>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
+

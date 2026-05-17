@@ -1,0 +1,10 @@
+.card h3 {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.card p {
+  font-size: 26px;
+  font-weight: bold;
+  color: #0ea5e9;
+}

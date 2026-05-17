@@ -1,0 +1,118 @@
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  gap: 20px;
+}
+
+.top-bar input {
+  width: 350px;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #dcdcdc;
+  outline: none;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-filter,
+.btn-new {
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-filter {
+  background: #eef2f7;
+}
+
+.btn-new {
+  background: #1976d2;
+  color: white;
+}
+
+.table-container {
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #f7f9fc;
+  color: #444;
+  padding: 16px;
+  text-align: left;
+  font-size: 14px;
+}
+
+td {
+  padding: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+tr:hover {
+  background: #fafcff;
+}
+
+.estado {
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.activo {
+  background: #e7f8ee;
+  color: #1f8b4c;
+}
+
+.inactivo {
+  background: #fdeaea;
+  color: #d93025;
+}
+
+.acciones {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-icon {
+  border: none;
+  background: #f3f5f7;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+
+  font-size: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  transform: scale(1.05);
+}
+
+.view:hover {
+  background: #dbeafe;
+}
+
+.edit:hover {
+  background: #fff4d6;
+}

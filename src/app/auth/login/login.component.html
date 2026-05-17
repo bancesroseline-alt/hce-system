@@ -1,0 +1,89 @@
+<div class="login-page">
+
+  <!-- PANEL IZQUIERDO -->
+  <div class="login-left">
+
+    <div class="overlay"></div>
+
+    <div class="brand">
+
+      <h1>HCE System</h1>
+
+      <p>
+        Sistema de Historia Clínica Electrónica
+      </p>
+
+    </div>
+
+  </div>
+
+  <!-- PANEL DERECHO -->
+  <div class="login-right">
+
+    <div class="login-card">
+
+      <div class="login-header">
+
+        <h2>Bienvenido</h2>
+
+        <p>
+          Ingrese sus credenciales para continuar
+        </p>
+
+      </div>
+
+      <form (ngSubmit)="login()">
+
+        <!-- USER -->
+        <div class="input-group">
+
+          <label>Usuario</label>
+
+          <input
+            type="text"
+            placeholder="Ingrese usuario"
+            [(ngModel)]="username"
+            name="username"
+            required
+          />
+
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="input-group">
+
+          <label>Contraseña</label>
+
+          <input
+            type="password"
+            placeholder="Ingrese contraseña"
+            [(ngModel)]="password"
+            name="password"
+            required
+          />
+
+        </div>
+
+        <!-- ERROR -->
+        <div class="error" *ngIf="error">
+          {{ error }}
+        </div>
+
+        <!-- BUTTON -->
+        <button type="submit" [disabled]="loading">
+
+        {{ loading ? 'Ingresando...' : 'Ingresar' }}
+
+        </button>
+
+      </form>
+
+      <div class="footer">
+        © 2026 HCE System
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

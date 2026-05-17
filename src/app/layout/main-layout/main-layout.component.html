@@ -1,0 +1,40 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>HCE</h2>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/pacientes" routerLinkActive="active">Pacientes</a>
+      <a routerLink="/citas" routerLinkActive="active">Citas</a>
+      <a routerLink="/historias-clinicas" routerLinkActive="active">Historia Clínica</a>
+      <a routerLink="/prediccion" routerLinkActive="active">Predicción</a>
+      <a routerLink="/sincronizacion" routerLinkActive="active">Sincronización</a>
+      <a routerLink="/reportes" routerLinkActive="active">Reportes</a>
+    </nav>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <div class="content">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-left">
+        <h3>Sistema HCE</h3>
+      </div>
+
+      <div class="header-right">
+        <span class="user">Admin</span>
+        <button (click)="logout()">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <!-- CONTENIDO DINÁMICO -->
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>
