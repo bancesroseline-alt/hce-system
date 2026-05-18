@@ -99,7 +99,7 @@ export class PacienteFormPageComponent {
 
               setTimeout(() => {
                 this.router.navigate(['/pacientes']);
-              }, 1500);
+              }, 5000);
 
             },
 
