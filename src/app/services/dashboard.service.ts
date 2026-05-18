@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 })
 export class DashboardService {
 
-  private api = 'http://localhost:8080/api';
+  private api = 'https://hce-backend.onrender.com/api';
 
   constructor(private http: HttpClient) {}
 
