@@ -9,7 +9,7 @@ import { Paciente } from '../models/paciente.model';
 })
 export class PacienteService {
 
-  private api = 'http://localhost:8080/api/pacientes';
+  private api = 'https://hce-backend.onrender.com/api/pacientes';
 
   constructor(private http: HttpClient) {}
 
