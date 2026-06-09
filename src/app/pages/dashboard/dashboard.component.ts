@@ -1,49 +1,34 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { DashboardService } from '../../services/dashboard.service';
-
-@Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
-})
 export class DashboardComponent implements OnInit {
 
   totalPacientes = 0;
-  totalCitasHoy = 0;
-  porcentajeInasistencia = 0;
+  citasHoy = 0;
+  totalCitasMedico = 0;
+  totalAtenciones = 0;
 
-  citasDelDia: any[] = [];
-  actividadesRecientes: any[] = [];
+  nombreUsuario = 'Usuario';
+  rolUsuario = 'Médico';
 
-  usuario: any;
-
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    const usuarioStorage = localStorage.getItem('usuario');
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
 
-    if (usuarioStorage) {
-      this.usuario = JSON.parse(usuarioStorage);
-      this.cargarDashboard();
-    }
-  }
+    this.nombreUsuario = usuario.nombre || usuario.nombres || 'Usuario';
+    this.rolUsuario = usuario.rol || 'Médico';
 
-  cargarDashboard(): void {
-    this.dashboardService.obtenerDashboardMedico(this.usuario.id).subscribe({
-      next: (data) => {
-        this.totalPacientes = data.totalPacientes;
-        this.totalCitasHoy = data.totalCitasHoy;
-        this.porcentajeInasistencia = data.porcentajeInasistencia;
-        this.citasDelDia = data.citasDelDia;
-        this.actividadesRecientes = data.actividadesRecientes;
-      },
-      error: (err) => {
-        console.error('Error al cargar dashboard', err);
-      }
-    });
+    const medicoId = usuario.id || 2;
+
+    this.http.get<any>(`https://hce-backend.onrender.com/api/dashboard/medico/${medicoId}`)
+      .subscribe({
+        next: (data) => {
+          this.totalPacientes = data.totalPacientes || 0;
+          this.citasHoy = data.citasHoy || 0;
+          this.totalCitasMedico = data.totalCitasMedico || 0;
+          this.totalAtenciones = data.totalAtenciones || 0;
+        },
+        error: (error) => {
+          console.error('Error al cargar dashboard', error);
+        }
+      });
   }
 }
