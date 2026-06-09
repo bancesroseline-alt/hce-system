@@ -78,17 +78,16 @@ header {
 }
 
 /* BOTÓN LOGOUT */
-header button {
+.logout-btn {
   background: #ef4444;
   border: none;
   padding: 8px 14px;
   color: white;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-header button:hover {
+.logout-btn:hover {
   background: #dc2626;
 }
 
