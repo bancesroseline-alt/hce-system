@@ -19,16 +19,37 @@
   <div class="content">
 
     <!-- HEADER -->
-    <header class="header">
-      <div class="header-left">
-        <h3>Sistema HCE</h3>
-      </div>
+    <header class="top-header">
+  <h3>Sistema HCE</h3>
 
-      <div class="header-right">
-        <span class="user">{{ usuario?.nombres || usuario?.username || 'Usuario' }}</span>
-        <button (click)="logout()">Cerrar sesión</button>
+  <div class="header-actions">
+    <button class="notification-btn" title="Notificaciones">
+      🔔
+      <span class="notification-badge">3</span>
+    </button>
+
+    <div class="user-menu">
+      <button class="user-menu-btn" (click)="toggleUserMenu()">
+        👤
+        <span>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</span>
+        <span>⌄</span>
+      </button>
+
+      <div class="dropdown" *ngIf="mostrarMenuUsuario">
+        <div class="dropdown-user">
+          <strong>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</strong>
+          <small>{{ usuario?.rol || 'Usuario' }}</small>
+        </div>
+
+        <button routerLink="/configuracion">⚙️ Configuración</button>
+        <button routerLink="/perfil">👤 Mi perfil</button>
+        <button class="logout" (click)="logout()">🚪 Cerrar sesión</button>
       </div>
-    </header>
+    </div>
+  </div>
+</header>
+
+<router-outlet></router-outlet>
 
     <!-- CONTENIDO DINÁMICO -->
     <main>
