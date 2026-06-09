@@ -244,9 +244,15 @@ label {
 .notification-btn {
   position: relative;
   border: none;
-  background: transparent;
+  background: transparent !important;
+  color: #0f172a !important;
   font-size: 22px;
   cursor: pointer;
+  padding: 0;
+}
+
+.notification-btn:hover {
+  background: transparent !important;
 }
 
 .notification-badge {
@@ -266,13 +272,18 @@ label {
 
 .user-menu-btn {
   border: none;
-  background: transparent;
+  background: transparent !important;
+  color: #0f172a !important;
   display: flex;
   align-items: center;
   gap: 8px;
   font-weight: 700;
   cursor: pointer;
-  color: #0f172a;
+  padding: 0;
+}
+
+.user-menu-btn:hover {
+  background: transparent !important;
 }
 
 .dropdown {
