@@ -1,22 +1,92 @@
-<h1>Bienvenido, {{ rolUsuario }} {{ nombreUsuario }}</h1>
-<p>Aquí tienes un resumen general del sistema</p>
+<div class="dashboard-container">
+  <div class="top-row">
+    <button class="menu-btn">☰</button>
 
-<div class="cards">
-  <div class="card">
-    <h3>Pacientes</h3>
-    <strong>{{ totalPacientes }}</strong>
-    <p>Total registrados</p>
+    <div>
+      <h1>Bienvenido, {{ rolUsuario }} {{ nombreUsuario }}</h1>
+      <p>Aquí tienes un resumen general del sistema</p>
+    </div>
+
+    <div class="status-online">● Sistema: Online</div>
+    <div class="bell">🔔</div>
+    <div class="user-icon">👤</div>
   </div>
 
-  <div class="card">
-    <h3>Citas hoy</h3>
-    <strong>{{ citasHoy }}</strong>
-    <p>Total programadas</p>
+  <div class="summary-cards">
+    <div class="summary-card">
+      <h3>Pacientes</h3>
+      <strong>{{ totalPacientes }}</strong>
+      <span>Total registrados</span>
+    </div>
+
+    <div class="summary-card">
+      <h3>Citas hoy</h3>
+      <strong>{{ citasHoy }}</strong>
+      <span>Total programadas</span>
+    </div>
+
+    <div class="summary-card">
+      <h3>% Inasistencia</h3>
+      <strong>{{ porcentajeInasistencia || 0 }}%</strong>
+      <span>Promedio mensual</span>
+    </div>
   </div>
 
-  <div class="card">
-    <h3>Atenciones</h3>
-    <strong>{{ totalAtenciones }}</strong>
-    <p>Total registradas</p>
+  <div class="content-grid">
+    <section class="panel citas-panel">
+      <div class="panel-header">
+        <h2>Citas del día</h2>
+        <button>Ver todas</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Hora</th>
+            <th>Paciente</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>Riesgo ML</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let cita of citasDelDia">
+            <td>{{ cita.hora }}</td>
+            <td>{{ cita.paciente }}</td>
+            <td>{{ cita.motivo }}</td>
+            <td><span class="estado">{{ cita.estado }}</span></td>
+            <td>
+              <span class="riesgo" [ngClass]="cita.riesgo?.toLowerCase()">
+                ● {{ cita.riesgo }}
+              </span>
+            </td>
+            <td>︙</td>
+          </tr>
+
+          <tr *ngIf="citasDelDia.length === 0">
+            <td colspan="6" class="empty">No hay citas registradas hoy</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <a class="link">Ver más citas ></a>
+    </section>
+
+    <section class="panel activity-panel">
+      <h2>Actividad reciente</h2>
+
+      <div class="activity" *ngFor="let act of actividades">
+        <strong>{{ act.titulo }}</strong>
+        <p>{{ act.detalle }}<br>{{ act.tiempo }}</p>
+      </div>
+
+      <div *ngIf="actividades.length === 0" class="empty">
+        Sin actividad reciente
+      </div>
+
+      <a class="link">Ver todas las actividades</a>
+    </section>
   </div>
 </div>
