@@ -14,4 +14,3 @@ export class DashboardService {
     return this.http.get<any>(`${this.api}/medico/${medicoId}`);
   }
 }
-}
