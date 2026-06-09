@@ -4,28 +4,27 @@ import { Router, RouterOutlet, RouterLink } from '@angular/router';
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink],
+  imports: [CommonModule, RouterOutlet, RouterLink],
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.css']
 })
 export class MainLayoutComponent implements OnInit {
 
   usuario: any;
+  mostrarMenuUsuario = false;
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-
-    const usuarioStorage = localStorage.getItem('usuario');
-
-    if (usuarioStorage) {
-      this.usuario = JSON.parse(usuarioStorage);
-    }
+    this.usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
   }
 
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
+  toggleUserMenu(): void {
+    this.mostrarMenuUsuario = !this.mostrarMenuUsuario;
+  }
+
+  logout(): void {
+    localStorage.clear();
     this.router.navigate(['/login']);
   }
 }
