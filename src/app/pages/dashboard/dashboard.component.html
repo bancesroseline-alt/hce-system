@@ -1,20 +1,22 @@
-<h1>Dashboard</h1>
+<h1>Bienvenido, {{ rolUsuario }} {{ nombreUsuario }}</h1>
+<p>Aquí tienes un resumen general del sistema</p>
 
-<div class="grid">
-
+<div class="cards">
   <div class="card">
     <h3>Pacientes</h3>
-    <p>{{ totalPacientes }}</p>
+    <strong>{{ totalPacientes }}</strong>
+    <p>Total registrados</p>
   </div>
 
   <div class="card">
-    <h3>Citas</h3>
-    <p>{{ totalCitasHoy }}</p>
+    <h3>Citas hoy</h3>
+    <strong>{{ citasHoy }}</strong>
+    <p>Total programadas</p>
   </div>
 
   <div class="card">
-    <h3>Citas Hoy</h3>
-    <p>{{ totalCitasHoy }}</p>
+    <h3>Atenciones</h3>
+    <strong>{{ totalAtenciones }}</strong>
+    <p>Total registradas</p>
   </div>
-
 </div>
