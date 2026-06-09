@@ -15,16 +15,20 @@ export class DashboardComponent implements OnInit {
   citasHoy = 0;
   totalCitasMedico = 0;
   totalAtenciones = 0;
+  porcentajeInasistencia = 0;
 
   nombreUsuario = 'Usuario';
   rolUsuario = 'Médico';
+
+  citasDelDia: any[] = [];
+  actividades: any[] = [];
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
 
-    this.nombreUsuario = usuario.nombre || usuario.nombres || 'Usuario';
+    this.nombreUsuario = usuario.nombre || usuario.nombres || usuario.username || 'Usuario';
     this.rolUsuario = usuario.rol || 'Médico';
 
     const medicoId = usuario.id || 2;
@@ -36,6 +40,10 @@ export class DashboardComponent implements OnInit {
           this.citasHoy = data.citasHoy || 0;
           this.totalCitasMedico = data.totalCitasMedico || 0;
           this.totalAtenciones = data.totalAtenciones || 0;
+          this.porcentajeInasistencia = data.porcentajeInasistencia || 0;
+
+          this.citasDelDia = data.citasDelDia || [];
+          this.actividades = data.actividades || [];
         },
         error: (error) => {
           console.error('Error al cargar dashboard', error);
