@@ -25,7 +25,7 @@
       </div>
 
       <div class="header-right">
-        <span class="user">Admin</span>
+        <span class="user">{{ usuario?.nombres || usuario?.username || 'Usuario' }}</span>
         <button (click)="logout()">Cerrar sesión</button>
       </div>
     </header>
