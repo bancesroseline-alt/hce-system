@@ -41,18 +41,23 @@ export class RegistroAtencionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.pacienteId = Number(this.route.snapshot.paramMap.get('pacienteId'));
+  this.pacienteId = Number(this.route.snapshot.paramMap.get('pacienteId'));
+  const citaId = this.route.snapshot.paramMap.get('citaId');
 
-    this.http.get<any>(`${this.api}/pacientes/${this.pacienteId}`)
-      .subscribe({
-        next: (data) => {
-          this.paciente = data;
-        },
-        error: (error) => {
-          console.error('Error al cargar paciente', error);
-        }
-      });
+  if (citaId) {
+    this.atencion.citaId = Number(citaId);
   }
+
+  this.http.get<any>(`${this.api}/pacientes/${this.pacienteId}`)
+    .subscribe({
+      next: data => {
+        this.paciente = data;
+      },
+      error: error => {
+        console.error('Error al cargar paciente', error);
+      }
+    });
+}
 
   guardarAtencion(): void {
     const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
@@ -61,7 +66,7 @@ export class RegistroAtencionComponent implements OnInit {
       ...this.atencion,
       pacienteId: this.pacienteId,
       usuarioId: usuario.id || 2,
-      citaId: null
+      citaId: this.atencion.citaId || null
     };
 
     this.http.post(`${this.api}/atenciones`, payload)
