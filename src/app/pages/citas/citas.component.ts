@@ -368,18 +368,17 @@ guardar(): void {
 
   cambiarEstado(cita: any, nuevoEstado: string): void {
 
-  const payload = {
-    ...cita,
-    estado: nuevoEstado
-  };
+  cita.estado = nuevoEstado;
 
   this.http.put(
-    `${this.api}/citas/${cita.id}`,
-    payload,
+    `${this.api}/citas/${cita.id}/estado`,
+    {
+      estado: nuevoEstado
+    },
     this.getHeaders()
   ).subscribe({
     next: () => {
-      cita.estado = nuevoEstado;
+
       this.mensaje = 'Estado actualizado correctamente';
       this.tipoMensaje = 'success';
 
@@ -387,6 +386,8 @@ guardar(): void {
         this.mensaje = '';
         this.tipoMensaje = '';
       }, 3000);
+
+      this.cargarCitas();
     },
     error: err => {
       console.error('Error al actualizar estado', err);
@@ -395,5 +396,6 @@ guardar(): void {
       this.tipoMensaje = 'error';
     }
   });
+
 }
 }
