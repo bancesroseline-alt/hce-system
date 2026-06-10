@@ -106,34 +106,36 @@ td {
 /* BADGES */
 
 .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 7px 13px;
+  padding: 8px 16px;
   border-radius: 999px;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.3px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  display: inline-block;
 }
 
-.badge.programada {
-  background: #dbeafe;
+/* PROGRAMADA: azul */
+.badge-programada {
+  background-color: #dbeafe;
   color: #1d4ed8;
 }
 
-.badge.cancelada {
-  background: #f1f5f9;
-  color: #64748b;
+/* ATENDIDA: verde */
+.badge-atendida {
+  background-color: #dcfce7;
+  color: #15803d;
 }
 
-.badge.no_asistio {
-  background: #fee2e2;
-  color: #dc2626;
+/* CANCELADA: rojo */
+.badge-cancelada {
+  background-color: #fee2e2;
+  color: #b91c1c;
 }
 
-.badge.atendida {
-  background: #dcfce7;
-  color: #16a34a;
+/* NO ASISTIÓ: naranja */
+.badge-no-asistio {
+  background-color: #ffedd5;
+  color: #c2410c;
 }
 
 /* BOTONES GENERALES */
