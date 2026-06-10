@@ -75,12 +75,15 @@ export const routes: Routes = [
             .then(m => m.HistoriaComponent)
       },
 
+      // =====================
+      // ATENCIONES
+      // =====================
       {
         path: 'atenciones/nueva/:pacienteId',
         loadComponent: () =>
           import('./pages/registro-atencion/registro-atencion.component')
             .then(m => m.RegistroAtencionComponent)
-      }
+      },
 
       // =====================
       // CITAS
