@@ -206,36 +206,48 @@ export class CitasComponent implements OnInit {
     this.busquedaMedico = '';
   }
 
-  guardar(): void {
-    if (!this.cita.paciente.id || !this.cita.medico.id) {
-      this.mensaje = 'Paciente y médico son obligatorios';
-      return;
-    }
+  // =========================
+// GUARDAR
+// =========================
 
-    const payload = {
-      paciente: { id: Number(this.cita.paciente.id) },
-      medico: { id: Number(this.cita.medico.id) },
-      tipoCita: this.cita.tipoCita,
-      fecha: this.cita.fecha,
-      hora: this.cita.hora,
-      especialidad: this.cita.especialidad,
-      motivoConsulta: this.cita.motivoConsulta,
-      estado: this.cita.estado
-    };
+guardar(): void {
 
-    this.http.post(`${this.api}/citas`, payload, this.getHeaders()).subscribe({
-      next: () => {
-        this.mensaje = 'Cita registrada correctamente';
-        this.modoNuevaCita = false;
-        this.limpiarFormulario();
-        this.cargarCitas();
-      },
-      error: err => {
-        console.error('Error al guardar cita', err);
-        this.mensaje = 'Error al guardar cita';
-      }
-    });
+  if (!this.cita.paciente.id || !this.cita.medico.id) {
+    this.mensaje = 'Paciente y médico son obligatorios';
+    return;
   }
+
+  if (!this.cita.fecha || !this.cita.hora) {
+    this.mensaje = 'Fecha y hora son obligatorias';
+    return;
+  }
+
+  const payload = {
+    pacienteId: Number(this.cita.paciente.id),
+    medicoId: Number(this.cita.medico.id),
+    tipoCita: this.cita.tipoCita,
+    fecha: this.cita.fecha,
+    hora: this.cita.hora,
+    especialidad: this.cita.especialidad,
+    motivoConsulta: this.cita.motivoConsulta,
+    estado: this.cita.estado
+  };
+
+  console.log('Payload cita:', payload);
+
+  this.http.post(`${this.api}/citas`, payload, this.getHeaders()).subscribe({
+    next: () => {
+      this.mensaje = 'Cita registrada correctamente';
+      this.modoNuevaCita = false;
+      this.limpiarFormulario();
+      this.cargarCitas();
+    },
+    error: err => {
+      console.error('Error al guardar cita', err);
+      this.mensaje = err.error?.message || 'Error al guardar cita';
+    }
+  });
+}
 
   limpiarFormulario(): void {
     this.cita = {
