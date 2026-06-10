@@ -1,0 +1,96 @@
+<div class="atencion-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Registro de Atención Médica</h1>
+      <p>Historia Clínica > {{ paciente?.nombres }} {{ paciente?.apellidos }} > Nueva atención</p>
+    </div>
+  </div>
+
+  <section class="patient-card" *ngIf="paciente">
+    <div class="avatar"></div>
+
+    <div>
+      <h2>{{ paciente.nombres }} {{ paciente.apellidos }}</h2>
+      <p>
+        DNI: {{ paciente.numeroDocumento }} |
+        {{ paciente.edad }} años |
+        {{ paciente.sexo }}
+      </p>
+    </div>
+
+    <span class="estado-activo">Activo</span>
+  </section>
+
+  <form class="form-grid" (ngSubmit)="guardarAtencion()">
+
+    <section class="form-section">
+      <h2>Información de la atención</h2>
+
+      <label>Fecha y hora *</label>
+      <input type="datetime-local" [(ngModel)]="atencion.fechaHora" name="fechaHora" required>
+
+      <label>Tipo de atención *</label>
+      <select [(ngModel)]="atencion.tipoAtencion" name="tipoAtencion" required>
+        <option value="CONSULTA">Consulta</option>
+        <option value="CONTROL">Control</option>
+        <option value="EMERGENCIA">Emergencia</option>
+        <option value="PREVENTIVA">Preventiva</option>
+      </select>
+
+      <label>Motivo de consulta *</label>
+      <input type="text" [(ngModel)]="atencion.motivoConsulta" name="motivoConsulta" required>
+    </section>
+
+    <section class="form-section">
+      <h2>Signos vitales</h2>
+
+      <label>Presión arterial</label>
+      <input type="text" [(ngModel)]="atencion.presionArterial" name="presionArterial">
+
+      <label>Temperatura</label>
+      <input type="number" step="0.1" [(ngModel)]="atencion.temperatura" name="temperatura">
+
+      <label>Saturación</label>
+      <input type="number" [(ngModel)]="atencion.saturacion" name="saturacion">
+
+      <label>Talla</label>
+      <input type="number" step="0.01" [(ngModel)]="atencion.talla" name="talla">
+
+      <label>Peso</label>
+      <input type="number" step="0.1" [(ngModel)]="atencion.peso" name="peso">
+    </section>
+
+    <section class="form-section">
+      <h2>Evaluación clínica</h2>
+
+      <label>Diagnóstico *</label>
+      <input type="text" [(ngModel)]="atencion.diagnostico" name="diagnostico" required>
+
+      <label>Observaciones</label>
+      <textarea [(ngModel)]="atencion.observaciones" name="observaciones"></textarea>
+    </section>
+
+    <section class="form-section">
+      <h2>Tratamiento / Indicaciones</h2>
+
+      <label>Tratamiento indicado *</label>
+      <textarea [(ngModel)]="atencion.tratamientoIndicado" name="tratamientoIndicado" required></textarea>
+
+      <label>Medicamentos</label>
+      <textarea [(ngModel)]="atencion.medicamentos" name="medicamentos"></textarea>
+    </section>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" [routerLink]="['/historias-clinicas', pacienteId]">
+        Cancelar
+      </button>
+
+      <button type="submit" class="btn-primary">
+        Guardar atención
+      </button>
+    </div>
+
+  </form>
+
+</div>
