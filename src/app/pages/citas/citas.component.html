@@ -256,15 +256,14 @@
             <td>{{ c.tipoCita }}</td>
 
             <td>
-
               <button
   class="btn-primary"
-    [routerLink]="[
-      '/atenciones/nueva',
-      c.paciente?.id,
-      'cita',
-      c.id
-    ]">
+  [routerLink]="[
+    '/atenciones/nueva',
+    c.paciente?.id,
+    'cita',
+    c.id
+  ]">
   Atender
 </button>
             </td>
