@@ -86,12 +86,32 @@ export class CitasComponent implements OnInit {
   }
 
   cargarMedicos(): void {
-    this.http.get<any[]>(`${this.api}/usuarios`).subscribe(data => {
-      this.medicos = (data || []).filter(u =>
-        (u.rol || '').toUpperCase().includes('MEDICO')
-      );
-    });
-  }
+
+  this.http.get<any[]>(`${this.api}/usuarios`).subscribe({
+    next: data => {
+
+      const usuarios = data || [];
+
+      this.medicos = usuarios.filter(u => {
+
+        const rol = (u.rol || '').toUpperCase();
+
+        return (
+          rol.includes('MEDICO') ||
+          rol.includes('ROLE_MEDICO') ||
+          rol.includes('MÉDICO')
+        );
+      });
+
+      console.log('MEDICOS CARGADOS:', this.medicos);
+    },
+
+    error: err => {
+      console.error('Error cargando médicos:', err);
+      this.medicos = [];
+    }
+  });
+}
 
   // =========================
   // BUSQUEDA
