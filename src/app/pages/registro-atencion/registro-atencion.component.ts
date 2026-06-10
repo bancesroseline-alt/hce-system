@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -16,11 +16,19 @@ export class RegistroAtencionComponent implements OnInit {
   paciente: any = null;
   pacienteId!: number;
 
+  citaId: number | null = null;
+  citaOrigen: any = null;
+
+  modoEmergencia = false;
+  mensaje = '';
+
   private api = 'https://hce-backend.onrender.com/api';
 
   atencion: any = {
+    pacienteId: null,
+    usuarioId: null,
     fechaHora: '',
-    tipoAtencion: 'CONSULTA',
+    tipoAtencion: '',
     motivoConsulta: '',
     presionArterial: '',
     temperatura: null,
@@ -31,7 +39,8 @@ export class RegistroAtencionComponent implements OnInit {
     observaciones: '',
     tratamientoIndicado: '',
     medicamentos: '',
-    estado: 'COMPLETADA'
+    estado: 'COMPLETADA',
+    citaId: null
   };
 
   constructor(
@@ -40,135 +49,189 @@ export class RegistroAtencionComponent implements OnInit {
     private http: HttpClient
   ) {}
 
-ngOnInit(): void {
+  ngOnInit(): void {
+    this.pacienteId = Number(this.route.snapshot.paramMap.get('pacienteId'));
+    this.citaId = Number(this.route.snapshot.paramMap.get('citaId')) || null;
 
-  console.log('================================');
-  console.log('URL actual:', this.router.url);
+    this.modoEmergencia = this.router.url.includes('/emergencia/');
 
-  console.log(
-    'pacienteId param:',
-    this.route.snapshot.paramMap.get('pacienteId')
-  );
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
 
-  console.log(
-    'citaId param:',
-    this.route.snapshot.paramMap.get('citaId')
-  );
+    this.atencion.pacienteId = this.pacienteId;
+    this.atencion.usuarioId = usuario.id || 2;
+    this.atencion.estado = 'COMPLETADA';
 
-  this.pacienteId = Number(
-    this.route.snapshot.paramMap.get('pacienteId')
-  );
+    if (!this.pacienteId || isNaN(this.pacienteId)) {
+      this.mensaje = 'Paciente inválido';
+      return;
+    }
 
-  console.log(
-    'pacienteId convertido:',
-    this.pacienteId
-  );
+    this.cargarPaciente();
 
-  console.log('================================');
-
-  const citaId =
-    this.route.snapshot.paramMap.get('citaId');
-
-  if (citaId) {
-
-    this.atencion.citaId = Number(citaId);
-
-    this.http.get<any>(
-      `${this.api}/citas/${citaId}`
-    ).subscribe({
-      next: cita => {
-
-        console.log('Cita cargada:', cita);
-
-        this.atencion.motivoConsulta =
-          cita.motivoConsulta || '';
-
-        if (cita.tipoCita) {
-          this.atencion.tipoAtencion =
-            cita.tipoCita;
-        }
-
-      },
-      error: err => {
-        console.error(
-          'Error al cargar cita',
-          err
-        );
-      }
-    });
+    if (this.modoEmergencia) {
+      this.prepararEmergencia();
+    } else if (this.citaId) {
+      this.cargarCita(this.citaId);
+    } else {
+      this.prepararAtencionManual();
+    }
   }
 
-  if (!isNaN(this.pacienteId)) {
+  getHeaders() {
+    const token = localStorage.getItem('token');
 
+    if (!token) return {};
+
+    return {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    };
+  }
+
+  cargarPaciente(): void {
     this.http.get<any>(
-      `${this.api}/pacientes/${this.pacienteId}`
+      `${this.api}/pacientes/${this.pacienteId}`,
+      this.getHeaders()
     ).subscribe({
       next: data => {
-
-        console.log(
-          'Paciente cargado:',
-          data
-        );
-
         this.paciente = data;
       },
       error: error => {
-        console.error(
-          'Error al cargar paciente',
-          error
-        );
+        console.error('Error al cargar paciente', error);
+        this.mensaje = 'No se pudo cargar el paciente';
       }
     });
-
-  } else {
-
-    console.error(
-      'pacienteId inválido:',
-      this.route.snapshot.paramMap.get('pacienteId')
-    );
-
   }
-}
-  
-guardarAtencion(): void {
 
-  const usuario = JSON.parse(
-    localStorage.getItem('usuario') || '{}'
-  );
+  prepararEmergencia(): void {
+    this.citaOrigen = null;
 
-  const payload = {
-    ...this.atencion,
-    pacienteId: this.pacienteId,
-    usuarioId: usuario.id || 2,
-    citaId: this.atencion.citaId || null
-  };
+    this.atencion.fechaHora = this.obtenerFechaHoraActualLocal();
+    this.atencion.tipoAtencion = 'EMERGENCIA';
+    this.atencion.motivoConsulta = '';
+    this.atencion.citaId = null;
+  }
 
-  console.log('========================');
-  console.log('pacienteId:', this.pacienteId);
-  console.log('usuarioId:', usuario.id);
-  console.log('citaId:', this.atencion.citaId);
-  console.log('Payload completo:', payload);
-  console.log('========================');
+  prepararAtencionManual(): void {
+    this.citaOrigen = null;
 
-  this.http.post(
-    `${this.api}/atenciones`,
-    payload
-  ).subscribe({
-    next: (resp) => {
-      console.log('Atención guardada', resp);
+    this.atencion.fechaHora = this.obtenerFechaHoraActualLocal();
+    this.atencion.tipoAtencion = 'CONSULTA';
+    this.atencion.citaId = null;
+  }
 
-      this.router.navigate([
-        '/historias-clinicas',
-        this.pacienteId
-      ]);
-    },
-    error: (err) => {
-      console.error(
-        'Error al guardar atención',
-        err
-      );
+  cargarCita(id: number): void {
+    this.http.get<any[]>(
+      `${this.api}/citas`,
+      this.getHeaders()
+    ).subscribe({
+      next: citas => {
+        const cita = (citas || []).find(c => Number(c.id) === Number(id));
+
+        if (!cita) {
+          this.mensaje = 'No se encontró la cita seleccionada';
+          return;
+        }
+
+        this.citaOrigen = cita;
+
+        this.atencion.citaId = cita.id;
+        this.atencion.fechaHora = `${cita.fecha}T${cita.hora}`;
+        this.atencion.tipoAtencion =
+          cita.tipoCita === 'PREVENTIVA' ? 'PREVENTIVA' : 'CONSULTA';
+        this.atencion.motivoConsulta = cita.motivoConsulta || '';
+      },
+      error: err => {
+        console.error('Error al cargar cita', err);
+        this.mensaje = 'Error al cargar datos de la cita';
+      }
+    });
+  }
+
+  obtenerFechaHoraActualLocal(): string {
+    const ahora = new Date();
+
+    const year = ahora.getFullYear();
+    const month = String(ahora.getMonth() + 1).padStart(2, '0');
+    const day = String(ahora.getDate()).padStart(2, '0');
+    const hours = String(ahora.getHours()).padStart(2, '0');
+    const minutes = String(ahora.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  guardarAtencion(): void {
+    this.mensaje = '';
+
+    if (!this.atencion.pacienteId) {
+      this.mensaje = 'El paciente es obligatorio';
+      return;
     }
-  });
-}
-  
+
+    if (!this.atencion.usuarioId) {
+      this.mensaje = 'El profesional de salud es obligatorio';
+      return;
+    }
+
+    if (!this.atencion.fechaHora) {
+      this.mensaje = 'La fecha y hora son obligatorias';
+      return;
+    }
+
+    if (!this.atencion.tipoAtencion) {
+      this.mensaje = 'El tipo de atención es obligatorio';
+      return;
+    }
+
+    if (!this.atencion.motivoConsulta?.trim()) {
+      this.mensaje = 'El motivo de consulta es obligatorio';
+      return;
+    }
+
+    if (!this.atencion.diagnostico?.trim()) {
+      this.mensaje = 'El diagnóstico es obligatorio';
+      return;
+    }
+
+    if (!this.atencion.tratamientoIndicado?.trim()) {
+      this.mensaje = 'El tratamiento indicado es obligatorio';
+      return;
+    }
+
+    const payload = {
+      pacienteId: Number(this.atencion.pacienteId),
+      usuarioId: Number(this.atencion.usuarioId),
+      fechaHora: this.atencion.fechaHora,
+      tipoAtencion: this.atencion.tipoAtencion,
+      motivoConsulta: this.atencion.motivoConsulta,
+      presionArterial: this.atencion.presionArterial,
+      temperatura: this.atencion.temperatura,
+      saturacion: this.atencion.saturacion,
+      talla: this.atencion.talla,
+      peso: this.atencion.peso,
+      diagnostico: this.atencion.diagnostico,
+      observaciones: this.atencion.observaciones,
+      tratamientoIndicado: this.atencion.tratamientoIndicado,
+      medicamentos: this.atencion.medicamentos,
+      estado: 'COMPLETADA',
+      citaId: this.atencion.citaId ? Number(this.atencion.citaId) : null
+    };
+
+    console.log('Payload atención:', payload);
+
+    this.http.post(
+      `${this.api}/atenciones`,
+      payload,
+      this.getHeaders()
+    ).subscribe({
+      next: () => {
+        this.router.navigate(['/historias-clinicas', this.pacienteId]);
+      },
+      error: err => {
+        console.error('Error al guardar atención', err);
+        this.mensaje = err.error?.message || 'Error al registrar atención';
+      }
+    });
+  }
 }
