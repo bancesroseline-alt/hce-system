@@ -91,36 +91,16 @@ if (usuario?.id) {
     });
   }
 
- cargarMedicos(): void {
-  this.http.get<any[]>(`${this.api}/usuarios`)
+cargarMedicos(): void {
+  this.http.get<any[]>(`${this.api}/usuarios/medicos`)
     .subscribe({
       next: data => {
-        this.medicos = (data || []).filter(u => {
-          const rol = (u.rol || '').toString()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace('ROLE_', '')
-            .toUpperCase();
-
-          return rol === 'MEDICO';
-        });
-
-        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-
-        const rolUsuario = (usuario.rol || '').toString()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace('ROLE_', '')
-          .toUpperCase();
-
-        if (
-          rolUsuario === 'MEDICO' &&
-          !this.medicos.some(m => m.id === usuario.id)
-        ) {
-          this.medicos.push(usuario);
-        }
+        this.medicos = data || [];
       },
-      error: error => console.error('Error al cargar médicos', error)
+      error: err => {
+        console.error('Error al cargar médicos', err);
+        this.medicos = [];
+      }
     });
 }
 
