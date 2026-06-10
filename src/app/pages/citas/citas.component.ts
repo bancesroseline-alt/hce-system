@@ -349,8 +349,11 @@ guardar(): void {
   }
 
   filtrarCitasPorDia(): void {
-    const iso = this.formatearFecha(this.fechaSeleccionada);
-    this.citasDelDia = this.citas.filter(c => c.fecha === iso);
+  const iso = this.formatearFecha(this.fechaSeleccionada);
+
+  this.citasDelDia = this.citas
+    .filter(c => c.fecha === iso)
+    .sort((a, b) => a.hora.localeCompare(b.hora));
   }
 
   formatearFecha(fecha: Date): string {
