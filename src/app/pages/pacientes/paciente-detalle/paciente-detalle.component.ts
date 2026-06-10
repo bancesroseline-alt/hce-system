@@ -14,7 +14,7 @@ import { Paciente } from '../../../models/paciente.model';
 })
 export class PacienteDetalleComponent {
 
-  paciente!: Paciente;
+  paciente: Paciente | null = null; // ✔ FIX IMPORTANTE
 
   constructor(
     private route: ActivatedRoute,
@@ -25,11 +25,17 @@ export class PacienteDetalleComponent {
 
     const id = this.route.snapshot.paramMap.get('id');
 
-    if (id) {
-      this.pacienteService.obtener(Number(id))
-        .subscribe(data => {
+    if (!id) return;
+
+    this.pacienteService.obtener(Number(id))
+      .subscribe({
+        next: (data) => {
           this.paciente = data;
-        });
-    }
+        },
+        error: (err) => {
+          console.error('Error cargando paciente', err);
+          this.paciente = null;
+        }
+      });
   }
 }
