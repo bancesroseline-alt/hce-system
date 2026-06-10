@@ -3,13 +3,17 @@
   <div class="page-header">
     <div>
       <h1 *ngIf="!modoEditar">Historial de citas</h1>
-      <h1 *ngIf="modoEditar">Detalle de la cita</h1>
+      <h1 *ngIf="modoEditar">
+        {{ citaEditando?.estado === 'ATENDIDA' ? 'Detalle de la cita' : 'Editar cita' }}
+      </h1>
 
       <p>
         <a routerLink="/pacientes">Pacientes</a>
         <span>›</span>
         <span *ngIf="!modoEditar">Historial de citas</span>
-        <span *ngIf="modoEditar">Detalle de cita</span>
+        <span *ngIf="modoEditar">
+          {{ citaEditando?.estado === 'ATENDIDA' ? 'Detalle de cita' : 'Editar cita' }}
+        </span>
       </p>
     </div>
 
@@ -107,7 +111,14 @@
           <td>{{ c.motivoConsulta }}</td>
 
           <td>
-            <span class="badge" [ngClass]="(c.estado || '').toLowerCase()">
+            <span
+              class="badge"
+              [ngClass]="{
+                'programada': c.estado === 'PROGRAMADA',
+                'atendida': c.estado === 'ATENDIDA',
+                'cancelada': c.estado === 'CANCELADA',
+                'no_asistio': c.estado === 'NO_ASISTIO'
+              }">
               {{ c.estado }}
             </span>
           </td>
@@ -131,10 +142,17 @@
     <div class="detalle-card">
       <h2>Información de la cita</h2>
 
+      <div class="alerta-info" *ngIf="citaEditando.estado === 'ATENDIDA'">
+        Esta cita ya fue atendida. Solo puede visualizarse y no permite modificaciones.
+      </div>
+
       <div class="form-grid">
+
         <div class="form-group">
           <label>Tipo de cita *</label>
-          <select [(ngModel)]="citaEditando.tipoCita">
+          <select
+            [(ngModel)]="citaEditando.tipoCita"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
             <option value="CONSULTA">Consulta</option>
             <option value="PREVENTIVA">Preventiva</option>
           </select>
@@ -142,27 +160,41 @@
 
         <div class="form-group">
           <label>Fecha *</label>
-          <input type="date" [(ngModel)]="citaEditando.fecha">
+          <input
+            type="date"
+            [(ngModel)]="citaEditando.fecha"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
         </div>
 
         <div class="form-group">
           <label>Hora *</label>
-          <input type="time" [(ngModel)]="citaEditando.hora">
+          <input
+            type="time"
+            [(ngModel)]="citaEditando.hora"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
         </div>
 
         <div class="form-group">
           <label>Especialidad *</label>
-          <input type="text" [(ngModel)]="citaEditando.especialidad">
+          <input
+            type="text"
+            [(ngModel)]="citaEditando.especialidad"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
         </div>
 
         <div class="form-group full">
           <label>Motivo de consulta *</label>
-          <textarea [(ngModel)]="citaEditando.motivoConsulta"></textarea>
+          <textarea
+            [(ngModel)]="citaEditando.motivoConsulta"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
+          </textarea>
         </div>
 
         <div class="form-group">
           <label>Médico *</label>
-          <select [(ngModel)]="citaEditando.medicoId">
+          <select
+            [(ngModel)]="citaEditando.medicoId"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
             <option [ngValue]="null">Seleccione médico</option>
             <option *ngFor="let m of medicos" [ngValue]="m.id">
               {{ m.nombres }} {{ m.apellidos }} - {{ m.username }}
@@ -172,13 +204,15 @@
 
         <div class="form-group">
           <label>Estado</label>
-          <select [(ngModel)]="citaEditando.estado">
+          <select
+            [(ngModel)]="citaEditando.estado"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
             <option value="PROGRAMADA">Programada</option>
-            <option value="ATENDIDA">Atendida</option>
             <option value="CANCELADA">Cancelada</option>
             <option value="NO_ASISTIO">No asistió</option>
           </select>
         </div>
+
       </div>
     </div>
 
@@ -195,15 +229,26 @@
       <div class="acciones-card">
         <h4>Acciones</h4>
 
-        <button class="btn-guardar" type="button" (click)="guardarCambios()">
+        <button
+          class="btn-guardar"
+          type="button"
+          (click)="guardarCambios()"
+          *ngIf="citaEditando.estado !== 'ATENDIDA'">
           Guardar cambios
         </button>
 
-        <button class="btn-secondary" type="button" (click)="cancelarEdicion()">
-          Cancelar
+        <button
+          class="btn-secondary"
+          type="button"
+          (click)="cancelarEdicion()">
+          Volver
         </button>
 
-        <button class="btn-danger" type="button" [(ngModel)]="citaEditando.estado" (click)="citaEditando.estado = 'CANCELADA'; guardarCambios()">
+        <button
+          class="btn-danger"
+          type="button"
+          *ngIf="citaEditando.estado !== 'ATENDIDA'"
+          (click)="citaEditando.estado = 'CANCELADA'; guardarCambios()">
           Cancelar cita
         </button>
       </div>
