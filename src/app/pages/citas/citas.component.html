@@ -244,12 +244,17 @@
             <td>
 
               <span
-                class="badge"
-                [ngClass]="(c.estado || '').toLowerCase()">
+  class="badge"
+  [ngClass]="{
+    'badge-programada': c.estado === 'PROGRAMADA',
+    'badge-atendida': c.estado === 'ATENDIDA',
+    'badge-cancelada': c.estado === 'CANCELADA',
+    'badge-no-asistio': c.estado === 'NO_ASISTIO'
+  }">
 
-                {{ c.estado || 'SIN_ESTADO' }}
+  {{ c.estado || 'SIN_ESTADO' }}
 
-              </span>
+</span>
 
             </td>
 
