@@ -2,17 +2,60 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h2>HCE</h2>
+
+    <div class="brand">
+      <div class="brand-icon">✚</div>
+      <div>
+        <h2>HCE</h2>
+        <span>Sistema Clínico</span>
+      </div>
+    </div>
 
     <nav>
-      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      <a routerLink="/pacientes" routerLinkActive="active">Pacientes</a>
-      <a routerLink="/citas" routerLinkActive="active">Citas</a>
-      <a routerLink="/historias-clinicas" routerLinkActive="active">Historia Clínica</a>
-      <a routerLink="/prediccion" routerLinkActive="active">Predicción</a>
-      <a routerLink="/sincronizacion" routerLinkActive="active">Sincronización</a>
-      <a routerLink="/reportes" routerLinkActive="active">Reportes</a>
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+
+      <a routerLink="/pacientes" routerLinkActive="active">
+        <span class="nav-icon">👥</span>
+        <span>Pacientes</span>
+      </a>
+
+      <a routerLink="/citas" routerLinkActive="active">
+        <span class="nav-icon">📅</span>
+        <span>Citas</span>
+      </a>
+
+      <a routerLink="/historias-clinicas" routerLinkActive="active">
+        <span class="nav-icon">📋</span>
+        <span>Historia Clínica</span>
+      </a>
+
+      <a routerLink="/prediccion" routerLinkActive="active">
+        <span class="nav-icon">🤖</span>
+        <span>Predicción</span>
+      </a>
+
+      <a routerLink="/sincronizacion" routerLinkActive="active">
+        <span class="nav-icon">🔄</span>
+        <span>Sincronización</span>
+      </a>
+
+      <a routerLink="/reportes" routerLinkActive="active">
+        <span class="nav-icon">📊</span>
+        <span>Reportes</span>
+      </a>
     </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-dot"></div>
+      <div>
+        <strong>Modo online</strong>
+        <span>Servicios activos</span>
+      </div>
+    </div>
+
   </aside>
 
   <!-- CONTENIDO -->
@@ -20,34 +63,59 @@
 
     <!-- HEADER -->
     <header class="top-header">
-  <h3>Sistema HCE</h3>
 
-  <div class="header-actions">
-    <button class="notification-btn" title="Notificaciones">
-      🔔
-      <span class="notification-badge">3</span>
-    </button>
+      <div class="header-title">
+        <h3>Sistema HCE</h3>
+        <span>Gestión de historias clínicas</span>
+      </div>
 
-    <div class="user-menu">
-      <button class="user-menu-btn" (click)="toggleUserMenu()">
-        👤
-        <span>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</span>
-        <span>⌄</span>
-      </button>
+      <div class="header-actions">
 
-      <div class="dropdown" *ngIf="mostrarMenuUsuario">
-        <div class="dropdown-user">
-          <strong>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</strong>
-          <small>{{ usuario?.rol || 'Usuario' }}</small>
+        <button class="notification-btn" title="Notificaciones">
+          🔔
+          <span class="notification-badge">3</span>
+        </button>
+
+        <div class="user-menu">
+
+          <button class="user-menu-btn" (click)="toggleUserMenu()">
+            <div class="user-avatar">
+              {{ (usuario?.nombres || usuario?.username || 'U').charAt(0) }}
+            </div>
+
+            <div class="user-info">
+              <strong>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</strong>
+              <small>{{ usuario?.rol || 'Usuario' }}</small>
+            </div>
+
+            <span class="chevron">⌄</span>
+          </button>
+
+          <div class="dropdown" *ngIf="mostrarMenuUsuario">
+
+            <div class="dropdown-user">
+              <div class="dropdown-avatar">
+                {{ (usuario?.nombres || usuario?.username || 'U').charAt(0) }}
+              </div>
+
+              <div>
+                <strong>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</strong>
+                <small>{{ usuario?.rol || 'Usuario' }}</small>
+              </div>
+            </div>
+
+            <button routerLink="/configuracion">⚙️ Configuración</button>
+            <button routerLink="/perfil">👤 Mi perfil</button>
+            <button class="logout" (click)="logout()">🚪 Cerrar sesión</button>
+
+          </div>
+
         </div>
 
-        <button routerLink="/configuracion">⚙️ Configuración</button>
-        <button routerLink="/perfil">👤 Mi perfil</button>
-        <button class="logout" (click)="logout()">🚪 Cerrar sesión</button>
       </div>
-    </div>
-  </div>
-</header>
+
+    </header>
+
     <!-- CONTENIDO DINÁMICO -->
     <main>
       <router-outlet></router-outlet>
