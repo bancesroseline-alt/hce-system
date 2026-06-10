@@ -1,373 +1,313 @@
-.citas-page {
-  padding: 28px;
-  background: #f7f9fc;
-  min-height: calc(100vh - 68px);
-}
+<div class="citas-page">
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
+  <!-- ENCABEZADO -->
+  <div class="page-header">
+    <div>
+      <h1>Citas</h1>
+      <p>Gestiona y visualiza las citas programadas</p>
+    </div>
 
-.page-header h1 {
-  margin: 0;
-  font-size: 30px;
-  color: #0f172a;
-}
+    <button class="btn-primary" (click)="modoNuevaCita = true">
+      + Nueva cita
+    </button>
+  </div>
 
-.page-header p {
-  margin-top: 6px;
-  color: #64748b;
-}
+  <!-- MENSAJE -->
+  <div *ngIf="mensaje" class="success">
+    {{ mensaje }}
+  </div>
 
-.content-grid {
-  display: grid;
-  grid-template-columns: 2.2fr 1fr;
-  gap: 24px;
-}
+  <!-- FORMULARIO NUEVA CITA -->
+  <section class="form-card" *ngIf="modoNuevaCita">
+    <h2>Nueva cita</h2>
 
-.panel,
-.side-panel > div,
-.form-card {
-  background: white;
-  border: 1px solid #dbe3ec;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, .08);
-}
+    <div class="form-grid">
 
-.citas-panel {
-  padding: 20px;
-}
+      <!-- BUSCAR PACIENTE -->
+      <div class="form-group buscador">
+        <label>Paciente</label>
 
-.panel-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
-}
+        <div class="search-wrapper">
+          <input
+            type="text"
+            placeholder="Buscar por ID, nombre o DNI"
+            [(ngModel)]="busquedaPaciente"
+            (input)="cita.paciente.id = null">
 
-.panel-title h2,
-.calendar-card h2,
-.summary-card h2,
-.form-card h2 {
-  margin: 0;
-  font-size: 20px;
-  color: #0f172a;
-}
+          <button
+            type="button"
+            class="clear-btn"
+            *ngIf="busquedaPaciente"
+            (click)="limpiarPaciente()">
+            ×
+          </button>
+        </div>
 
-.panel-title p {
-  color: #64748b;
-  font-weight: 700;
-}
+        <div class="resultados" *ngIf="busquedaPaciente && !cita.paciente.id">
+          <button
+            type="button"
+            *ngFor="let p of pacientesFiltrados()"
+            (click)="seleccionarPaciente(p)">
+            {{ p.id }} - {{ p.nombres }} {{ p.apellidos }} - DNI {{ p.numeroDocumento }}
+          </button>
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+          <div class="no-results" *ngIf="pacientesFiltrados().length === 0">
+            No se encontraron pacientes.
+          </div>
+        </div>
+      </div>
 
-thead {
-  background: #f1f5f9;
-}
+      <!-- BUSCAR MÉDICO -->
+      <div class="form-group buscador">
+        <label>Médico</label>
 
-th,
-td {
-  padding: 14px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
-  font-size: 14px;
-}
+        <div class="search-wrapper">
+          <input
+            type="text"
+            placeholder="Buscar por ID o nombre del médico"
+            [(ngModel)]="busquedaMedico"
+            (input)="cita.medico.id = null">
 
-th {
-  color: #475569;
-  font-weight: 800;
-}
+          <button
+            type="button"
+            class="clear-btn"
+            *ngIf="busquedaMedico"
+            (click)="limpiarMedico()">
+            ×
+          </button>
+        </div>
 
-.badge {
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-}
+        <div class="resultados" *ngIf="busquedaMedico && !cita.medico.id">
+          <button
+            type="button"
+            *ngFor="let m of medicosFiltrados()"
+            (click)="seleccionarMedico(m)">
+            {{ m.id }} - {{ obtenerNombreUsuario(m) }}
+          </button>
 
-.badge.programada {
-  background: #dcfce7;
-  color: #16a34a;
-}
+          <div class="no-results" *ngIf="medicosFiltrados().length === 0">
+            No se encontraron médicos.
+          </div>
+        </div>
+      </div>
 
-.badge.cancelada {
-  background: #f1f5f9;
-  color: #64748b;
-}
+      <!-- TIPO DE CITA -->
+      <div class="form-group">
+        <label>Tipo de cita</label>
 
-.badge.no_asistio {
-  background: #fee2e2;
-  color: #dc2626;
-}
+        <select [(ngModel)]="cita.tipoCita">
+          <option value="CONSULTA">Consulta</option>
+          <option value="PREVENTIVA">Preventiva</option>
+        </select>
+      </div>
 
-.badge.atendida {
-  background: #dbeafe;
-  color: #2563eb;
-}
+      <!-- FECHA -->
+      <div class="form-group">
+        <label>Fecha</label>
 
-.btn-primary {
-  background: #0ea5e9;
-  color: white;
-  border: none;
-  padding: 11px 18px;
-  border-radius: 10px;
-  font-weight: 800;
-  cursor: pointer;
-}
+        <input
+          type="date"
+          [(ngModel)]="cita.fecha">
+      </div>
 
-.btn-primary:hover {
-  background: #0284c7;
-}
+      <!-- HORA -->
+      <div class="form-group">
+        <label>Hora</label>
 
-.btn-secondary {
-  background: white;
-  color: #334155;
-  border: 1px solid #cbd5e1;
-  padding: 11px 18px;
-  border-radius: 10px;
-  font-weight: 800;
-  cursor: pointer;
-}
+        <input
+          type="time"
+          [(ngModel)]="cita.hora">
+      </div>
 
-.btn-action {
-  background: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #bfdbfe;
-  padding: 8px 12px;
-  border-radius: 9px;
-  font-weight: 800;
-  cursor: pointer;
-}
+      <!-- ESPECIALIDAD -->
+      <div class="form-group">
+        <label>Especialidad</label>
 
-.btn-action:hover {
-  background: #dbeafe;
-}
+        <input
+          type="text"
+          placeholder="Ej. Medicina general"
+          [(ngModel)]="cita.especialidad">
+      </div>
 
-.side-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+      <!-- MOTIVO -->
+      <div class="form-group full">
+        <label>Motivo de consulta</label>
 
-.calendar-card,
-.summary-card {
-  padding: 20px;
-}
+        <textarea
+          placeholder="Describe el motivo de consulta"
+          [(ngModel)]="cita.motivoConsulta">
+        </textarea>
+      </div>
 
-.calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
+    </div>
 
-.calendar-header h2 {
-  margin: 0;
-  font-size: 16px;
-}
+    <!-- ACCIONES FORMULARIO -->
+    <div class="actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="modoNuevaCita = false">
+        Cancelar
+      </button>
 
-.calendar-nav {
-  border: none;
-  background: #f1f5f9;
-  color: #0f172a;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 900;
-}
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="guardar()">
+        Guardar cita
+      </button>
+    </div>
+  </section>
 
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 7px;
-  text-align: center;
-}
+  <!-- LISTADO + CALENDARIO -->
+  <div class="content-grid" *ngIf="!modoNuevaCita">
 
-.day-name {
-  font-size: 12px;
-  font-weight: 800;
-  color: #64748b;
-  padding: 4px;
-}
+    <!-- TABLA CITAS -->
+    <section class="panel citas-panel">
 
-.calendar-day {
-  position: relative;
-  border: none;
-  background: #f8fafc;
-  color: #334155;
-  min-height: 34px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
-}
+      <div class="panel-title">
+        <div>
+          <h2>Citas del día</h2>
+          <p>{{ formatearFecha(fechaSeleccionada) }}</p>
+        </div>
+      </div>
 
-.calendar-day:hover {
-  background: #e0f2fe;
-}
+      <table>
+        <thead>
+          <tr>
+            <th>Hora</th>
+            <th>Paciente</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
 
-.empty-day {
-  background: transparent;
-  cursor: default;
-}
+        <tbody>
 
-.active-day {
-  background: #0ea5e9 !important;
-  color: white;
-}
+          <tr *ngFor="let c of citasDelDia">
+            <td>{{ c.hora }}</td>
 
-.has-citas {
-  border: 1px solid #0ea5e9;
-}
+            <td>
+              {{ c.pacienteNombre || c.paciente?.nombres || 'Paciente' }}
+            </td>
 
-.dot {
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 5px;
-  height: 5px;
-  background: #0ea5e9;
-  border-radius: 50%;
-}
+            <td>{{ c.motivoConsulta }}</td>
 
-.active-day .dot {
-  background: white;
-}
+            <td>
+              <span class="badge" [ngClass]="c.estado?.toLowerCase()">
+                {{ c.estado }}
+              </span>
+            </td>
 
-.summary-card p {
-  display: flex;
-  justify-content: space-between;
-  color: #475569;
-  margin: 12px 0;
-}
+            <td>{{ c.tipoCita }}</td>
 
-.form-card {
-  padding: 24px;
-}
+            <td>
+              <button
+                type="button"
+                class="btn-action"
+                [routerLink]="['/atenciones/nueva', c.pacienteId || c.paciente?.id, 'cita', c.id]">
+                Atender
+              </button>
+            </td>
+          </tr>
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px 24px;
-}
+          <tr *ngIf="citasDelDia.length === 0">
+            <td colspan="6" class="empty">
+              No hay citas registradas para este día.
+            </td>
+          </tr>
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
+        </tbody>
+      </table>
 
-.form-group.full {
-  grid-column: 1 / -1;
-}
+    </section>
 
-.form-group label {
-  font-weight: 700;
-  color: #334155;
-  font-size: 13px;
-}
+    <!-- PANEL DERECHO -->
+    <aside class="side-panel">
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-  border: 1px solid #cbd5e1;
-  border-radius: 9px;
-  padding: 11px;
-}
+      <!-- CALENDARIO FUNCIONAL -->
+      <div class="calendar-card">
 
-.form-group textarea {
-  min-height: 90px;
-}
+        <div class="calendar-header">
+          <button
+            type="button"
+            class="calendar-nav"
+            (click)="mesAnterior()">
+            ‹
+          </button>
 
-.buscador {
-  position: relative;
-}
+          <h2>{{ nombreMesActual }}</h2>
 
-.search-wrapper {
-  position: relative;
-}
+          <button
+            type="button"
+            class="calendar-nav"
+            (click)="mesSiguiente()">
+            ›
+          </button>
+        </div>
 
-.search-wrapper input {
-  width: 100%;
-  padding-right: 36px;
-}
+        <div class="calendar-grid">
 
-.clear-btn {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
-  background: #f1f5f9;
-  color: #475569;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-weight: 900;
-}
+          <span
+            class="day-name"
+            *ngFor="let d of diasSemana">
+            {{ d }}
+          </span>
 
-.resultados {
-  position: absolute;
-  top: 72px;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, .12);
-  z-index: 20;
-  max-height: 210px;
-  overflow-y: auto;
-}
+          <button
+            type="button"
+            class="calendar-day"
+            *ngFor="let item of diasCalendario"
+            [class.empty-day]="!item.fecha"
+            [class.active-day]="item.seleccionado"
+            [class.has-citas]="item.tieneCitas"
+            (click)="seleccionarDia(item)">
 
-.resultados button {
-  width: 100%;
-  border: none;
-  background: white;
-  padding: 10px 12px;
-  text-align: left;
-  cursor: pointer;
-  font-weight: 600;
-  color: #334155;
-}
+            {{ item.dia }}
 
-.resultados button:hover {
-  background: #f1f5f9;
-}
+            <span
+              *ngIf="item.tieneCitas"
+              class="dot">
+            </span>
+          </button>
 
-.no-results {
-  padding: 12px;
-  color: #64748b;
-  font-weight: 700;
-}
+        </div>
+      </div>
 
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-}
+      <!-- RESUMEN DEL DÍA -->
+      <div class="summary-card">
+        <h2>Resumen del día</h2>
 
-.success {
-  background: #dcfce7;
-  color: #166534;
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin-bottom: 18px;
-  font-weight: 700;
-}
+        <p>
+          Fecha seleccionada
+          <strong>{{ formatearFecha(fechaSeleccionada) }}</strong>
+        </p>
 
-.empty {
-  text-align: center;
-  padding: 28px;
-  color: #64748b;
-  font-weight: 700;
-}
+        <p>
+          Citas del día
+          <strong>{{ citasDelDia.length }}</strong>
+        </p>
+
+        <p>
+          Programadas
+          <strong>{{ contarPorEstado('PROGRAMADA') }}</strong>
+        </p>
+
+        <p>
+          No asistió
+          <strong>{{ contarPorEstado('NO_ASISTIO') }}</strong>
+        </p>
+
+        <p>
+          Canceladas
+          <strong>{{ contarPorEstado('CANCELADA') }}</strong>
+        </p>
+      </div>
+
+    </aside>
+
+  </div>
+
+</div>
