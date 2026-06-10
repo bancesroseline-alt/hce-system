@@ -1,3 +1,4 @@
+
 <div class="page">
 
   <!-- HEADER -->
@@ -6,10 +7,19 @@
     <div>
       <h1>Detalle del paciente</h1>
 
+      <!-- BREADCRUMB MEJORADO -->
       <div class="breadcrumb">
-        <a routerLink="/pacientes">Pacientes</a>
-        <span>></span>
-        <span>Detalle</span>
+
+        <a routerLink="/pacientes" class="breadcrumb-link">
+          Pacientes
+        </a>
+
+        <span class="separator">›</span>
+
+        <span class="breadcrumb-current">
+          {{ paciente ? 'Detalle paciente' : 'Cargando...' }}
+        </span>
+
       </div>
     </div>
 
@@ -23,12 +33,15 @@
     <div class="detail-grid">
 
       <div><strong>DNI:</strong> {{ paciente.numeroDocumento }}</div>
+
       <div><strong>Tipo:</strong> {{ paciente.tipoDocumento }}</div>
 
       <div><strong>Edad:</strong> {{ paciente.edad }}</div>
+
       <div><strong>Sexo:</strong> {{ paciente.sexo }}</div>
 
       <div><strong>Estado civil:</strong> {{ paciente.estadoCivil }}</div>
+
       <div><strong>Teléfono:</strong> {{ paciente.telefono }}</div>
 
       <div class="full">
@@ -47,35 +60,31 @@
 
     </div>
 
-    <!-- BOTONES ACCIONES -->
+    <!-- BOTONES -->
     <div class="buttons">
 
       <button routerLink="/pacientes" class="btn-cancel">
         Volver
       </button>
 
-      <!-- EDITAR -->
       <button
         class="btn-save"
         [routerLink]="['/pacientes/editar', paciente.id]">
         Editar paciente
       </button>
 
-      <!-- HISTORIA CLÍNICA -->
       <button
         class="btn-save"
         [routerLink]="['/historias-clinicas', paciente.id]">
         Historia clínica
       </button>
 
-      <!-- NUEVA ATENCIÓN -->
       <button
         class="btn-save"
         [routerLink]="['/citas/nueva', paciente.id]">
         Nueva atención
       </button>
 
-      <!-- CITAS -->
       <button
         class="btn-save"
         [routerLink]="['/citas/paciente', paciente.id]">
