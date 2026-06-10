@@ -80,25 +80,35 @@ export class RegistroAtencionComponent implements OnInit {
       }
     });
 }
+guardarAtencion(): void {
 
-  guardarAtencion(): void {
-    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  const usuario =
+    JSON.parse(localStorage.getItem('usuario') || '{}');
 
-    const payload = {
-      ...this.atencion,
-      pacienteId: this.pacienteId,
-      usuarioId: usuario.id || 2,
-      citaId: this.atencion.citaId || null
-    };
+  const payload = {
+    ...this.atencion,
+    pacienteId: this.pacienteId,
+    usuarioId: usuario.id || 2,
+    citaId: this.atencion.citaId || null
+  };
 
-    this.http.post(`${this.api}/atenciones`, payload)
-      .subscribe({
-        next: () => {
-          this.router.navigate(['/historias-clinicas', this.pacienteId]);
-        },
-        error: error => {
-          console.error('Error al guardar atención', error);
-        }
-      });
-  }
+  console.log('Payload atención:', payload);
+
+  this.http.post(
+    `${this.api}/atenciones`,
+    payload
+  ).subscribe({
+    next: (resp) => {
+      console.log('Atención guardada', resp);
+
+      this.router.navigate([
+        '/historias-clinicas',
+        this.pacienteId
+      ]);
+    },
+    error: (err) => {
+      console.error('Error al guardar atención', err);
+    }
+  });
+}
 }
