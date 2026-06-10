@@ -47,10 +47,41 @@
 
     </div>
 
+    <!-- BOTONES ACCIONES -->
     <div class="buttons">
+
       <button routerLink="/pacientes" class="btn-cancel">
         Volver
       </button>
+
+      <!-- EDITAR -->
+      <button
+        class="btn-save"
+        [routerLink]="['/pacientes/editar', paciente.id]">
+        Editar paciente
+      </button>
+
+      <!-- HISTORIA CLÍNICA -->
+      <button
+        class="btn-save"
+        [routerLink]="['/historias-clinicas', paciente.id]">
+        Historia clínica
+      </button>
+
+      <!-- NUEVA ATENCIÓN -->
+      <button
+        class="btn-save"
+        [routerLink]="['/citas/nueva', paciente.id]">
+        Nueva atención
+      </button>
+
+      <!-- CITAS -->
+      <button
+        class="btn-save"
+        [routerLink]="['/citas/paciente', paciente.id]">
+        Ver citas
+      </button>
+
     </div>
 
   </div>
