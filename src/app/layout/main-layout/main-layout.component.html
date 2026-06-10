@@ -4,57 +4,50 @@
   <aside class="sidebar">
 
     <div class="brand">
-      <div class="brand-icon">✚</div>
-      <div>
+      <div class="brand-mark">H</div>
+
+      <div class="brand-text">
         <h2>HCE</h2>
-        <span>Sistema Clínico</span>
+        <span>Sistema clínico</span>
       </div>
     </div>
 
-    <nav>
+    <nav class="menu">
       <a routerLink="/dashboard" routerLinkActive="active">
-        <span class="nav-icon">🏠</span>
+        <span class="nav-icon">D</span>
         <span>Dashboard</span>
       </a>
 
       <a routerLink="/pacientes" routerLinkActive="active">
-        <span class="nav-icon">👥</span>
+        <span class="nav-icon">P</span>
         <span>Pacientes</span>
       </a>
 
       <a routerLink="/citas" routerLinkActive="active">
-        <span class="nav-icon">📅</span>
+        <span class="nav-icon">C</span>
         <span>Citas</span>
       </a>
 
       <a routerLink="/historias-clinicas" routerLinkActive="active">
-        <span class="nav-icon">📋</span>
+        <span class="nav-icon">H</span>
         <span>Historia Clínica</span>
       </a>
 
       <a routerLink="/prediccion" routerLinkActive="active">
-        <span class="nav-icon">🤖</span>
+        <span class="nav-icon">ML</span>
         <span>Predicción</span>
       </a>
 
       <a routerLink="/sincronizacion" routerLinkActive="active">
-        <span class="nav-icon">🔄</span>
+        <span class="nav-icon">S</span>
         <span>Sincronización</span>
       </a>
 
       <a routerLink="/reportes" routerLinkActive="active">
-        <span class="nav-icon">📊</span>
+        <span class="nav-icon">R</span>
         <span>Reportes</span>
       </a>
     </nav>
-
-    <div class="sidebar-footer">
-      <div class="status-dot"></div>
-      <div>
-        <strong>Modo online</strong>
-        <span>Servicios activos</span>
-      </div>
-    </div>
 
   </aside>
 
@@ -79,35 +72,26 @@
         <div class="user-menu">
 
           <button class="user-menu-btn" (click)="toggleUserMenu()">
-            <div class="user-avatar">
+            <span class="user-avatar">
               {{ (usuario?.nombres || usuario?.username || 'U').charAt(0) }}
-            </div>
+            </span>
 
-            <div class="user-info">
-              <strong>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</strong>
-              <small>{{ usuario?.rol || 'Usuario' }}</small>
-            </div>
+            <span class="user-name">
+              {{ usuario?.nombres || usuario?.username || 'Usuario' }}
+            </span>
 
             <span class="chevron">⌄</span>
           </button>
 
           <div class="dropdown" *ngIf="mostrarMenuUsuario">
-
             <div class="dropdown-user">
-              <div class="dropdown-avatar">
-                {{ (usuario?.nombres || usuario?.username || 'U').charAt(0) }}
-              </div>
-
-              <div>
-                <strong>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</strong>
-                <small>{{ usuario?.rol || 'Usuario' }}</small>
-              </div>
+              <strong>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</strong>
+              <small>{{ usuario?.rol || 'Usuario' }}</small>
             </div>
 
-            <button routerLink="/configuracion">⚙️ Configuración</button>
-            <button routerLink="/perfil">👤 Mi perfil</button>
-            <button class="logout" (click)="logout()">🚪 Cerrar sesión</button>
-
+            <button routerLink="/configuracion">Configuración</button>
+            <button routerLink="/perfil">Mi perfil</button>
+            <button class="logout" (click)="logout()">Cerrar sesión</button>
           </div>
 
         </div>
