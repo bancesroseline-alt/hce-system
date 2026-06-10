@@ -12,6 +12,9 @@ import { HttpClient } from '@angular/common/http';
 })
 export class HistoriaComponent implements OnInit {
 
+  modoListado = true;
+
+  pacientes: any[] = [];
   paciente: any = null;
   atenciones: any[] = [];
   citasProgramadas: any[] = [];
@@ -29,26 +32,46 @@ export class HistoriaComponent implements OnInit {
   ngOnInit(): void {
     const pacienteId = Number(this.route.snapshot.paramMap.get('id'));
 
-    if (!pacienteId) return;
+    if (pacienteId) {
+      this.modoListado = false;
+      this.cargarDetallePaciente(pacienteId);
+    } else {
+      this.modoListado = true;
+      this.cargarListadoHistorias();
+    }
+  }
 
+  cargarListadoHistorias(): void {
+    this.http.get<any[]>(`${this.api}/pacientes`)
+      .subscribe({
+        next: data => {
+          this.pacientes = data || [];
+        },
+        error: error => {
+          console.error('Error al cargar pacientes', error);
+        }
+      });
+  }
+
+  cargarDetallePaciente(pacienteId: number): void {
     this.http.get<any>(`${this.api}/historias-clinicas/paciente/${pacienteId}`)
       .subscribe({
-        next: (data) => {
+        next: data => {
           this.paciente = data.paciente;
           this.atenciones = data.atenciones || [];
         },
-        error: (error) => {
+        error: error => {
           console.error('Error al cargar historia clínica', error);
         }
       });
 
     this.http.get<any[]>(`${this.api}/citas/paciente/${pacienteId}`)
       .subscribe({
-        next: (citas) => {
-          this.citasProgramadas = citas.filter(c => c.estado !== 'NO_ASISTIO');
-          this.citasNoAsistidas = citas.filter(c => c.estado === 'NO_ASISTIO');
+        next: citas => {
+          this.citasProgramadas = (citas || []).filter(c => c.estado !== 'NO_ASISTIO');
+          this.citasNoAsistidas = (citas || []).filter(c => c.estado === 'NO_ASISTIO');
         },
-        error: (error) => {
+        error: error => {
           console.error('Error al cargar citas del paciente', error);
         }
       });
