@@ -115,7 +115,7 @@ export const routes: Routes = [
           loadComponent: () =>
             import('./pages/paciente-citas/paciente-citas.component')
               .then(m => m.PacienteCitasComponent)
-        }
+        },
 
       // =====================
       // OTROS MÓDULOS
