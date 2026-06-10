@@ -84,10 +84,14 @@
       <button type="button" class="btn-secondary" [routerLink]="['/historias-clinicas', pacienteId]">
         Cancelar
       </button>
-
-      <button type="submit" class="btn-primary">
-        Guardar atención
-      </button>
+      
+<button
+  type="button"
+  class="btn-primary"
+  (click)="guardarAtencion()">
+  Guardar atención
+</button>
+      
     </div>
 
   </form>
