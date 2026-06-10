@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { CitaService } from '../../services/cita.service';
 import { Cita } from '../../models/cita.model';
@@ -8,37 +8,53 @@ import { Cita } from '../../models/cita.model';
 @Component({
   selector: 'app-citas',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './citas.component.html',
   styleUrls: ['./citas.component.css']
 })
 export class CitasComponent {
 
-  citas: Cita[] = [];
-  idPaciente: number | null = null;
+  cita: Cita = {
+    paciente: { id: 0 },
+    medico: { id: 0 },
+    tipoCita: 'CONSULTA',
+    fecha: '',
+    hora: '',
+    especialidad: '',
+    motivoConsulta: '',
+    estado: 'PROGRAMADA'
+  };
 
-  constructor(
-    private citaService: CitaService,
-    private route: ActivatedRoute
-  ) {}
+  mensaje = '';
 
-  ngOnInit(): void {
+  constructor(private citaService: CitaService) {}
 
-    const id = this.route.snapshot.paramMap.get('id');
+  guardar(): void {
 
-    if (id) {
-      this.idPaciente = Number(id);
-
-      this.citaService.porPaciente(this.idPaciente)
-        .subscribe(data => {
-          this.citas = data ?? [];
-        });
-
-    } else {
-      this.citaService.listar()
-        .subscribe(data => {
-          this.citas = data ?? [];
-        });
+    if (!this.cita.paciente.id || !this.cita.medico.id) {
+      alert('Paciente y médico son obligatorios');
+      return;
     }
+
+    this.citaService.crear(this.cita).subscribe({
+      next: () => {
+        this.mensaje = 'Cita registrada correctamente';
+
+        this.cita = {
+          paciente: { id: 0 },
+          medico: { id: 0 },
+          tipoCita: 'CONSULTA',
+          fecha: '',
+          hora: '',
+          especialidad: '',
+          motivoConsulta: '',
+          estado: 'PROGRAMADA'
+        };
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error al registrar cita');
+      }
+    });
   }
 }
