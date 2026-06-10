@@ -51,14 +51,13 @@
         <label>Médico *</label>
 
         <select [(ngModel)]="cita.medico.id">
+  <option [ngValue]="null">Seleccione médico</option>
 
-          <option [ngValue]="null">Seleccione médico</option>
-
-          <option *ngFor="let m of (medicos || [])" [ngValue]="m.id">
-            {{ m.nombres || '' }} {{ m.apellidos || '' }} - {{ m.username || '' }}
-          </option>
-
-        </select>
+  <option *ngFor="let m of medicos" [ngValue]="m.id">
+    {{ m.nombres }} {{ m.apellidos }} - {{ m.username }}
+  </option>
+</select>
+        
       </div>
 
       <!-- TIPO -->
