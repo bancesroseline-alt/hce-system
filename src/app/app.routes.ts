@@ -110,6 +110,13 @@ export const routes: Routes = [
             .then(m => m.CitasComponent)
       },
 
+              {
+          path: 'pacientes/:id/citas',
+          loadComponent: () =>
+            import('./pages/paciente-citas/paciente-citas.component')
+              .then(m => m.PacienteCitasComponent)
+        }
+
       // =====================
       // OTROS MÓDULOS
       // =====================
