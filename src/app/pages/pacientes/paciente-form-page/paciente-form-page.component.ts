@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
 import { PacienteService } from '../../../services/paciente.service';
 import { Paciente } from '../../../models/paciente.model';
@@ -17,104 +17,146 @@ export class PacienteFormPageComponent {
 
   mensaje = '';
 
-  paciente: Paciente = {
+  // 🔵 CAMBIO 1: control de modo edición
+  modoEdicion = false;
+  idPaciente: number | null = null;
 
+  paciente: Paciente = {
     tipoDocumento: 'DNI',
     numeroDocumento: '',
-
     nombres: '',
     apellidos: '',
-
     fechaNacimiento: '',
     edad: 0,
-
     sexo: 'F',
     estadoCivil: 'SOLTERO',
-
     telefono: '',
     direccion: '',
-
     antecedentes: '',
-
     estado: true
   };
 
   constructor(
     private pacienteService: PacienteService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
- calcularEdad(): void {
+  // 🔵 CAMBIO 2: detectar si es edición
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
 
-  if (!this.paciente.fechaNacimiento) return;
+      if (id) {
+        this.modoEdicion = true;
+        this.idPaciente = Number(id);
 
-  const fechaNacimiento = new Date(this.paciente.fechaNacimiento);
-
-  const hoy = new Date();
-
-  let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-
-  const mes = hoy.getMonth() - fechaNacimiento.getMonth();
-
-  if (
-    mes < 0 ||
-    (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())
-  ) {
-    edad--;
+        this.cargarPaciente(this.idPaciente);
+      }
+    });
   }
 
-  this.paciente.edad = edad;
-}
+  // 🔵 CAMBIO 3: cargar paciente para editar
+  cargarPaciente(id: number): void {
+    this.pacienteService.getById(id).subscribe(data => {
+      this.paciente = data;
+    });
+  }
+
+  calcularEdad(): void {
+    if (!this.paciente.fechaNacimiento) return;
+
+    const fechaNacimiento = new Date(this.paciente.fechaNacimiento);
+    const hoy = new Date();
+
+    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+
+    if (
+      mes < 0 ||
+      (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())
+    ) {
+      edad--;
+    }
+
+    this.paciente.edad = edad;
+  }
 
   guardar(): void {
 
-  // VALIDAR CAMPOS
-  if (
-    !this.paciente.numeroDocumento ||
-    !this.paciente.nombres ||
-    !this.paciente.apellidos
-  ) {
-    alert('Complete los campos obligatorios');
-    return;
-  }
+    if (
+      !this.paciente.numeroDocumento ||
+      !this.paciente.nombres ||
+      !this.paciente.apellidos
+    ) {
+      alert('Complete los campos obligatorios');
+      return;
+    }
 
-  // VALIDAR DNI DUPLICADO
-  this.pacienteService.buscar(this.paciente.numeroDocumento)
-    .subscribe({
+    // 🔵 CAMBIO 4: lógica separada (crear vs editar)
+    if (this.modoEdicion) {
 
-      next: (data) => {
+      // =======================
+      // ACTUALIZAR PACIENTE
+      // =======================
+      this.pacienteService.actualizar(this.idPaciente!, this.paciente)
+        .subscribe({
 
-        if (data.length > 0) {
-          alert('Ya existe un paciente con ese documento');
-          return;
-        }
+          next: () => {
+            this.mensaje = 'Paciente actualizado correctamente';
 
-        // GUARDAR
-        this.pacienteService.registrar(this.paciente)
-          .subscribe({
+            setTimeout(() => {
+              this.router.navigate(['/pacientes']);
+            }, 2000);
+          },
 
-            next: () => {
+          error: (err) => {
+            console.error(err);
+            alert('Error al actualizar paciente');
+          }
+        });
 
-              this.mensaje = 'Paciente registrado correctamente';
+    } else {
 
-              setTimeout(() => {
-                this.router.navigate(['/pacientes']);
-              }, 5000);
+      // =======================
+      // CREAR PACIENTE
+      // =======================
 
-            },
+      this.pacienteService.buscar(this.paciente.numeroDocumento)
+        .subscribe({
 
-            error: (err) => {
-              console.error(err);
-              alert('Error al registrar paciente');
+          next: (data) => {
+
+            if (data.length > 0) {
+              alert('Ya existe un paciente con ese documento');
+              return;
             }
 
-          });
+            this.pacienteService.registrar(this.paciente)
+              .subscribe({
 
-      },
+                next: () => {
 
-      error: (err) => {
-        console.error(err);
-      }
-    });
-}
+                  this.mensaje = 'Paciente registrado correctamente';
+
+                  setTimeout(() => {
+                    this.router.navigate(['/pacientes']);
+                  }, 2000);
+                },
+
+                error: (err) => {
+                  console.error(err);
+                  alert('Error al registrar paciente');
+                }
+
+              });
+
+          },
+
+          error: (err) => {
+            console.error(err);
+          }
+        });
+    }
+  }
 }
