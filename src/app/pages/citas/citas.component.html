@@ -1,18 +1,25 @@
 <div class="citas-page">
 
-  <!-- ENCABEZADO -->
+  <!-- HEADER -->
   <div class="page-header">
+
     <div>
       <h1>Citas</h1>
       <p>Gestiona y visualiza las citas programadas</p>
     </div>
 
-    <button class="btn-primary" (click)="modoNuevaCita = true">
+    <button
+      class="btn-primary"
+      type="button"
+      (click)="modoNuevaCita = true">
+
       + Nueva cita
+
     </button>
+
   </div>
 
-  <!-- MENSAJE -->
+  <!-- ALERTA -->
   <div *ngIf="mensaje" class="success">
     {{ mensaje }}
   </div>
@@ -26,103 +33,191 @@
 
       <!-- PACIENTE -->
       <div class="form-group buscador">
+
         <label>Paciente</label>
 
-        <input
-          type="text"
-          placeholder="Buscar paciente"
-          [(ngModel)]="busquedaPaciente"
-          (input)="cita.paciente.id = null">
+        <div class="search-wrapper">
 
-        <div class="resultados" *ngIf="busquedaPaciente && !cita.paciente.id">
+          <input
+            type="text"
+            placeholder="Buscar paciente..."
+            [(ngModel)]="busquedaPaciente"
+            (input)="cita.paciente.id = null">
+
+          <button
+            *ngIf="busquedaPaciente"
+            type="button"
+            class="clear-btn"
+            (click)="limpiarPaciente()">
+
+            ×
+
+          </button>
+
+        </div>
+
+        <div
+          class="resultados"
+          *ngIf="busquedaPaciente && !cita.paciente.id">
 
           <button
             type="button"
             *ngFor="let p of pacientesFiltrados()"
             (click)="seleccionarPaciente(p)">
-            {{ p.id }} - {{ p.nombres }} {{ p.apellidos || '' }} - DNI {{ p.numeroDocumento }}
+
+            {{ p.id }} - {{ p.nombres }} {{ p.apellidos || '' }}
+            - DNI {{ p.numeroDocumento }}
+
           </button>
 
+          <div
+            class="no-results"
+            *ngIf="pacientesFiltrados().length === 0">
+
+            No se encontraron pacientes
+
+          </div>
+
         </div>
+
       </div>
 
-      <!-- MÉDICO (SAFE) -->
+      <!-- MEDICO -->
       <div class="form-group">
+
         <label>Médico *</label>
 
         <select [(ngModel)]="cita.medico.id">
-  <option [ngValue]="null">Seleccione médico</option>
 
-  <option *ngFor="let m of medicos" [ngValue]="m.id">
-    {{ m.nombres }} {{ m.apellidos }} - {{ m.username }}
-  </option>
-</select>
-        
+          <option [ngValue]="null">
+            Seleccione médico
+          </option>
+
+          <option
+            *ngFor="let m of medicos"
+            [ngValue]="m.id">
+
+            {{ m.nombres }} {{ m.apellidos }} - {{ m.username }}
+
+          </option>
+
+        </select>
+
       </div>
 
       <!-- TIPO -->
       <div class="form-group">
+
         <label>Tipo de cita</label>
 
         <select [(ngModel)]="cita.tipoCita">
-          <option value="CONSULTA">Consulta</option>
-          <option value="PREVENTIVA">Preventiva</option>
+
+          <option value="CONSULTA">
+            Consulta
+          </option>
+
+          <option value="PREVENTIVA">
+            Preventiva
+          </option>
+
         </select>
+
       </div>
 
       <!-- FECHA -->
       <div class="form-group">
+
         <label>Fecha</label>
-        <input type="date" [(ngModel)]="cita.fecha">
+
+        <input
+          type="date"
+          [(ngModel)]="cita.fecha">
+
       </div>
 
       <!-- HORA -->
       <div class="form-group">
+
         <label>Hora</label>
-        <input type="time" [(ngModel)]="cita.hora">
+
+        <input
+          type="time"
+          [(ngModel)]="cita.hora">
+
       </div>
 
       <!-- ESPECIALIDAD -->
       <div class="form-group">
+
         <label>Especialidad</label>
-        <input type="text" [(ngModel)]="cita.especialidad">
+
+        <input
+          type="text"
+          placeholder="Ej. Medicina General"
+          [(ngModel)]="cita.especialidad">
+
       </div>
 
       <!-- MOTIVO -->
       <div class="form-group full">
+
         <label>Motivo</label>
-        <textarea [(ngModel)]="cita.motivoConsulta"></textarea>
+
+        <textarea
+          placeholder="Describe el motivo de la consulta..."
+          [(ngModel)]="cita.motivoConsulta">
+
+        </textarea>
+
       </div>
 
     </div>
 
-    <div class="actions">
+    <!-- BOTONES -->
+    <div class="acciones-form">
 
-      <button (click)="modoNuevaCita = false">
+      <button
+        class="btn-cancelar"
+        type="button"
+        (click)="modoNuevaCita = false">
+
         Cancelar
+
       </button>
 
-      <button (click)="guardar()">
+      <button
+        class="btn-guardar"
+        type="button"
+        (click)="guardar()">
+
         Guardar cita
+
       </button>
 
     </div>
 
   </section>
 
-  <!-- LISTADO -->
+  <!-- CONTENIDO -->
   <div class="content-grid" *ngIf="!modoNuevaCita">
 
+    <!-- TABLA -->
     <section class="panel citas-panel">
 
       <div class="panel-title">
+
         <h2>Citas del día</h2>
-        <p>{{ formatearFecha(fechaSeleccionada) }}</p>
+
+        <p>
+          {{ formatearFecha(fechaSeleccionada) }}
+        </p>
+
       </div>
 
-      <table>
+      <table class="tabla-citas">
 
         <thead>
+
           <tr>
             <th>Hora</th>
             <th>Paciente</th>
@@ -131,6 +226,7 @@
             <th>Tipo</th>
             <th>Acciones</th>
           </tr>
+
         </thead>
 
         <tbody>
@@ -146,21 +242,39 @@
             <td>{{ c.motivoConsulta }}</td>
 
             <td>
-              <span class="badge">
+
+              <span
+                class="badge"
+                [ngClass]="(c.estado || '').toLowerCase()">
+
                 {{ c.estado || 'SIN_ESTADO' }}
+
               </span>
+
             </td>
 
             <td>{{ c.tipoCita }}</td>
 
             <td>
-              <button>Atender</button>
+
+              <button
+                class="btn-action"
+                type="button">
+
+                Atender
+
+              </button>
+
             </td>
 
           </tr>
 
           <tr *ngIf="(citasDelDia || []).length === 0">
-            <td colspan="6">No hay citas</td>
+
+            <td colspan="6" class="empty">
+              No hay citas registradas
+            </td>
+
           </tr>
 
         </tbody>
@@ -169,30 +283,62 @@
 
     </section>
 
-    <!-- CALENDARIO -->
+    <!-- SIDEBAR -->
     <aside class="side-panel">
 
+      <!-- CALENDARIO -->
       <div class="calendar-card">
 
         <div class="calendar-header">
-          <button (click)="mesAnterior()">‹</button>
+
+          <button
+            class="calendar-nav"
+            type="button"
+            (click)="mesAnterior()">
+
+            ‹
+
+          </button>
+
           <h2>{{ nombreMesActual }}</h2>
-          <button (click)="mesSiguiente()">›</button>
+
+          <button
+            class="calendar-nav"
+            type="button"
+            (click)="mesSiguiente()">
+
+            ›
+
+          </button>
+
         </div>
 
         <div class="calendar-grid">
 
-          <span *ngFor="let d of diasSemana || []">
+          <span
+            class="day-name"
+            *ngFor="let d of diasSemana || []">
+
             {{ d }}
+
           </span>
 
           <button
+            type="button"
+            class="calendar-day"
             *ngFor="let item of diasCalendario || []"
             (click)="seleccionarDia(item)"
+            [class.empty-day]="!item?.dia"
             [class.active-day]="item?.seleccionado"
             [class.has-citas]="item?.tieneCitas">
 
             {{ item?.dia }}
+
+            <span
+              *ngIf="item?.tieneCitas"
+              class="dot">
+
+            </span>
 
           </button>
 
@@ -200,13 +346,30 @@
 
       </div>
 
+      <!-- RESUMEN -->
       <div class="summary-card">
+
         <h2>Resumen</h2>
 
-        <p>Total: {{ citasDelDia?.length || 0 }}</p>
-        <p>Programadas: {{ contarPorEstado('PROGRAMADA') }}</p>
-        <p>Canceladas: {{ contarPorEstado('CANCELADA') }}</p>
-        <p>No asistió: {{ contarPorEstado('NO_ASISTIO') }}</p>
+        <p>
+          <span>Total:</span>
+          <strong>{{ citasDelDia.length || 0 }}</strong>
+        </p>
+
+        <p>
+          <span>Programadas:</span>
+          <strong>{{ contarPorEstado('PROGRAMADA') }}</strong>
+        </p>
+
+        <p>
+          <span>Canceladas:</span>
+          <strong>{{ contarPorEstado('CANCELADA') }}</strong>
+        </p>
+
+        <p>
+          <span>No asistió:</span>
+          <strong>{{ contarPorEstado('NO_ASISTIO') }}</strong>
+        </p>
 
       </div>
 
