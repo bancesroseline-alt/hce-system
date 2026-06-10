@@ -132,8 +132,9 @@ ngOnInit(): void {
   
 guardarAtencion(): void {
 
-  const usuario =
-    JSON.parse(localStorage.getItem('usuario') || '{}');
+  const usuario = JSON.parse(
+    localStorage.getItem('usuario') || '{}'
+  );
 
   const payload = {
     ...this.atencion,
@@ -142,7 +143,12 @@ guardarAtencion(): void {
     citaId: this.atencion.citaId || null
   };
 
-  console.log('Payload atención:', payload);
+  console.log('========================');
+  console.log('pacienteId:', this.pacienteId);
+  console.log('usuarioId:', usuario.id);
+  console.log('citaId:', this.atencion.citaId);
+  console.log('Payload completo:', payload);
+  console.log('========================');
 
   this.http.post(
     `${this.api}/atenciones`,
@@ -157,8 +163,12 @@ guardarAtencion(): void {
       ]);
     },
     error: (err) => {
-      console.error('Error al guardar atención', err);
+      console.error(
+        'Error al guardar atención',
+        err
+      );
     }
   });
 }
+  
 }
