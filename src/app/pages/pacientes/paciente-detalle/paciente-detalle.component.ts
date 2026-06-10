@@ -22,6 +22,7 @@ export class PacienteDetalleComponent {
   ) {}
 
   ngOnInit(): void {
+
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id) {
