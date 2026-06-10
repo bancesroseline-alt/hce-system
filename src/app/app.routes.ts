@@ -27,6 +27,7 @@ export const routes: Routes = [
       { path: 'sincronizacion', loadComponent: () => import('./pages/sincronizacion/sincronizacion.component').then(m => m.SincronizacionComponent) },
       { path: 'reportes', loadComponent: () => import('./pages/reportes/reportes.component').then(m => m.ReportesComponent) },
       { path: 'pacientes/nuevo', loadComponent: () => import('./pages/pacientes/paciente-form-page/paciente-form-page.component') .then(m => m.PacienteFormPageComponent)},
+      { path: 'pacientes/editar/:id', loadComponent: () => import('./pages/pacientes/paciente-form-page/paciente-form-page.component').then(m => m.PacienteFormPageComponent)},
       { path: 'pacientes/:id', loadComponent: () => import('./pages/pacientes/paciente-detalle/paciente-detalle.component') .then(m => m.PacienteDetalleComponent)},
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
