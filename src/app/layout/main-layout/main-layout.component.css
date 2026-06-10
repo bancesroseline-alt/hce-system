@@ -70,45 +70,76 @@
 
 .menu a {
   text-decoration: none;
-  color: #cbd5e1;
+  color: #e2e8f0;
   padding: 11px 12px;
   border-radius: 12px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 11px;
   transition: all 0.18s ease;
 }
 
-.menu a:hover .nav-icon {
-  background: rgba(255, 255, 255, 0.14);
+.menu a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
 }
 
-.menu a.active .nav-icon {
-  background: rgba(255, 255, 255, 0.22);
+.menu a.active {
+  background: #0ea5e9;
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(14, 165, 233, 0.28);
 }
 
+/* ICONOS DEL SIDEBAR */
 .nav-icon {
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   display: grid;
   place-items: center;
   flex-shrink: 0;
+  color: #ffffff !important;
 }
 
 .nav-icon svg {
   width: 18px;
   height: 18px;
-  fill: #ffffff;
-  opacity: 0.9;
+  display: block;
+  fill: #ffffff !important;
+  color: #ffffff !important;
 }
 
-.menu a.active .nav-icon svg {
-  fill: #ffffff;
-  opacity: 1;
+.nav-icon svg path,
+.nav-icon svg rect,
+.nav-icon svg circle,
+.nav-icon svg polygon,
+.nav-icon svg line,
+.nav-icon svg polyline {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  stroke: none !important;
+}
+
+.menu a:hover .nav-icon {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.menu a.active .nav-icon {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.menu a.active .nav-icon svg,
+.menu a.active .nav-icon svg path,
+.menu a.active .nav-icon svg rect,
+.menu a.active .nav-icon svg circle,
+.menu a.active .nav-icon svg polygon,
+.menu a.active .nav-icon svg line,
+.menu a.active .nav-icon svg polyline {
+  fill: #ffffff !important;
+  color: #ffffff !important;
 }
 
 /* CONTENT */
@@ -290,35 +321,6 @@ main {
   flex: 1;
   overflow-y: auto;
   background: #f4f7fb;
-}
-
-/* FORZAR ÍCONOS DEL SIDEBAR EN BLANCO */
-.sidebar .nav-icon svg,
-.sidebar .nav-icon svg path {
-  fill: #ffffff !important;
-  color: #ffffff !important;
-  stroke: none !important;
-}
-
-.sidebar .nav-icon {
-  background: rgba(255, 255, 255, 0.12) !important;
-}
-
-.sidebar a.active .nav-icon {
-  background: rgba(255, 255, 255, 0.24) !important;
-}
-
-.sidebar a:hover .nav-icon {
-  background: rgba(255, 255, 255, 0.18) !important;
-}
-
-/* Mejor contraste del texto */
-.sidebar a {
-  color: #e2e8f0 !important;
-}
-
-.sidebar a.active {
-  color: #ffffff !important;
 }
 
 /* RESPONSIVE */
