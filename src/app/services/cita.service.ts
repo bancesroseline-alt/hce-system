@@ -16,15 +16,7 @@ export class CitaService {
     return this.http.get<Cita[]>(this.api);
   }
 
-  porPaciente(id: number): Observable<Cita[]> {
-    return this.http.get<Cita[]>(`${this.api}/paciente/${id}`);
-  }
-
   crear(cita: Cita): Observable<Cita> {
     return this.http.post<Cita>(this.api, cita);
-  }
-
-  actualizar(id: number, cita: Cita): Observable<Cita> {
-    return this.http.put<Cita>(`${this.api}/${id}`, cita);
   }
 }
