@@ -57,7 +57,7 @@ export const routes: Routes = [
           import('./pages/pacientes/paciente-detalle/paciente-detalle.component')
             .then(m => m.PacienteDetalleComponent)
       },
-
+      
       // =====================
       // HISTORIAS CLÍNICAS
       // =====================
@@ -67,17 +67,14 @@ export const routes: Routes = [
           import('./pages/historia/historia.component')
             .then(m => m.HistoriaComponent)
       },
-
+      
       {
         path: 'historias-clinicas/:id',
         loadComponent: () =>
           import('./pages/historia/historia.component')
             .then(m => m.HistoriaComponent)
       },
-
-      // =====================
-      // ATENCIONES
-      // =====================
+      
       {
         path: 'atenciones/nueva/:pacienteId',
         loadComponent: () =>
