@@ -1,22 +1,25 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Cita } from '../models/cita.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CitaService {
 
-  private api = 'https://hce-backend.onrender.com/api/citas';
+  private api = 'https://hce-backend.onrender.com/api';
 
   constructor(private http: HttpClient) {}
 
-  listar(): Observable<Cita[]> {
-    return this.http.get<Cita[]>(this.api);
+  listar(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/citas`);
   }
 
-  crear(cita: Cita): Observable<Cita> {
-    return this.http.post<Cita>(this.api, cita);
+  registrar(cita: any): Observable<any> {
+    return this.http.post(`${this.api}/citas`, cita);
+  }
+
+  listarMedicos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/usuarios/medicos`);
   }
 }
