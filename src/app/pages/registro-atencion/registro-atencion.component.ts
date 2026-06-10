@@ -40,46 +40,96 @@ export class RegistroAtencionComponent implements OnInit {
     private http: HttpClient
   ) {}
 
-  ngOnInit(): void {
+ngOnInit(): void {
+
+  console.log('================================');
+  console.log('URL actual:', this.router.url);
+
+  console.log(
+    'pacienteId param:',
+    this.route.snapshot.paramMap.get('pacienteId')
+  );
+
+  console.log(
+    'citaId param:',
+    this.route.snapshot.paramMap.get('citaId')
+  );
 
   this.pacienteId = Number(
     this.route.snapshot.paramMap.get('pacienteId')
   );
 
-  const citaId = this.route.snapshot.paramMap.get('citaId');
+  console.log(
+    'pacienteId convertido:',
+    this.pacienteId
+  );
+
+  console.log('================================');
+
+  const citaId =
+    this.route.snapshot.paramMap.get('citaId');
 
   if (citaId) {
 
     this.atencion.citaId = Number(citaId);
 
-    this.http.get<any>(`${this.api}/citas/${citaId}`)
-      .subscribe({
-        next: cita => {
+    this.http.get<any>(
+      `${this.api}/citas/${citaId}`
+    ).subscribe({
+      next: cita => {
 
-          this.atencion.motivoConsulta =
-            cita.motivoConsulta || '';
+        console.log('Cita cargada:', cita);
 
-          if (cita.tipoCita) {
-            this.atencion.tipoAtencion = cita.tipoCita;
-          }
+        this.atencion.motivoConsulta =
+          cita.motivoConsulta || '';
 
-        },
-        error: err => {
-          console.error('Error al cargar cita', err);
+        if (cita.tipoCita) {
+          this.atencion.tipoAtencion =
+            cita.tipoCita;
         }
-      });
+
+      },
+      error: err => {
+        console.error(
+          'Error al cargar cita',
+          err
+        );
+      }
+    });
   }
 
-  this.http.get<any>(`${this.api}/pacientes/${this.pacienteId}`)
-    .subscribe({
+  if (!isNaN(this.pacienteId)) {
+
+    this.http.get<any>(
+      `${this.api}/pacientes/${this.pacienteId}`
+    ).subscribe({
       next: data => {
+
+        console.log(
+          'Paciente cargado:',
+          data
+        );
+
         this.paciente = data;
       },
       error: error => {
-        console.error('Error al cargar paciente', error);
+        console.error(
+          'Error al cargar paciente',
+          error
+        );
       }
     });
+
+  } else {
+
+    console.error(
+      'pacienteId inválido:',
+      this.route.snapshot.paramMap.get('pacienteId')
+    );
+
+  }
 }
+  
 guardarAtencion(): void {
 
   const usuario =
