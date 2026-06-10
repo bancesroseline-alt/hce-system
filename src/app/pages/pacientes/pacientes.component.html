@@ -58,9 +58,11 @@
     👁
     </button>
 
-          <button class="btn-icon edit">
-            ✏
-          </button>
+          <button
+  class="btn-icon edit"
+  [routerLink]="['/pacientes/editar', p.id]">
+  ✏
+</button>
 
         </td>
 
