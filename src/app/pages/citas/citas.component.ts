@@ -66,8 +66,10 @@ export class CitasComponent implements OnInit {
       this.cita.paciente.id = pacienteId;
     }
     const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-    
-    this.cita.medico.id = usuario.id;
+
+if (usuario?.id) {
+  this.cita.medico.id = usuario.id;
+}
 
   }
 
