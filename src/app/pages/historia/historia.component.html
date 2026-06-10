@@ -235,16 +235,6 @@
             <p><strong>Especialidad:</strong> {{ cita.especialidad }}</p>
             <p><strong>Motivo:</strong> {{ cita.motivoConsulta }}</p>
 
-            <button
-              class="btn-primary"
-              type="button"
-              [routerLink]="['/atenciones/nueva', paciente?.id, 'cita', cita.id]"
-              *ngIf="cita.estado === 'PROGRAMADA'">
-
-              Iniciar atención
-
-            </button>
-
           </div>
 
         </div>
