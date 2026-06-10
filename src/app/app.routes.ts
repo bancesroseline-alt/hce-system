@@ -117,6 +117,13 @@ export const routes: Routes = [
               .then(m => m.PacienteCitasComponent)
         },
 
+              {
+          path: 'atenciones/emergencia/:pacienteId',
+          loadComponent: () =>
+            import('./pages/registro-atencion/registro-atencion.component')
+              .then(m => m.RegistroAtencionComponent)
+        },
+
       // =====================
       // OTROS MÓDULOS
       // =====================
