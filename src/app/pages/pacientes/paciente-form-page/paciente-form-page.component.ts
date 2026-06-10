@@ -17,7 +17,7 @@ export class PacienteFormPageComponent {
 
   mensaje = '';
 
-  // 🔵 CAMBIO 1: control de modo edición
+  // 🔵 EDITAR / CREAR CONTROL
   modoEdicion = false;
   idPaciente: number | null = null;
 
@@ -42,24 +42,23 @@ export class PacienteFormPageComponent {
     private route: ActivatedRoute
   ) {}
 
-  // 🔵 CAMBIO 2: detectar si es edición
+  // CARGAR SI ES EDICIÓN
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
+
       const id = params.get('id');
 
       if (id) {
         this.modoEdicion = true;
         this.idPaciente = Number(id);
 
-        this.cargarPaciente(this.idPaciente);
+        // CARGAR DATOS DEL PACIENTE
+        this.pacienteService.obtener(this.idPaciente)
+          .subscribe(data => {
+            this.paciente = data;
+          });
       }
-    });
-  }
 
-  // 🔵 CAMBIO 3: cargar paciente para editar
-  cargarPaciente(id: number): void {
-    this.pacienteService.getById(id).subscribe(data => {
-      this.paciente = data;
     });
   }
 
@@ -93,15 +92,13 @@ export class PacienteFormPageComponent {
       return;
     }
 
-    // 🔵 CAMBIO 4: lógica separada (crear vs editar)
+    // =========================
+    // MODO EDICIÓN
+    // =========================
     if (this.modoEdicion) {
 
-      // =======================
-      // ACTUALIZAR PACIENTE
-      // =======================
       this.pacienteService.actualizar(this.idPaciente!, this.paciente)
         .subscribe({
-
           next: () => {
             this.mensaje = 'Paciente actualizado correctamente';
 
@@ -109,18 +106,17 @@ export class PacienteFormPageComponent {
               this.router.navigate(['/pacientes']);
             }, 2000);
           },
-
           error: (err) => {
             console.error(err);
             alert('Error al actualizar paciente');
           }
         });
 
-    } else {
-
-      // =======================
-      // CREAR PACIENTE
-      // =======================
+    } 
+    // =========================
+    // MODO CREAR
+    // =========================
+    else {
 
       this.pacienteService.buscar(this.paciente.numeroDocumento)
         .subscribe({
@@ -136,7 +132,6 @@ export class PacienteFormPageComponent {
               .subscribe({
 
                 next: () => {
-
                   this.mensaje = 'Paciente registrado correctamente';
 
                   setTimeout(() => {
@@ -156,6 +151,7 @@ export class PacienteFormPageComponent {
           error: (err) => {
             console.error(err);
           }
+
         });
     }
   }
