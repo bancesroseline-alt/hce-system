@@ -167,23 +167,38 @@ export class CitasComponent implements OnInit {
     return usuario.nombres || usuario.nombre || usuario.username || 'Usuario';
   }
 
-  guardar(): void {
-    if (!this.cita.paciente.id || !this.cita.medico.id) {
-      this.mensaje = 'Debes seleccionar paciente y médico.';
-      return;
-    }
+guardar(): void {
 
-    this.http.post(`${this.api}/citas`, this.cita)
-      .subscribe({
-        next: () => {
-          this.mensaje = 'Cita registrada correctamente';
-          this.modoNuevaCita = false;
-          this.limpiarFormulario();
-          this.cargarCitas();
-        },
-        error: error => console.error('Error al guardar cita', error)
-      });
+  if (!this.cita.paciente.id || !this.cita.medico.id) {
+    this.mensaje = 'Debes seleccionar paciente y médico.';
+    return;
   }
+
+  const payload = {
+    paciente: { id: Number(this.cita.paciente.id) },
+    medico: { id: Number(this.cita.medico.id) },
+    tipoCita: this.cita.tipoCita,
+    fecha: this.cita.fecha,
+    hora: this.cita.hora,
+    especialidad: this.cita.especialidad,
+    motivoConsulta: this.cita.motivoConsulta,
+    estado: this.cita.estado
+  };
+
+  this.http.post(`${this.api}/citas`, payload)
+    .subscribe({
+      next: () => {
+        this.mensaje = 'Cita registrada correctamente';
+        this.modoNuevaCita = false;
+        this.limpiarFormulario();
+        this.cargarCitas();
+      },
+      error: error => {
+        console.error('ERROR BACKEND:', error);
+        this.mensaje = 'Error al guardar cita (revisar backend)';
+      }
+    });
+}
 
   limpiarFormulario(): void {
     this.cita = {
