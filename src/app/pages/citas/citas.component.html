@@ -259,7 +259,7 @@
              <button
           class="btn-action"
           type="button"
-          [routerLink]="['/atenciones/nueva', c.pacienteId, 'cita', c.id]">
+          [routerLink]="['/atenciones/nueva', c.pacienteId || c.paciente?.id, 'cita', c.id]">
           Atender
         </button>
             </td>
