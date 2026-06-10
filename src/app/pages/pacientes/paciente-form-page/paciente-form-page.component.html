@@ -4,12 +4,12 @@
   <div class="page-header">
 
     <div>
-      <h1>Nuevo paciente</h1>
+      <h1>{{ modoEdicion ? 'Editar paciente' : 'Nuevo paciente' }}</h1>
 
       <div class="breadcrumb">
         <a routerLink="/pacientes">Pacientes</a>
         <span>></span>
-        <span>Nuevo paciente</span>
+        <span>{{ modoEdicion ? 'Editar paciente' : 'Nuevo paciente' }}</span>
       </div>
     </div>
 
@@ -36,7 +36,6 @@
 
         <div class="field">
           <label>Tipo de documento *</label>
-
           <select [(ngModel)]="paciente.tipoDocumento">
             <option value="DNI">DNI</option>
             <option value="CE">CE</option>
@@ -45,52 +44,44 @@
 
         <div class="field">
           <label>Número de documento *</label>
-
+          <!-- 🔵 CAMBIO: DNI bloqueado en edición -->
           <input
             type="text"
             [(ngModel)]="paciente.numeroDocumento"
+            [disabled]="modoEdicion"
           >
         </div>
 
         <div class="field">
           <label>Nombres *</label>
-
-          <input
-            type="text"
-            [(ngModel)]="paciente.nombres"
-          >
+          <input type="text" [(ngModel)]="paciente.nombres">
         </div>
 
         <div class="field">
           <label>Apellidos *</label>
-
-          <input
-            type="text"
-            [(ngModel)]="paciente.apellidos"
-          >
+          <input type="text" [(ngModel)]="paciente.apellidos">
         </div>
 
         <div class="field">
           <label>Fecha de nacimiento *</label>
-
           <input
-    type="date"
-    [(ngModel)]="paciente.fechaNacimiento"
-    (change)="calcularEdad()"
-         >
+            type="date"
+            [(ngModel)]="paciente.fechaNacimiento"
+            (change)="calcularEdad()"
+          >
         </div>
 
         <div class="field">
+          <label>Edad</label>
           <input
-             type="number"
-             [(ngModel)]="paciente.edad"
+            type="number"
+            [(ngModel)]="paciente.edad"
             readonly
-        >
+          >
         </div>
 
         <div class="field">
           <label>Sexo *</label>
-
           <select [(ngModel)]="paciente.sexo">
             <option value="M">Masculino</option>
             <option value="F">Femenino</option>
@@ -99,12 +90,11 @@
 
         <div class="field">
           <label>Estado civil *</label>
-
           <select [(ngModel)]="paciente.estadoCivil">
-            <option value="SOLTERO">Soltera</option>
-            <option value="CASADO">Casada</option>
-            <option value="DIVORCIADO">Divorciada</option>
-            <option value="VIUDO">Viuda</option>
+            <option value="SOLTERO">Soltero</option>
+            <option value="CASADO">Casado</option>
+            <option value="DIVORCIADO">Divorciado</option>
+            <option value="VIUDO">Viudo</option>
           </select>
         </div>
 
@@ -121,20 +111,12 @@
 
         <div class="field full">
           <label>Dirección</label>
-
-          <input
-            type="text"
-            [(ngModel)]="paciente.direccion"
-          >
+          <input type="text" [(ngModel)]="paciente.direccion">
         </div>
 
         <div class="field">
           <label>Teléfono</label>
-
-          <input
-            type="text"
-            [(ngModel)]="paciente.telefono"
-          >
+          <input type="text" [(ngModel)]="paciente.telefono">
         </div>
 
       </div>
@@ -149,14 +131,8 @@
       <div class="estado-box">
 
         <label class="switch">
-
-          <input
-            type="checkbox"
-            [(ngModel)]="paciente.estado"
-          >
-
+          <input type="checkbox" [(ngModel)]="paciente.estado">
           <span class="slider"></span>
-
         </label>
 
         <span>
@@ -187,7 +163,7 @@
       </button>
 
       <button class="btn-save" (click)="guardar()">
-        Guardar paciente
+        {{ modoEdicion ? 'Actualizar paciente' : 'Guardar paciente' }}
       </button>
 
     </div>
