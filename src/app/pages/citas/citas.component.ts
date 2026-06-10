@@ -1,22 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-import { CitaService } from '../../services/cita.service';
-import { Cita } from '../../models/cita.model';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-citas',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './citas.component.html',
-  styleUrls: ['./citas.component.css']
+  styleUrl: './citas.component.css'
 })
-export class CitasComponent {
+export class CitasComponent implements OnInit {
 
-  cita: Cita = {
-    paciente: { id: 0 },
-    medico: { id: 0 },
+  api = 'https://hce-backend.onrender.com/api';
+
+  citas: any[] = [];
+  mensaje = '';
+
+  cita: any = {
+    paciente: { id: null },
+    medico: { id: null },
     tipoCita: 'CONSULTA',
     fecha: '',
     hora: '',
@@ -25,36 +29,44 @@ export class CitasComponent {
     estado: 'PROGRAMADA'
   };
 
-  mensaje = '';
+  modoNuevaCita = false;
 
-  constructor(private citaService: CitaService) {}
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
+    const pacienteId = Number(this.route.snapshot.paramMap.get('id'));
+
+    if (pacienteId) {
+      this.modoNuevaCita = true;
+      this.cita.paciente.id = pacienteId;
+
+      const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+      this.cita.medico.id = usuario.id || 2;
+    } else {
+      this.cargarCitas();
+    }
+  }
+
+  cargarCitas(): void {
+    this.http.get<any[]>(`${this.api}/citas`)
+      .subscribe({
+        next: data => this.citas = data || [],
+        error: error => console.error('Error al cargar citas', error)
+      });
+  }
 
   guardar(): void {
-
-    if (!this.cita.paciente.id || !this.cita.medico.id) {
-      alert('Paciente y médico son obligatorios');
-      return;
-    }
-
-    this.citaService.crear(this.cita).subscribe({
-      next: () => {
-        this.mensaje = 'Cita registrada correctamente';
-
-        this.cita = {
-          paciente: { id: 0 },
-          medico: { id: 0 },
-          tipoCita: 'CONSULTA',
-          fecha: '',
-          hora: '',
-          especialidad: '',
-          motivoConsulta: '',
-          estado: 'PROGRAMADA'
-        };
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Error al registrar cita');
-      }
-    });
+    this.http.post(`${this.api}/citas`, this.cita)
+      .subscribe({
+        next: () => {
+          this.mensaje = 'Cita registrada correctamente';
+          this.modoNuevaCita = false;
+          this.cargarCitas();
+        },
+        error: error => console.error('Error al guardar cita', error)
+      });
   }
 }
