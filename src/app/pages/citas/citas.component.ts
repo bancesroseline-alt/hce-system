@@ -9,7 +9,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './citas.component.html',
-  styleUrl: './citas.component.css'
+  styleUrls: ['./citas.component.css']
 })
 export class CitasComponent implements OnInit {
 
