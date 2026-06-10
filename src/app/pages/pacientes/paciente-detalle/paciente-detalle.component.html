@@ -1,11 +1,58 @@
 <div class="page">
 
-  <h1>Detalle Paciente</h1>
+  <!-- HEADER -->
+  <div class="page-header">
 
-  <p>ID Paciente: {{ id }}</p>
+    <div>
+      <h1>Detalle del paciente</h1>
 
-  <button routerLink="/pacientes">
-    Volver
-  </button>
+      <div class="breadcrumb">
+        <a routerLink="/pacientes">Pacientes</a>
+        <span>></span>
+        <span>Detalle</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CARD -->
+  <div class="card" *ngIf="paciente">
+
+    <h2>{{ paciente.nombres }} {{ paciente.apellidos }}</h2>
+
+    <div class="detail-grid">
+
+      <div><strong>DNI:</strong> {{ paciente.numeroDocumento }}</div>
+      <div><strong>Tipo:</strong> {{ paciente.tipoDocumento }}</div>
+
+      <div><strong>Edad:</strong> {{ paciente.edad }}</div>
+      <div><strong>Sexo:</strong> {{ paciente.sexo }}</div>
+
+      <div><strong>Estado civil:</strong> {{ paciente.estadoCivil }}</div>
+      <div><strong>Teléfono:</strong> {{ paciente.telefono }}</div>
+
+      <div class="full">
+        <strong>Dirección:</strong> {{ paciente.direccion }}
+      </div>
+
+      <div class="full">
+        <strong>Antecedentes:</strong>
+        <p>{{ paciente.antecedentes }}</p>
+      </div>
+
+      <div>
+        <strong>Estado:</strong>
+        {{ paciente.estado ? 'Activo' : 'Inactivo' }}
+      </div>
+
+    </div>
+
+    <div class="buttons">
+      <button routerLink="/pacientes" class="btn-cancel">
+        Volver
+      </button>
+    </div>
+
+  </div>
 
 </div>
