@@ -80,18 +80,19 @@ export class CitasComponent implements OnInit {
   }
 
   cargarCitas(): void {
-    this.http.get<any[]>(`${this.api}/citas`, this.getHeaders()).subscribe({
-      next: data => {
-  this.citas = (data || []).sort((a, b) =>
-    a.hora.localeCompare(b.hora)
-  );
+  this.http.get<any[]>(`${this.api}/citas`, this.getHeaders()).subscribe({
+    next: data => {
 
-  this.filtrarCitasPorDia();
-  this.generarCalendario();
-},
-      error: err => console.error('Error al cargar citas', err)
-    });
-  }
+      this.citas = (data || []).sort((a, b) =>
+        `${a.fecha} ${a.hora}`.localeCompare(`${b.fecha} ${b.hora}`)
+      );
+
+      this.filtrarCitasPorDia();
+      this.generarCalendario();
+    },
+    error: err => console.error('Error al cargar citas', err)
+  });
+}
 
   cargarPacientes(): void {
     this.http.get<any[]>(`${this.api}/pacientes`, this.getHeaders()).subscribe({
@@ -351,10 +352,8 @@ guardar(): void {
   filtrarCitasPorDia(): void {
   const iso = this.formatearFecha(this.fechaSeleccionada);
 
-  this.citasDelDia = this.citas
-    .filter(c => c.fecha === iso)
-    .sort((a, b) => a.hora.localeCompare(b.hora));
-  }
+  this.citasDelDia = this.citas.filter(c => c.fecha === iso);
+}
 
   formatearFecha(fecha: Date): string {
     const y = fecha.getFullYear();
