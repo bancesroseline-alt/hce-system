@@ -365,4 +365,35 @@ guardar(): void {
   contarPorEstado(estado: string): number {
     return this.citasDelDia.filter(c => c.estado === estado).length;
   }
+
+  cambiarEstado(cita: any, nuevoEstado: string): void {
+
+  const payload = {
+    ...cita,
+    estado: nuevoEstado
+  };
+
+  this.http.put(
+    `${this.api}/citas/${cita.id}`,
+    payload,
+    this.getHeaders()
+  ).subscribe({
+    next: () => {
+      cita.estado = nuevoEstado;
+      this.mensaje = 'Estado actualizado correctamente';
+      this.tipoMensaje = 'success';
+
+      setTimeout(() => {
+        this.mensaje = '';
+        this.tipoMensaje = '';
+      }, 3000);
+    },
+    error: err => {
+      console.error('Error al actualizar estado', err);
+
+      this.mensaje = 'Error al actualizar estado';
+      this.tipoMensaje = 'error';
+    }
+  });
+}
 }
