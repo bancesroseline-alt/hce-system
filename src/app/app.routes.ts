@@ -61,22 +61,26 @@ export const routes: Routes = [
       // =====================
       // HISTORIAS CLÍNICAS
       // =====================
-      {
+           {
         path: 'historias-clinicas',
         loadComponent: () =>
           import('./pages/historia/historia.component')
             .then(m => m.HistoriaComponent)
       },
-      
       {
         path: 'historias-clinicas/:id',
         loadComponent: () =>
           import('./pages/historia/historia.component')
             .then(m => m.HistoriaComponent)
       },
-      
       {
         path: 'atenciones/nueva/:pacienteId',
+        loadComponent: () =>
+          import('./pages/registro-atencion/registro-atencion.component')
+            .then(m => m.RegistroAtencionComponent)
+      },
+      {
+        path: 'atenciones/nueva/:pacienteId/cita/:citaId',
         loadComponent: () =>
           import('./pages/registro-atencion/registro-atencion.component')
             .then(m => m.RegistroAtencionComponent)
