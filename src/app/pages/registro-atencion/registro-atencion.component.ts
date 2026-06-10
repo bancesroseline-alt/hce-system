@@ -50,8 +50,14 @@ export class RegistroAtencionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.pacienteId = Number(this.route.snapshot.paramMap.get('pacienteId'));
-    this.citaId = Number(this.route.snapshot.paramMap.get('citaId')) || null;
+    const pacienteParam =
+  this.route.snapshot.paramMap.get('pacienteId') ||
+  this.route.snapshot.paramMap.get('id');
+
+    const citaParam = this.route.snapshot.paramMap.get('citaId');
+    
+    this.pacienteId = Number(pacienteParam);
+    this.citaId = citaParam ? Number(citaParam) : null;
 
     this.modoEmergencia = this.router.url.includes('/emergencia/');
 
