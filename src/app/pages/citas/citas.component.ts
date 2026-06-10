@@ -60,11 +60,15 @@ export class CitasComponent implements OnInit {
     this.cargarCitas();
 
     const pacienteId = Number(this.route.snapshot.paramMap.get('id'));
-
+  
     if (pacienteId) {
       this.modoNuevaCita = true;
       this.cita.paciente.id = pacienteId;
     }
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    
+    this.cita.medico.id = usuario.id;
+
   }
 
   // =========================
