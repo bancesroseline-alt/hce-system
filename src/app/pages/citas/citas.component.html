@@ -1,57 +1,39 @@
 
 <div class="page">
 
-  <div class="page-header">
-    <h1>
-      {{ idPaciente ? 'Citas del paciente' : 'Dashboard de citas' }}
-    </h1>
+  <h1>Nueva Cita</h1>
+
+  <div *ngIf="mensaje" class="success">
+    {{ mensaje }}
   </div>
 
-  <div class="card">
+  <div class="form">
 
-    <table *ngIf="citas.length > 0; else empty">
+    <input type="number" placeholder="ID Paciente"
+      [(ngModel)]="cita.paciente.id">
 
-      <thead>
-        <tr>
-          <th>Paciente</th>
-          <th>Médico</th>
-          <th>Fecha</th>
-          <th>Hora</th>
-          <th>Tipo</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
+    <input type="number" placeholder="ID Médico"
+      [(ngModel)]="cita.medico.id">
 
-      <tbody>
-        <tr *ngFor="let c of citas">
+    <select [(ngModel)]="cita.tipoCita">
+      <option value="CONSULTA">Consulta</option>
+      <option value="CONTROL">Control</option>
+      <option value="EMERGENCIA">Emergencia</option>
+    </select>
 
-          <td>
-            {{ c.paciente?.nombres }} {{ c.paciente?.apellidos }}
-          </td>
+    <input type="date" [(ngModel)]="cita.fecha">
 
-          <td>
-            {{ c.medico?.username }}
-          </td>
+    <input type="time" [(ngModel)]="cita.hora">
 
-          <td>{{ c.fecha }}</td>
-          <td>{{ c.hora }}</td>
+    <input type="text" placeholder="Especialidad"
+      [(ngModel)]="cita.especialidad">
 
-          <td>{{ c.tipoCita }}</td>
+    <textarea placeholder="Motivo de consulta"
+      [(ngModel)]="cita.motivoConsulta"></textarea>
 
-          <td>
-  <span [class]="c.estado ? c.estado.toLowerCase() : ''">
-    {{ c.estado || 'SIN ESTADO' }}
-  </span>
-</td>
-
-        </tr>
-      </tbody>
-
-    </table>
-
-    <ng-template #empty>
-      <p>No hay citas registradas.</p>
-    </ng-template>
+    <button (click)="guardar()">
+      Guardar Cita
+    </button>
 
   </div>
 
