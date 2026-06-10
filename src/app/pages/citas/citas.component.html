@@ -17,50 +17,51 @@
     {{ mensaje }}
   </div>
 
-  <!-- FORMULARIO NUEVA CITA -->
+  <!-- FORMULARIO -->
   <section class="form-card" *ngIf="modoNuevaCita">
+
     <h2>Nueva cita</h2>
 
     <div class="form-grid">
 
-      <!-- PACIENTE (se mantiene búsqueda si quieres) -->
+      <!-- PACIENTE -->
       <div class="form-group buscador">
         <label>Paciente</label>
 
         <input
           type="text"
-          placeholder="Buscar por ID, nombre o DNI"
+          placeholder="Buscar paciente"
           [(ngModel)]="busquedaPaciente"
           (input)="cita.paciente.id = null">
 
         <div class="resultados" *ngIf="busquedaPaciente && !cita.paciente.id">
+
           <button
             type="button"
             *ngFor="let p of pacientesFiltrados()"
             (click)="seleccionarPaciente(p)">
-            {{ p.id }} - {{ p.nombres }} {{ p.apellidos }} - DNI {{ p.numeroDocumento }}
+            {{ p.id }} - {{ p.nombres }} {{ p.apellidos || '' }} - DNI {{ p.numeroDocumento }}
           </button>
 
-          <div class="no-results" *ngIf="pacientesFiltrados().length === 0">
-            No se encontraron pacientes.
-          </div>
         </div>
       </div>
 
-      <!-- MÉDICO CORREGIDO (DROPDOWN) -->
+      <!-- MÉDICO (SAFE) -->
       <div class="form-group">
         <label>Médico *</label>
 
         <select [(ngModel)]="cita.medico.id">
+
           <option [ngValue]="null">Seleccione médico</option>
 
-          <option *ngFor="let m of medicos" [ngValue]="m.id">
-            {{ m.nombres }} {{ m.apellidos }} - {{ m.username }}
+          <option *ngFor="let m of (medicos || [])" [ngValue]="m.id">
+            {{ m.nombres || '' }} {{ m.apellidos || '' }} - {{ m.username || '' }}
           </option>
+
         </select>
       </div>
 
-      <!-- TIPO DE CITA -->
+      <!-- TIPO -->
       <div class="form-group">
         <label>Tipo de cita</label>
 
@@ -90,23 +91,24 @@
 
       <!-- MOTIVO -->
       <div class="form-group full">
-        <label>Motivo de consulta</label>
-
+        <label>Motivo</label>
         <textarea [(ngModel)]="cita.motivoConsulta"></textarea>
       </div>
 
     </div>
 
-    <!-- ACCIONES -->
     <div class="actions">
-      <button class="btn-secondary" (click)="modoNuevaCita = false">
+
+      <button (click)="modoNuevaCita = false">
         Cancelar
       </button>
 
-      <button class="btn-primary" (click)="guardar()">
+      <button (click)="guardar()">
         Guardar cita
       </button>
+
     </div>
+
   </section>
 
   <!-- LISTADO -->
@@ -120,6 +122,7 @@
       </div>
 
       <table>
+
         <thead>
           <tr>
             <th>Hora</th>
@@ -133,37 +136,36 @@
 
         <tbody>
 
-          <tr *ngFor="let c of citasDelDia">
+          <tr *ngFor="let c of (citasDelDia || [])">
 
             <td>{{ c.hora }}</td>
 
-            <td>{{ c.pacienteNombre || c.paciente?.nombres }}</td>
+            <td>
+              {{ c.paciente?.nombres || c.pacienteNombre || 'Sin nombre' }}
+            </td>
 
             <td>{{ c.motivoConsulta }}</td>
 
             <td>
               <span class="badge">
-                {{ c.estado }}
+                {{ c.estado || 'SIN_ESTADO' }}
               </span>
             </td>
 
             <td>{{ c.tipoCita }}</td>
 
             <td>
-              <button class="btn-action">
-                Atender
-              </button>
+              <button>Atender</button>
             </td>
 
           </tr>
 
-          <tr *ngIf="citasDelDia.length === 0">
-            <td colspan="6" class="empty">
-              No hay citas registradas para este día.
-            </td>
+          <tr *ngIf="(citasDelDia || []).length === 0">
+            <td colspan="6">No hay citas</td>
           </tr>
 
         </tbody>
+
       </table>
 
     </section>
@@ -181,27 +183,28 @@
 
         <div class="calendar-grid">
 
-          <span *ngFor="let d of diasSemana">
+          <span *ngFor="let d of diasSemana || []">
             {{ d }}
           </span>
 
           <button
-            *ngFor="let item of diasCalendario"
+            *ngFor="let item of diasCalendario || []"
             (click)="seleccionarDia(item)"
-            [class.active-day]="item.seleccionado"
-            [class.has-citas]="item.tieneCitas">
+            [class.active-day]="item?.seleccionado"
+            [class.has-citas]="item?.tieneCitas">
 
-            {{ item.dia }}
+            {{ item?.dia }}
 
           </button>
 
         </div>
+
       </div>
 
       <div class="summary-card">
         <h2>Resumen</h2>
 
-        <p>Total: {{ citasDelDia.length }}</p>
+        <p>Total: {{ citasDelDia?.length || 0 }}</p>
         <p>Programadas: {{ contarPorEstado('PROGRAMADA') }}</p>
         <p>Canceladas: {{ contarPorEstado('CANCELADA') }}</p>
         <p>No asistió: {{ contarPorEstado('NO_ASISTIO') }}</p>
