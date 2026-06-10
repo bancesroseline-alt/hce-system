@@ -82,10 +82,13 @@ export class CitasComponent implements OnInit {
   cargarCitas(): void {
     this.http.get<any[]>(`${this.api}/citas`, this.getHeaders()).subscribe({
       next: data => {
-        this.citas = data || [];
-        this.filtrarCitasPorDia();
-        this.generarCalendario();
-      },
+  this.citas = (data || []).sort((a, b) =>
+    a.hora.localeCompare(b.hora)
+  );
+
+  this.filtrarCitasPorDia();
+  this.generarCalendario();
+},
       error: err => console.error('Error al cargar citas', err)
     });
   }
