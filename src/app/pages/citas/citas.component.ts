@@ -89,32 +89,37 @@ export class CitasComponent implements OnInit {
     });
   }
 
-  cargarMedicos(): void {
+ cargarMedicos(): void {
+  this.http.get<any[]>(`${this.api}/usuarios`)
+    .subscribe({
+      next: data => {
+        this.medicos = (data || []).filter(u => {
+          const rol = (u.rol || '').toString()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace('ROLE_', '')
+            .toUpperCase();
 
-  this.http.get<any[]>(`${this.api}/usuarios`).subscribe({
-    next: data => {
+          return rol === 'MEDICO';
+        });
 
-      const usuarios = data || [];
+        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
 
-      this.medicos = usuarios.filter(u => {
+        const rolUsuario = (usuario.rol || '').toString()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace('ROLE_', '')
+          .toUpperCase();
 
-        const rol = (u.rol || '').toUpperCase();
-
-        return (
-          rol.includes('MEDICO') ||
-          rol.includes('ROLE_MEDICO') ||
-          rol.includes('MÉDICO')
-        );
-      });
-
-      console.log('MEDICOS CARGADOS:', this.medicos);
-    },
-
-    error: err => {
-      console.error('Error cargando médicos:', err);
-      this.medicos = [];
-    }
-  });
+        if (
+          rolUsuario === 'MEDICO' &&
+          !this.medicos.some(m => m.id === usuario.id)
+        ) {
+          this.medicos.push(usuario);
+        }
+      },
+      error: error => console.error('Error al cargar médicos', error)
+    });
 }
 
   // =========================
