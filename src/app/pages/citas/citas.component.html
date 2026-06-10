@@ -270,19 +270,38 @@
 
 <td>
 
+  <select
+    [ngModel]="c.estado"
+    (ngModelChange)="cambiarEstado(c, $event)"
+    class="form-select">
+
+    <option value="PROGRAMADA">
+      PROGRAMADA
+    </option>
+
+    <option value="ATENDIDA">
+      ATENDIDA
+    </option>
+
+    <option value="NO_ASISTIO">
+      NO_ASISTIO
+    </option>
+
+    <option value="CANCELADA">
+      CANCELADA
+    </option>
+
+  </select>
+
   <button
     *ngIf="c.estado === 'PROGRAMADA'"
-    class="btn-action"
+    class="btn-action mt-2"
     type="button"
     [routerLink]="['/atenciones/nueva', c.pacienteId || c.paciente?.id, 'cita', c.id]">
-    Atender
-  </button>
 
-  <span
-    *ngIf="c.estado === 'ATENDIDA'"
-    class="text-success">
-    Atención registrada
-  </span>
+    Atender
+
+  </button>
 
 </td>
 
