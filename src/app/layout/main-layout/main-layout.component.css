@@ -292,6 +292,35 @@ main {
   background: #f4f7fb;
 }
 
+/* FORZAR ÍCONOS DEL SIDEBAR EN BLANCO */
+.sidebar .nav-icon svg,
+.sidebar .nav-icon svg path {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  stroke: none !important;
+}
+
+.sidebar .nav-icon {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.sidebar a.active .nav-icon {
+  background: rgba(255, 255, 255, 0.24) !important;
+}
+
+.sidebar a:hover .nav-icon {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* Mejor contraste del texto */
+.sidebar a {
+  color: #e2e8f0 !important;
+}
+
+.sidebar a.active {
+  color: #ffffff !important;
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .sidebar {
