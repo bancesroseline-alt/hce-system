@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+
+import { PacienteService } from '../../../services/paciente.service';
+import { Paciente } from '../../../models/paciente.model';
 
 @Component({
   selector: 'app-paciente-detalle',
@@ -9,18 +12,23 @@ import { CommonModule } from '@angular/common';
   templateUrl: './paciente-detalle.component.html',
   styleUrls: ['./paciente-detalle.component.css']
 })
-export class PacienteDetalleComponent implements OnInit {
+export class PacienteDetalleComponent {
 
-  id!: number;
+  paciente!: Paciente;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private pacienteService: PacienteService
+  ) {}
 
   ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
 
-    this.id = Number(this.route.snapshot.paramMap.get('id'));
-
-    console.log('Paciente ID:', this.id);
-
+    if (id) {
+      this.pacienteService.obtener(Number(id))
+        .subscribe(data => {
+          this.paciente = data;
+        });
+    }
   }
-
 }
