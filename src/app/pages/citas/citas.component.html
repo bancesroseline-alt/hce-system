@@ -23,25 +23,15 @@
 
     <div class="form-grid">
 
-      <!-- BUSCAR PACIENTE -->
+      <!-- PACIENTE (se mantiene búsqueda si quieres) -->
       <div class="form-group buscador">
         <label>Paciente</label>
 
-        <div class="search-wrapper">
-          <input
-            type="text"
-            placeholder="Buscar por ID, nombre o DNI"
-            [(ngModel)]="busquedaPaciente"
-            (input)="cita.paciente.id = null">
-
-          <button
-            type="button"
-            class="clear-btn"
-            *ngIf="busquedaPaciente"
-            (click)="limpiarPaciente()">
-            ×
-          </button>
-        </div>
+        <input
+          type="text"
+          placeholder="Buscar por ID, nombre o DNI"
+          [(ngModel)]="busquedaPaciente"
+          (input)="cita.paciente.id = null">
 
         <div class="resultados" *ngIf="busquedaPaciente && !cita.paciente.id">
           <button
@@ -57,38 +47,17 @@
         </div>
       </div>
 
-      <!-- BUSCAR MÉDICO -->
-      <div class="form-group buscador">
-        <label>Médico</label>
+      <!-- MÉDICO CORREGIDO (DROPDOWN) -->
+      <div class="form-group">
+        <label>Médico *</label>
 
-        <div class="search-wrapper">
-          <input
-            type="text"
-            placeholder="Buscar por ID o nombre del médico"
-            [(ngModel)]="busquedaMedico"
-            (input)="cita.medico.id = null">
+        <select [(ngModel)]="cita.medico.id">
+          <option [ngValue]="null">Seleccione médico</option>
 
-          <button
-            type="button"
-            class="clear-btn"
-            *ngIf="busquedaMedico"
-            (click)="limpiarMedico()">
-            ×
-          </button>
-        </div>
-
-        <div class="resultados" *ngIf="busquedaMedico && !cita.medico.id">
-          <button
-            type="button"
-            *ngFor="let m of medicosFiltrados()"
-            (click)="seleccionarMedico(m)">
-            {{ m.id }} - {{ obtenerNombreUsuario(m) }}
-          </button>
-
-          <div class="no-results" *ngIf="medicosFiltrados().length === 0">
-            No se encontraron médicos.
-          </div>
-        </div>
+          <option *ngFor="let m of medicos" [ngValue]="m.id">
+            {{ m.nombres }} {{ m.apellidos }} - {{ m.username }}
+          </option>
+        </select>
       </div>
 
       <!-- TIPO DE CITA -->
@@ -104,72 +73,50 @@
       <!-- FECHA -->
       <div class="form-group">
         <label>Fecha</label>
-
-        <input
-          type="date"
-          [(ngModel)]="cita.fecha">
+        <input type="date" [(ngModel)]="cita.fecha">
       </div>
 
       <!-- HORA -->
       <div class="form-group">
         <label>Hora</label>
-
-        <input
-          type="time"
-          [(ngModel)]="cita.hora">
+        <input type="time" [(ngModel)]="cita.hora">
       </div>
 
       <!-- ESPECIALIDAD -->
       <div class="form-group">
         <label>Especialidad</label>
-
-        <input
-          type="text"
-          placeholder="Ej. Medicina general"
-          [(ngModel)]="cita.especialidad">
+        <input type="text" [(ngModel)]="cita.especialidad">
       </div>
 
       <!-- MOTIVO -->
       <div class="form-group full">
         <label>Motivo de consulta</label>
 
-        <textarea
-          placeholder="Describe el motivo de consulta"
-          [(ngModel)]="cita.motivoConsulta">
-        </textarea>
+        <textarea [(ngModel)]="cita.motivoConsulta"></textarea>
       </div>
 
     </div>
 
-    <!-- ACCIONES FORMULARIO -->
+    <!-- ACCIONES -->
     <div class="actions">
-      <button
-        type="button"
-        class="btn-secondary"
-        (click)="modoNuevaCita = false">
+      <button class="btn-secondary" (click)="modoNuevaCita = false">
         Cancelar
       </button>
 
-      <button
-        type="button"
-        class="btn-primary"
-        (click)="guardar()">
+      <button class="btn-primary" (click)="guardar()">
         Guardar cita
       </button>
     </div>
   </section>
 
-  <!-- LISTADO + CALENDARIO -->
+  <!-- LISTADO -->
   <div class="content-grid" *ngIf="!modoNuevaCita">
 
-    <!-- TABLA CITAS -->
     <section class="panel citas-panel">
 
       <div class="panel-title">
-        <div>
-          <h2>Citas del día</h2>
-          <p>{{ formatearFecha(fechaSeleccionada) }}</p>
-        </div>
+        <h2>Citas del día</h2>
+        <p>{{ formatearFecha(fechaSeleccionada) }}</p>
       </div>
 
       <table>
@@ -187,16 +134,15 @@
         <tbody>
 
           <tr *ngFor="let c of citasDelDia">
+
             <td>{{ c.hora }}</td>
 
-            <td>
-              {{ c.pacienteNombre || c.paciente?.nombres || 'Paciente' }}
-            </td>
+            <td>{{ c.pacienteNombre || c.paciente?.nombres }}</td>
 
             <td>{{ c.motivoConsulta }}</td>
 
             <td>
-              <span class="badge" [ngClass]="c.estado?.toLowerCase()">
+              <span class="badge">
                 {{ c.estado }}
               </span>
             </td>
@@ -204,13 +150,11 @@
             <td>{{ c.tipoCita }}</td>
 
             <td>
-              <button
-                type="button"
-                class="btn-action"
-                [routerLink]="['/atenciones/nueva', c.pacienteId || c.paciente?.id, 'cita', c.id]">
+              <button class="btn-action">
                 Atender
               </button>
             </td>
+
           </tr>
 
           <tr *ngIf="citasDelDia.length === 0">
@@ -224,86 +168,44 @@
 
     </section>
 
-    <!-- PANEL DERECHO -->
+    <!-- CALENDARIO -->
     <aside class="side-panel">
 
-      <!-- CALENDARIO FUNCIONAL -->
       <div class="calendar-card">
 
         <div class="calendar-header">
-          <button
-            type="button"
-            class="calendar-nav"
-            (click)="mesAnterior()">
-            ‹
-          </button>
-
+          <button (click)="mesAnterior()">‹</button>
           <h2>{{ nombreMesActual }}</h2>
-
-          <button
-            type="button"
-            class="calendar-nav"
-            (click)="mesSiguiente()">
-            ›
-          </button>
+          <button (click)="mesSiguiente()">›</button>
         </div>
 
         <div class="calendar-grid">
 
-          <span
-            class="day-name"
-            *ngFor="let d of diasSemana">
+          <span *ngFor="let d of diasSemana">
             {{ d }}
           </span>
 
           <button
-            type="button"
-            class="calendar-day"
             *ngFor="let item of diasCalendario"
-            [class.empty-day]="!item.fecha"
+            (click)="seleccionarDia(item)"
             [class.active-day]="item.seleccionado"
-            [class.has-citas]="item.tieneCitas"
-            (click)="seleccionarDia(item)">
+            [class.has-citas]="item.tieneCitas">
 
             {{ item.dia }}
 
-            <span
-              *ngIf="item.tieneCitas"
-              class="dot">
-            </span>
           </button>
 
         </div>
       </div>
 
-      <!-- RESUMEN DEL DÍA -->
       <div class="summary-card">
-        <h2>Resumen del día</h2>
+        <h2>Resumen</h2>
 
-        <p>
-          Fecha seleccionada
-          <strong>{{ formatearFecha(fechaSeleccionada) }}</strong>
-        </p>
+        <p>Total: {{ citasDelDia.length }}</p>
+        <p>Programadas: {{ contarPorEstado('PROGRAMADA') }}</p>
+        <p>Canceladas: {{ contarPorEstado('CANCELADA') }}</p>
+        <p>No asistió: {{ contarPorEstado('NO_ASISTIO') }}</p>
 
-        <p>
-          Citas del día
-          <strong>{{ citasDelDia.length }}</strong>
-        </p>
-
-        <p>
-          Programadas
-          <strong>{{ contarPorEstado('PROGRAMADA') }}</strong>
-        </p>
-
-        <p>
-          No asistió
-          <strong>{{ contarPorEstado('NO_ASISTIO') }}</strong>
-        </p>
-
-        <p>
-          Canceladas
-          <strong>{{ contarPorEstado('CANCELADA') }}</strong>
-        </p>
       </div>
 
     </aside>
