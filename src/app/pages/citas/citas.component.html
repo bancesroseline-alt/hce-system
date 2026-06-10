@@ -1,1 +1,58 @@
-<p>citas works!</p>
+
+<div class="page">
+
+  <div class="page-header">
+    <h1>
+      {{ idPaciente ? 'Citas del paciente' : 'Dashboard de citas' }}
+    </h1>
+  </div>
+
+  <div class="card">
+
+    <table *ngIf="citas.length > 0; else empty">
+
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let c of citas">
+
+          <td>
+            {{ c.paciente?.nombres }} {{ c.paciente?.apellidos }}
+          </td>
+
+          <td>
+            {{ c.medico?.username }}
+          </td>
+
+          <td>{{ c.fecha }}</td>
+          <td>{{ c.hora }}</td>
+
+          <td>{{ c.tipoCita }}</td>
+
+          <td>
+            <span [class]="c.estado.toLowerCase()">
+              {{ c.estado }}
+            </span>
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+
+    <ng-template #empty>
+      <p>No hay citas registradas.</p>
+    </ng-template>
+
+  </div>
+
+</div>
