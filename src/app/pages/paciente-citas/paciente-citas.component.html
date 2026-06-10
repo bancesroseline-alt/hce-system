@@ -116,7 +116,7 @@
 
           <td>
             <button class="btn-detalle" type="button" (click)="abrirDetalle(c)">
-              Ver / Editar
+              {{ c.estado === 'ATENDIDA' ? 'Ver' : 'Ver / Editar' }}
             </button>
           </td>
         </tr>
