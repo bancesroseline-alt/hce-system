@@ -39,7 +39,11 @@
               <span class="estado-inactivo-mini" *ngIf="!p.estado">Inactivo</span>
             </td>
             <td>
-              <button class="btn-primary" [routerLink]="['/historias-clinicas', p.id]">
+             <button
+                class="btn-historial"
+                [routerLink]="['/historias-clinicas', p.id]">
+              
+                <span class="icon-btn">📋</span>
                 Ver historial
               </button>
             </td>
