@@ -20,9 +20,17 @@
   </div>
 
   <!-- ALERTA -->
-  <div *ngIf="mensaje" class="success">
-    {{ mensaje }}
-  </div>
+ <div
+  *ngIf="mensaje"
+  class="alerta"
+  [ngClass]="{
+    'alerta-success': tipoMensaje === 'success',
+    'alerta-error': tipoMensaje === 'error'
+  }">
+
+  {{ mensaje }}
+
+</div>
 
   <!-- FORMULARIO -->
   <section class="form-card" *ngIf="modoNuevaCita">
