@@ -22,11 +22,21 @@ export class CitasComponent implements OnInit {
   medicos: any[] = [];
 
   busquedaPaciente = '';
+  busquedaMedico = '';
+
   mensaje = '';
   modoNuevaCita = false;
 
-  fechaSeleccionada = new Date();
+  fechaSeleccionada: Date = new Date();
+
   diasCalendario: any[] = [];
+
+  meses = [
+    'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
+  ];
+
+  diasSemana = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 
   cita: any = {
     paciente: { id: null },
@@ -47,6 +57,7 @@ export class CitasComponent implements OnInit {
   ngOnInit(): void {
     this.cargarPacientes();
     this.cargarMedicos();
+    this.cargarCitas();
 
     const pacienteId = Number(this.route.snapshot.paramMap.get('id'));
 
@@ -54,34 +65,83 @@ export class CitasComponent implements OnInit {
       this.modoNuevaCita = true;
       this.cita.paciente.id = pacienteId;
     }
+  }
 
-    this.cargarCitas();
+  // =========================
+  // CARGAS
+  // =========================
+
+  cargarCitas(): void {
+    this.http.get<any[]>(`${this.api}/citas`).subscribe(data => {
+      this.citas = data || [];
+      this.filtrarCitasPorDia();
+      this.generarCalendario();
+    });
   }
 
   cargarPacientes(): void {
-    this.http.get<any[]>(`${this.api}/pacientes`)
-      .subscribe({
-        next: data => this.pacientes = data || [],
-        error: err => console.error(err)
-      });
+    this.http.get<any[]>(`${this.api}/pacientes`).subscribe(data => {
+      this.pacientes = data || [];
+    });
   }
 
   cargarMedicos(): void {
-    this.http.get<any[]>(`${this.api}/usuarios`)
-      .subscribe({
-        next: data => {
-          this.medicos = (data || []).filter(u =>
-            (u.rol || '').toUpperCase() === 'MEDICO'
-          );
-        },
-        error: err => console.error(err)
-      });
+    this.http.get<any[]>(`${this.api}/usuarios`).subscribe(data => {
+      this.medicos = (data || []).filter(u =>
+        (u.rol || '').toUpperCase().includes('MEDICO')
+      );
+    });
   }
+
+  // =========================
+  // BUSQUEDA
+  // =========================
+
+  pacientesFiltrados(): any[] {
+    const q = this.busquedaPaciente.toLowerCase();
+    return this.pacientes.filter(p =>
+      p.nombres?.toLowerCase().includes(q) ||
+      p.apellidos?.toLowerCase().includes(q) ||
+      p.numeroDocumento?.includes(q)
+    );
+  }
+
+  medicosFiltrados(): any[] {
+    const q = this.busquedaMedico.toLowerCase();
+    return this.medicos.filter(m =>
+      (m.nombres || '').toLowerCase().includes(q) ||
+      (m.username || '').toLowerCase().includes(q)
+    );
+  }
+
+  seleccionarPaciente(p: any): void {
+    this.cita.paciente.id = p.id;
+    this.busquedaPaciente = `${p.nombres} ${p.apellidos}`;
+  }
+
+  seleccionarMedico(m: any): void {
+    this.cita.medico.id = m.id;
+    this.busquedaMedico = m.nombres || m.username;
+  }
+
+  limpiarPaciente(): void {
+    this.cita.paciente.id = null;
+    this.busquedaPaciente = '';
+  }
+
+  limpiarMedico(): void {
+    this.cita.medico.id = null;
+    this.busquedaMedico = '';
+  }
+
+  // =========================
+  // GUARDAR (FIX BACKEND SAFE)
+  // =========================
 
   guardar(): void {
 
     if (!this.cita.paciente.id || !this.cita.medico.id) {
-      this.mensaje = 'Debes seleccionar paciente y médico.';
+      this.mensaje = 'Paciente y médico son obligatorios';
       return;
     }
 
@@ -96,18 +156,18 @@ export class CitasComponent implements OnInit {
       estado: this.cita.estado
     };
 
-    this.http.post(`${this.api}/citas`, payload)
-      .subscribe({
-        next: () => {
-          this.mensaje = 'Cita registrada correctamente';
-          this.limpiarFormulario();
-          this.cargarCitas();
-        },
-        error: err => {
-          console.error('ERROR BACKEND:', err);
-          this.mensaje = 'Error al guardar cita';
-        }
-      });
+    this.http.post(`${this.api}/citas`, payload).subscribe({
+      next: () => {
+        this.mensaje = 'Cita registrada correctamente';
+        this.modoNuevaCita = false;
+        this.limpiarFormulario();
+        this.cargarCitas();
+      },
+      error: (err) => {
+        console.error(err);
+        this.mensaje = 'Error al guardar cita';
+      }
+    });
   }
 
   limpiarFormulario(): void {
@@ -123,28 +183,87 @@ export class CitasComponent implements OnInit {
     };
 
     this.busquedaPaciente = '';
+    this.busquedaMedico = '';
   }
 
-  cargarCitas(): void {
-    this.http.get<any[]>(`${this.api}/citas`)
-      .subscribe({
-        next: data => {
-          this.citas = data || [];
-          this.filtrarCitasPorDia();
-        },
-        error: err => console.error(err)
+  // =========================
+  // CALENDARIO
+  // =========================
+
+  get nombreMesActual(): string {
+    return `${this.meses[this.fechaSeleccionada.getMonth()]} ${this.fechaSeleccionada.getFullYear()}`;
+  }
+
+  mesAnterior(): void {
+    this.fechaSeleccionada = new Date(
+      this.fechaSeleccionada.getFullYear(),
+      this.fechaSeleccionada.getMonth() - 1,
+      1
+    );
+    this.generarCalendario();
+    this.filtrarCitasPorDia();
+  }
+
+  mesSiguiente(): void {
+    this.fechaSeleccionada = new Date(
+      this.fechaSeleccionada.getFullYear(),
+      this.fechaSeleccionada.getMonth() + 1,
+      1
+    );
+    this.generarCalendario();
+    this.filtrarCitasPorDia();
+  }
+
+  generarCalendario(): void {
+
+    const year = this.fechaSeleccionada.getFullYear();
+    const month = this.fechaSeleccionada.getMonth();
+
+    const first = new Date(year, month, 1);
+    const last = new Date(year, month + 1, 0);
+
+    let start = first.getDay();
+    start = start === 0 ? 6 : start - 1;
+
+    this.diasCalendario = [];
+
+    for (let i = 0; i < start; i++) {
+      this.diasCalendario.push({ dia: '', fecha: null, tieneCitas: false });
+    }
+
+    for (let d = 1; d <= last.getDate(); d++) {
+      const fecha = new Date(year, month, d);
+      const iso = this.formatearFecha(fecha);
+
+      this.diasCalendario.push({
+        dia: d,
+        fecha: iso,
+        tieneCitas: this.citas.some(c => c.fecha === iso),
+        seleccionado: iso === this.formatearFecha(this.fechaSeleccionada)
       });
+    }
+  }
+
+  seleccionarDia(item: any): void {
+    if (!item.fecha) return;
+    this.fechaSeleccionada = new Date(item.fecha + 'T00:00:00');
+    this.filtrarCitasPorDia();
+    this.generarCalendario();
   }
 
   filtrarCitasPorDia(): void {
-    const fechaISO = this.formatearFecha(this.fechaSeleccionada);
-    this.citasDelDia = this.citas.filter(c => c.fecha === fechaISO);
+    const iso = this.formatearFecha(this.fechaSeleccionada);
+    this.citasDelDia = this.citas.filter(c => c.fecha === iso);
   }
 
   formatearFecha(fecha: Date): string {
-    const year = fecha.getFullYear();
-    const month = String(fecha.getMonth() + 1).padStart(2, '0');
-    const day = String(fecha.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const y = fecha.getFullYear();
+    const m = String(fecha.getMonth() + 1).padStart(2, '0');
+    const d = String(fecha.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  contarPorEstado(estado: string): number {
+    return this.citasDelDia.filter(c => c.estado === estado).length;
   }
 }
