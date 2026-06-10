@@ -1,39 +1,135 @@
+<div class="citas-page">
 
-<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Citas</h1>
+      <p>Gestiona y visualiza las citas programadas</p>
+    </div>
 
-  <h1>Nueva Cita</h1>
+    <button class="btn-primary" (click)="modoNuevaCita = true">
+      + Nueva cita
+    </button>
+  </div>
 
   <div *ngIf="mensaje" class="success">
     {{ mensaje }}
   </div>
 
-  <div class="form">
+  <section class="form-card" *ngIf="modoNuevaCita">
+    <h2>Nueva cita</h2>
 
-    <input type="number" placeholder="ID Paciente"
-      [(ngModel)]="cita.paciente.id">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>ID Paciente</label>
+        <input type="number" [(ngModel)]="cita.paciente.id">
+      </div>
 
-    <input type="number" placeholder="ID Médico"
-      [(ngModel)]="cita.medico.id">
+      <div class="form-group">
+        <label>ID Médico</label>
+        <input type="number" [(ngModel)]="cita.medico.id">
+      </div>
 
-    <select [(ngModel)]="cita.tipoCita">
-      <option value="CONSULTA">Consulta</option>
-      <option value="CONTROL">Control</option>
-      <option value="EMERGENCIA">Emergencia</option>
-    </select>
+      <div class="form-group">
+        <label>Tipo de cita</label>
+        <select [(ngModel)]="cita.tipoCita">
+          <option value="CONSULTA">Consulta</option>
+          <option value="PREVENTIVA">Preventiva</option>
+        </select>
+      </div>
 
-    <input type="date" [(ngModel)]="cita.fecha">
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" [(ngModel)]="cita.fecha">
+      </div>
 
-    <input type="time" [(ngModel)]="cita.hora">
+      <div class="form-group">
+        <label>Hora</label>
+        <input type="time" [(ngModel)]="cita.hora">
+      </div>
 
-    <input type="text" placeholder="Especialidad"
-      [(ngModel)]="cita.especialidad">
+      <div class="form-group">
+        <label>Especialidad</label>
+        <input type="text" [(ngModel)]="cita.especialidad">
+      </div>
 
-    <textarea placeholder="Motivo de consulta"
-      [(ngModel)]="cita.motivoConsulta"></textarea>
+      <div class="form-group full">
+        <label>Motivo de consulta</label>
+        <textarea [(ngModel)]="cita.motivoConsulta"></textarea>
+      </div>
+    </div>
 
-    <button (click)="guardar()">
-      Guardar Cita
-    </button>
+    <div class="actions">
+      <button class="btn-secondary" (click)="modoNuevaCita = false">Cancelar</button>
+      <button class="btn-primary" (click)="guardar()">Guardar cita</button>
+    </div>
+  </section>
+
+  <div class="content-grid" *ngIf="!modoNuevaCita">
+
+    <section class="panel citas-panel">
+      <div class="panel-title">
+        <h2>Citas programadas</h2>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Hora</th>
+            <th>Paciente</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let c of citas">
+            <td>{{ c.hora }}</td>
+            <td>{{ c.pacienteNombre || c.paciente?.nombres || 'Paciente' }}</td>
+            <td>{{ c.motivoConsulta }}</td>
+            <td>
+              <span class="badge" [ngClass]="c.estado?.toLowerCase()">
+                {{ c.estado }}
+              </span>
+            </td>
+            <td>{{ c.tipoCita }}</td>
+            <td>
+              <button
+                class="btn-action"
+                [routerLink]="['/atenciones/nueva', c.pacienteId || c.paciente?.id, 'cita', c.id]">
+                Atender
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="citas.length === 0">
+            <td colspan="6" class="empty">No hay citas registradas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <aside class="side-panel">
+      <div class="calendar-card">
+        <h2>Calendario</h2>
+        <p class="calendar-month">Mayo 2026</p>
+
+        <div class="calendar-grid">
+          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+          <span>8</span><span>9</span><span class="active-day">10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+          <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <h2>Resumen del día</h2>
+        <p>Citas registradas <strong>{{ citas.length }}</strong></p>
+        <p>Citas confirmadas <strong>{{ citas.length }}</strong></p>
+        <p>Citas pendientes <strong>0</strong></p>
+      </div>
+    </aside>
 
   </div>
 
