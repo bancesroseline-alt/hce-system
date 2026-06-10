@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 @Component({
@@ -31,11 +31,11 @@ export class CitasComponent implements OnInit {
   diasCalendario: any[] = [];
 
   meses = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
   ];
 
-  diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  diasSemana = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 
   cita: any = {
     paciente: { id: null },
@@ -56,85 +56,88 @@ export class CitasComponent implements OnInit {
   ngOnInit(): void {
     const pacienteId = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.cargarPacientes();
-    this.cargarMedicos();
-    this.cargarCitas();
-
     if (pacienteId) {
       this.modoNuevaCita = true;
       this.cita.paciente.id = pacienteId;
     }
+
+    this.cargarPacientes();
+    this.cargarMedicos();
+    this.cargarCitas();
+  }
+
+  getHeaders() {
+    const token = localStorage.getItem('token');
+
+    if (!token) return {};
+
+    return {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    };
   }
 
   cargarCitas(): void {
-    this.http.get<any[]>(`${this.api}/citas`).subscribe({
+    this.http.get<any[]>(`${this.api}/citas`, this.getHeaders()).subscribe({
       next: data => {
         this.citas = data || [];
         this.filtrarCitasPorDia();
         this.generarCalendario();
       },
-      error: error => {
-        console.error('Error al cargar citas', error);
-      }
+      error: err => console.error('Error al cargar citas', err)
     });
   }
 
   cargarPacientes(): void {
-    this.http.get<any[]>(`${this.api}/pacientes`).subscribe({
+    this.http.get<any[]>(`${this.api}/pacientes`, this.getHeaders()).subscribe({
       next: data => {
         this.pacientes = data || [];
 
         if (this.cita.paciente.id) {
-          const pacienteSeleccionado = this.pacientes.find(
-            p => Number(p.id) === Number(this.cita.paciente.id)
-          );
+          const p = this.pacientes.find(x => Number(x.id) === Number(this.cita.paciente.id));
 
-          if (pacienteSeleccionado) {
-            this.busquedaPaciente =
-              `${pacienteSeleccionado.nombres} ${pacienteSeleccionado.apellidos} - DNI ${pacienteSeleccionado.numeroDocumento}`;
+          if (p) {
+            this.busquedaPaciente = `${p.nombres} ${p.apellidos} - DNI ${p.numeroDocumento}`;
           }
         }
       },
-      error: error => {
-        console.error('Error al cargar pacientes', error);
+      error: err => {
+        console.error('Error al cargar pacientes', err);
+        this.pacientes = [];
       }
     });
   }
 
   cargarMedicos(): void {
-    const usuarioActual = JSON.parse(localStorage.getItem('usuario') || '{}');
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
 
-    this.http.get<any[]>(`${this.api}/usuarios`).subscribe({
+    this.http.get<any[]>(`${this.api}/usuarios`, this.getHeaders()).subscribe({
       next: data => {
-        const usuarios = data || [];
-
-        this.medicos = usuarios.filter(u => this.normalizarRol(u.rol) === 'MEDICO');
+        this.medicos = (data || []).filter(u => this.normalizarRol(u.rol) === 'MEDICO');
 
         if (
-          this.normalizarRol(usuarioActual.rol) === 'MEDICO' &&
-          usuarioActual.id &&
-          !this.medicos.some(m => Number(m.id) === Number(usuarioActual.id))
+          this.normalizarRol(usuario.rol) === 'MEDICO' &&
+          usuario.id &&
+          !this.medicos.some(m => Number(m.id) === Number(usuario.id))
         ) {
-          this.medicos.push(usuarioActual);
+          this.medicos.push(usuario);
         }
 
-        if (!this.cita.medico.id && usuarioActual.id && this.normalizarRol(usuarioActual.rol) === 'MEDICO') {
-          this.cita.medico.id = usuarioActual.id;
-          this.busquedaMedico = this.obtenerNombreUsuario(usuarioActual);
-        }
-
-        if (this.medicos.length === 1 && !this.cita.medico.id) {
-          this.cita.medico.id = this.medicos[0].id;
-          this.busquedaMedico = this.obtenerNombreUsuario(this.medicos[0]);
+        if (usuario.id && this.normalizarRol(usuario.rol) === 'MEDICO') {
+          this.cita.medico.id = usuario.id;
+          this.busquedaMedico = this.obtenerNombreUsuario(usuario);
         }
       },
-      error: error => {
-        console.error('Error al cargar médicos', error);
+      error: err => {
+        console.error('Error al cargar médicos', err);
 
-        if (this.normalizarRol(usuarioActual.rol) === 'MEDICO' && usuarioActual.id) {
-          this.medicos = [usuarioActual];
-          this.cita.medico.id = usuarioActual.id;
-          this.busquedaMedico = this.obtenerNombreUsuario(usuarioActual);
+        if (this.normalizarRol(usuario.rol) === 'MEDICO' && usuario.id) {
+          this.medicos = [usuario];
+          this.cita.medico.id = usuario.id;
+          this.busquedaMedico = this.obtenerNombreUsuario(usuario);
+        } else {
+          this.medicos = [];
         }
       }
     });
@@ -149,13 +152,23 @@ export class CitasComponent implements OnInit {
       .toUpperCase();
   }
 
+  obtenerNombreUsuario(usuario: any): string {
+    const nombres = usuario.nombres || usuario.nombre || '';
+    const apellidos = usuario.apellidos || '';
+    const username = usuario.username || '';
+
+    return `${nombres} ${apellidos}`.trim() || username || 'Médico';
+  }
+
   pacientesFiltrados(): any[] {
     const q = this.busquedaPaciente.trim().toLowerCase();
 
-    if (!q) return [];
+    if (!q) return this.pacientes;
 
     return this.pacientes.filter(p =>
-      `${p.id}`.includes(q) ||
+      `${p.id || ''}`.includes(q) ||
+      `${p.nombres || ''}`.toLowerCase().includes(q) ||
+      `${p.apellidos || ''}`.toLowerCase().includes(q) ||
       `${p.nombres || ''} ${p.apellidos || ''}`.toLowerCase().includes(q) ||
       `${p.numeroDocumento || ''}`.includes(q)
     );
@@ -164,24 +177,23 @@ export class CitasComponent implements OnInit {
   medicosFiltrados(): any[] {
     const q = this.busquedaMedico.trim().toLowerCase();
 
-    if (!q) return [];
+    if (!q) return this.medicos;
 
     return this.medicos.filter(m =>
-      `${m.id}`.includes(q) ||
+      `${m.id || ''}`.includes(q) ||
       this.obtenerNombreUsuario(m).toLowerCase().includes(q) ||
       `${m.username || ''}`.toLowerCase().includes(q)
     );
   }
 
-  seleccionarPaciente(paciente: any): void {
-    this.cita.paciente.id = paciente.id;
-    this.busquedaPaciente =
-      `${paciente.nombres} ${paciente.apellidos} - DNI ${paciente.numeroDocumento}`;
+  seleccionarPaciente(p: any): void {
+    this.cita.paciente.id = p.id;
+    this.busquedaPaciente = `${p.nombres} ${p.apellidos} - DNI ${p.numeroDocumento}`;
   }
 
-  seleccionarMedico(medico: any): void {
-    this.cita.medico.id = medico.id;
-    this.busquedaMedico = this.obtenerNombreUsuario(medico);
+  seleccionarMedico(m: any): void {
+    this.cita.medico.id = m.id;
+    this.busquedaMedico = this.obtenerNombreUsuario(m);
   }
 
   limpiarPaciente(): void {
@@ -192,10 +204,6 @@ export class CitasComponent implements OnInit {
   limpiarMedico(): void {
     this.cita.medico.id = null;
     this.busquedaMedico = '';
-  }
-
-  obtenerNombreUsuario(usuario: any): string {
-    return usuario.nombres || usuario.nombre || usuario.username || 'Usuario';
   }
 
   guardar(): void {
@@ -215,15 +223,15 @@ export class CitasComponent implements OnInit {
       estado: this.cita.estado
     };
 
-    this.http.post(`${this.api}/citas`, payload).subscribe({
+    this.http.post(`${this.api}/citas`, payload, this.getHeaders()).subscribe({
       next: () => {
         this.mensaje = 'Cita registrada correctamente';
         this.modoNuevaCita = false;
         this.limpiarFormulario();
         this.cargarCitas();
       },
-      error: error => {
-        console.error('Error al guardar cita', error);
+      error: err => {
+        console.error('Error al guardar cita', err);
         this.mensaje = 'Error al guardar cita';
       }
     });
@@ -255,7 +263,6 @@ export class CitasComponent implements OnInit {
       this.fechaSeleccionada.getMonth() - 1,
       1
     );
-
     this.generarCalendario();
     this.filtrarCitasPorDia();
   }
@@ -266,7 +273,6 @@ export class CitasComponent implements OnInit {
       this.fechaSeleccionada.getMonth() + 1,
       1
     );
-
     this.generarCalendario();
     this.filtrarCitasPorDia();
   }
