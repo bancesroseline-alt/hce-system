@@ -39,10 +39,10 @@
           <td>{{ c.tipoCita }}</td>
 
           <td>
-            <span [class]="c.estado.toLowerCase()">
-              {{ c.estado }}
-            </span>
-          </td>
+  <span [class]="c.estado ? c.estado.toLowerCase() : ''">
+    {{ c.estado || 'SIN ESTADO' }}
+  </span>
+</td>
 
         </tr>
       </tbody>
