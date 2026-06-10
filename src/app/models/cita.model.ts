@@ -2,27 +2,25 @@ export interface Cita {
 
   id?: number;
 
-  paciente: {
-    id: number;
+  paciente?: {
+    id?: number;
     nombres?: string;
     apellidos?: string;
   };
 
-  medico: {
-    id: number;
+  medico?: {
+    id?: number;
     username?: string;
   };
 
-  tipoCita: 'CONSULTA' | 'CONTROL' | 'EMERGENCIA';
+  tipoCita?: string;
 
-  fecha: string; // LocalDate -> string
-  hora: string;  // LocalTime -> string
+  fecha?: string;
+  hora?: string;
 
-  especialidad: string;
+  especialidad?: string;
 
-  motivoConsulta: string;
+  motivoConsulta?: string;
 
-  estado: 'PROGRAMADA' | 'ATENDIDA' | 'CANCELADA';
-
-  sincronizado?: boolean;
+  estado?: 'PROGRAMADA' | 'ATENDIDA' | 'CANCELADA';
 }
