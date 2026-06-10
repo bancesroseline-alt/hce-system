@@ -364,6 +364,39 @@ th {
   color: #64748b;
 }
 
+.estado-cita {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+/* ATENDIDA: verde */
+.estado-atendida {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+/* PROGRAMADA: azul */
+.estado-programada {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+
+/* CANCELADA: rojo */
+.estado-cancelada {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+/* NO ASISTIÓ: naranja */
+.estado-no-asistio {
+  background: #ffedd5 !important;
+  color: #c2410c !important;
+}
+
 @media (max-width: 900px) {
   .table-header,
   .patient-card,
