@@ -1,191 +1,70 @@
-.historial-page {
-  padding: 28px;
-  background: #f7f9fc;
-  min-height: calc(100vh - 68px);
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.page-header h1 {
-  font-size: 28px;
-  margin: 0;
-  color: #0f172a;
-}
-
-.page-header p {
-  color: #64748b;
-  margin-top: 4px;
-}
-
-.patient-card {
+.list-card {
   background: white;
   border: 1px solid #dbe3ec;
   border-radius: 12px;
-  padding: 22px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 24px;
+  overflow: hidden;
   box-shadow: 0 4px 12px rgba(15, 23, 42, .08);
 }
 
-.avatar {
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  background: #d9d9d9;
-}
-
-.patient-card h2 {
-  margin: 0 0 8px;
-  color: #111827;
-}
-
-.patient-card p {
-  margin: 0;
-  color: #475569;
-}
-
-.estado-activo {
-  margin-left: auto;
-  background: #dcfce7;
-  color: #16a34a;
-  padding: 8px 22px;
-  border-radius: 999px;
-  font-weight: 700;
-}
-
-.estado-inactivo {
-  margin-left: auto;
-  background: #fee2e2;
-  color: #dc2626;
-  padding: 8px 22px;
-  border-radius: 999px;
-  font-weight: 700;
-}
-
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.tabs button {
-  border: none;
-  background: #e2e8f0;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
-  color: #475569;
-}
-
-.tabs button.active {
-  background: #0ea5e9;
-  color: white;
-}
-
-.timeline {
-  background: white;
-  border: 1px solid #dbe3ec;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.timeline-item {
+.table-header {
+  padding: 18px;
   display: flex;
   gap: 16px;
-  padding: 16px 0;
+  justify-content: space-between;
+}
+
+.table-header input {
+  width: 420px;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #f1f5f9;
+}
+
+th,
+td {
+  padding: 16px;
+  text-align: left;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.timeline-item:last-child {
-  border-bottom: none;
-}
-
-.icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-}
-
-.icon.success {
+.estado-activo-mini {
   background: #dcfce7;
   color: #16a34a;
-}
-
-.icon.info {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-.icon.danger {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.timeline-content {
-  flex: 1;
-}
-
-.timeline-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.timeline-head h3 {
-  margin: 0;
-}
-
-.timeline-content p {
-  margin: 6px 0;
-  color: #475569;
-}
-
-.badge {
   padding: 6px 12px;
   border-radius: 999px;
-  font-size: 12px;
   font-weight: 700;
+  font-size: 12px;
 }
 
-.badge.success {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.badge.info {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-.badge.danger {
+.estado-inactivo-mini {
   background: #fee2e2;
   color: #dc2626;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
 }
 
-.btn-primary {
-  background: #0ea5e9;
-  color: white;
-  border: none;
+.header-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid #cbd5e1;
   padding: 11px 18px;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
-}
-
-.empty {
-  text-align: center;
-  color: #64748b;
-  padding: 30px;
-  font-weight: 700;
+  color: #334155;
 }
