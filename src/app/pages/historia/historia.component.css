@@ -1,32 +1,70 @@
-.list-card {
+.historial-page {
+  padding: 28px;
+  background: #f7f9fc;
+  min-height: calc(100vh - 68px);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 32px;
+  color: #0f172a;
+}
+
+.page-header p {
+  margin-top: 8px;
+  color: #64748b;
+}
+
+.list-card,
+.historia-card,
+.patient-card,
+.timeline-content {
   background: white;
   border: 1px solid #dbe3ec;
-  border-radius: 12px;
+  border-radius: 18px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+
+.list-card {
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, .08);
 }
 
 .table-header {
-  padding: 18px;
+  padding: 20px;
   display: flex;
   gap: 16px;
   justify-content: space-between;
+  align-items: center;
 }
 
 .table-header input {
   width: 420px;
-  padding: 12px;
+  padding: 12px 14px;
   border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  border-radius: 12px;
+  outline: none;
+}
+
+.table-header input:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 thead {
-  background: #f1f5f9;
+  background: #eef4fa;
 }
 
 th,
@@ -34,23 +72,98 @@ td {
   padding: 16px;
   text-align: left;
   border-bottom: 1px solid #e5e7eb;
+  color: #334155;
 }
 
+th {
+  font-weight: 900;
+}
+
+.historia-card {
+  padding: 28px;
+}
+
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.breadcrumb-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.separator {
+  color: #94a3b8;
+}
+
+.breadcrumb-current {
+  color: #334155;
+  font-weight: 700;
+}
+
+.patient-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  margin: 24px 0;
+}
+
+.avatar {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+  flex-shrink: 0;
+}
+
+.patient-info-box {
+  flex: 1;
+}
+
+.patient-name {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #0f172a;
+}
+
+.patient-info {
+  display: flex;
+  gap: 16px;
+  color: #475569;
+  font-size: 14px;
+}
+
+.estado-activo,
 .estado-activo-mini {
   background: #dcfce7;
   color: #16a34a;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 12px;
 }
 
+.estado-inactivo,
 .estado-inactivo-mini {
   background: #fee2e2;
   color: #dc2626;
+}
+
+.estado-activo,
+.estado-inactivo {
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+.estado-activo-mini,
+.estado-inactivo-mini {
   padding: 6px 12px;
   border-radius: 999px;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 12px;
 }
 
@@ -59,14 +172,44 @@ td {
   gap: 12px;
 }
 
-.btn-secondary {
-  background: white;
-  border: 1px solid #cbd5e1;
-  padding: 11px 18px;
-  border-radius: 8px;
-  font-weight: 700;
+.btn-secondary,
+.btn-print,
+.btn-primary,
+.btn-historial {
+  border: none;
+  border-radius: 999px;
+  font-weight: 800;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary {
+  background: #eef2f7;
   color: #334155;
+  padding: 11px 18px;
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+.btn-print {
+  background: #0f766e;
+  color: white;
+  padding: 11px 18px;
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.22);
+}
+
+.btn-print:hover {
+  background: #115e59;
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  padding: 10px 16px;
+  margin-top: 12px;
 }
 
 .btn-historial {
@@ -75,22 +218,166 @@ td {
   gap: 8px;
   background: linear-gradient(135deg, #0ea5e9, #0284c7);
   color: white;
-  border: none;
   padding: 10px 16px;
-  border-radius: 10px;
-  font-weight: 700;
   font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 3px 8px rgba(14,165,233,.25);
+  box-shadow: 0 6px 14px rgba(14, 165, 233, 0.25);
 }
 
 .btn-historial:hover {
   transform: translateY(-1px);
   background: linear-gradient(135deg, #0284c7, #0369a1);
-  box-shadow: 0 6px 12px rgba(14,165,233,.35);
 }
 
 .icon-btn {
   font-size: 15px;
+}
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin: 28px 0 24px;
+}
+
+.tab-btn {
+  border: none;
+  background: #eef2f7;
+  color: #475569;
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.tab-btn.active {
+  background: #0ea5e9;
+  color: white;
+  box-shadow: 0 8px 18px rgba(14, 165, 233, 0.22);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 14px;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.icon.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.icon.info {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.icon.danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.timeline-content {
+  padding: 18px;
+  flex: 1;
+}
+
+.timeline-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeline-head h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.timeline-content p {
+  margin: 8px 0;
+  color: #475569;
+}
+
+.badge {
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.badge.success,
+.badge.info {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.badge.danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.empty,
+.empty-state {
+  text-align: center;
+  padding: 42px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.empty-state {
+  border: 2px dashed #dbe3ec;
+  border-radius: 18px;
+  background: #fbfdff;
+}
+
+.empty-icon {
+  font-size: 52px;
+  margin-bottom: 12px;
+}
+
+.empty-state h3 {
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #64748b;
+}
+
+@media (max-width: 900px) {
+  .table-header,
+  .patient-card,
+  .patient-info,
+  .timeline-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table-header input {
+    width: 100%;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
 }
