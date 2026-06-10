@@ -1,5 +1,6 @@
 <div class="historial-page">
 
+  <!-- LISTADO GENERAL -->
   <ng-container *ngIf="modoListado">
 
     <div class="page-header">
@@ -10,10 +11,13 @@
     </div>
 
     <section class="list-card">
+
       <div class="table-header">
         <input placeholder="Buscar paciente por nombre o DNI ..." />
 
-        <button class="btn-secondary">Filtros</button>
+        <button class="btn-secondary" type="button">
+          Filtros
+        </button>
       </div>
 
       <table>
@@ -39,140 +43,253 @@
               <span class="estado-inactivo-mini" *ngIf="!p.estado">Inactivo</span>
             </td>
             <td>
-             <button
+              <button
                 class="btn-historial"
+                type="button"
                 [routerLink]="['/historias-clinicas', p.id]">
-              
+
                 <span class="icon-btn">📋</span>
                 Ver historial
+
               </button>
             </td>
           </tr>
 
           <tr *ngIf="pacientes.length === 0">
-            <td colspan="6" class="empty">No hay pacientes registrados.</td>
+            <td colspan="6" class="empty">
+              No hay pacientes registrados.
+            </td>
           </tr>
         </tbody>
       </table>
+
     </section>
 
   </ng-container>
 
+  <!-- DETALLE DE HISTORIA CLÍNICA -->
   <ng-container *ngIf="!modoListado">
 
-    <div class="page-header">
-      <div>
-        <h1>Historia Clínica</h1>
-        <p>Pacientes > {{ paciente?.nombres }} {{ paciente?.apellidos }} > Historia Clínica</p>
-      </div>
+    <section class="historia-card">
 
-      <div class="header-buttons">
-        <button class="btn-secondary" onclick="window.print()">
+      <!-- HEADER -->
+      <div class="page-header historia-header">
+
+        <div>
+          <h1>Historia Clínica</h1>
+
+          <div class="breadcrumb">
+            <a routerLink="/pacientes" class="breadcrumb-link">Pacientes</a>
+            <span class="separator">›</span>
+            <span>{{ paciente?.nombres }} {{ paciente?.apellidos }}</span>
+            <span class="separator">›</span>
+            <span class="breadcrumb-current">Historia Clínica</span>
+          </div>
+        </div>
+
+        <button class="btn-print" type="button" onclick="window.print()">
           Imprimir historial
         </button>
-      </div>
-    </div>
 
-    <section class="patient-card" *ngIf="paciente">
-      <div class="avatar"></div>
-
-      <div>
-        <h2>{{ paciente.nombres }} {{ paciente.apellidos }}</h2>
-        <p>
-          DNI: {{ paciente.numeroDocumento }} |
-          {{ paciente.edad }} años |
-          {{ paciente.sexo }}
-        </p>
       </div>
 
-      <span class="estado-activo" *ngIf="paciente.estado">Activo</span>
-      <span class="estado-inactivo" *ngIf="!paciente.estado">Inactivo</span>
-    </section>
+      <!-- PACIENTE -->
+      <section class="patient-card" *ngIf="paciente">
 
-    <div class="tabs">
-      <button [class.active]="tab === 'atenciones'" (click)="tab='atenciones'">
-        Atenciones médicas
-      </button>
+        <div class="avatar"></div>
 
-      <button [class.active]="tab === 'citas'" (click)="tab='citas'">
-        Citas programadas
-      </button>
+        <div class="patient-info-box">
+          <h2 class="patient-name">
+            {{ paciente.nombres }} {{ paciente.apellidos }}
+          </h2>
 
-      <button [class.active]="tab === 'inasistencias'" (click)="tab='inasistencias'">
-        No asistencias
-      </button>
-    </div>
+          <div class="patient-info">
+            <span>DNI: {{ paciente.numeroDocumento }}</span>
+            <span>{{ paciente.edad }} años</span>
+            <span>{{ paciente.sexo }}</span>
+          </div>
+        </div>
 
-    <section class="timeline" *ngIf="tab === 'atenciones'">
-      <div class="timeline-item" *ngFor="let atencion of atenciones">
-        <div class="icon success">✓</div>
+        <span class="estado-activo" *ngIf="paciente.estado">
+          Activo
+        </span>
 
-        <div class="timeline-content">
-          <div class="timeline-head">
-            <h3>{{ atencion.tipoAtencion }}</h3>
-            <span class="badge success">{{ atencion.estado }}</span>
+        <span class="estado-inactivo" *ngIf="!paciente.estado">
+          Inactivo
+        </span>
+
+      </section>
+
+      <!-- TABS -->
+      <div class="tabs">
+
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="tab === 'atenciones'"
+          (click)="tab = 'atenciones'">
+
+          Atenciones médicas
+
+        </button>
+
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="tab === 'citas'"
+          (click)="tab = 'citas'">
+
+          Citas programadas
+
+        </button>
+
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="tab === 'inasistencias'"
+          (click)="tab = 'inasistencias'">
+
+          No asistencias
+
+        </button>
+
+      </div>
+
+      <!-- ATENCIONES -->
+      <section class="timeline" *ngIf="tab === 'atenciones'">
+
+        <div class="timeline-item" *ngFor="let atencion of atenciones">
+
+          <div class="icon success">
+            ✓
           </div>
 
-          <p><strong>Fecha:</strong> {{ atencion.fechaHora | date:'dd/MM/yyyy HH:mm' }}</p>
-          <p><strong>Motivo:</strong> {{ atencion.motivoConsulta }}</p>
-          <p><strong>Diagnóstico:</strong> {{ atencion.diagnostico }}</p>
-          <p><strong>Tratamiento:</strong> {{ atencion.tratamientoIndicado }}</p>
-          <p><strong>Profesional:</strong> {{ atencion.profesionalSalud }}</p>
-        </div>
-      </div>
+          <div class="timeline-content">
 
-      <div class="empty" *ngIf="atenciones.length === 0">
-        No existen atenciones médicas registradas.
-      </div>
-    </section>
+            <div class="timeline-head">
+              <h3>{{ atencion.tipoAtencion }}</h3>
 
-    <section class="timeline" *ngIf="tab === 'citas'">
-      <div class="timeline-item" *ngFor="let cita of citasProgramadas">
-        <div class="icon info">📅</div>
+              <span class="badge success">
+                {{ atencion.estado }}
+              </span>
+            </div>
 
-        <div class="timeline-content">
-          <div class="timeline-head">
-            <h3>{{ cita.tipoCita }}</h3>
-            <span class="badge info">{{ cita.estado }}</span>
+            <p><strong>Fecha:</strong> {{ atencion.fechaHora | date:'dd/MM/yyyy HH:mm' }}</p>
+            <p><strong>Motivo:</strong> {{ atencion.motivoConsulta }}</p>
+            <p><strong>Diagnóstico:</strong> {{ atencion.diagnostico }}</p>
+            <p><strong>Tratamiento:</strong> {{ atencion.tratamientoIndicado }}</p>
+            <p><strong>Profesional:</strong> {{ atencion.profesionalSalud }}</p>
+
           </div>
 
-          <p><strong>Fecha:</strong> {{ cita.fecha }} {{ cita.hora }}</p>
-          <p><strong>Especialidad:</strong> {{ cita.especialidad }}</p>
-          <p><strong>Motivo:</strong> {{ cita.motivoConsulta }}</p>
-
-          <button
-            class="btn-primary"
-            [routerLink]="['/atenciones/nueva', paciente?.id, 'cita', cita.id]"
-            *ngIf="cita.estado === 'PROGRAMADA'">
-            Iniciar atención
-          </button>
         </div>
-      </div>
 
-      <div class="empty" *ngIf="citasProgramadas.length === 0">
-        No existen citas programadas.
-      </div>
-    </section>
+        <div class="empty-state" *ngIf="atenciones.length === 0">
 
-    <section class="timeline" *ngIf="tab === 'inasistencias'">
-      <div class="timeline-item" *ngFor="let cita of citasNoAsistidas">
-        <div class="icon danger">!</div>
+          <div class="empty-icon">📄</div>
 
-        <div class="timeline-content">
-          <div class="timeline-head">
-            <h3>{{ cita.tipoCita }}</h3>
-            <span class="badge danger">No asistió</span>
+          <h3>No existen atenciones médicas registradas</h3>
+
+          <p>
+            El paciente todavía no cuenta con registros clínicos.
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- CITAS -->
+      <section class="timeline" *ngIf="tab === 'citas'">
+
+        <div class="timeline-item" *ngFor="let cita of citasProgramadas">
+
+          <div class="icon info">
+            📅
           </div>
 
-          <p><strong>Fecha:</strong> {{ cita.fecha }} {{ cita.hora }}</p>
-          <p><strong>Especialidad:</strong> {{ cita.especialidad }}</p>
-          <p><strong>Motivo:</strong> {{ cita.motivoConsulta }}</p>
-        </div>
-      </div>
+          <div class="timeline-content">
 
-      <div class="empty" *ngIf="citasNoAsistidas.length === 0">
-        El paciente no tiene inasistencias registradas.
-      </div>
+            <div class="timeline-head">
+              <h3>{{ cita.tipoCita }}</h3>
+
+              <span class="badge info">
+                {{ cita.estado }}
+              </span>
+            </div>
+
+            <p><strong>Fecha:</strong> {{ cita.fecha }} {{ cita.hora }}</p>
+            <p><strong>Especialidad:</strong> {{ cita.especialidad }}</p>
+            <p><strong>Motivo:</strong> {{ cita.motivoConsulta }}</p>
+
+            <button
+              class="btn-primary"
+              type="button"
+              [routerLink]="['/atenciones/nueva', paciente?.id, 'cita', cita.id]"
+              *ngIf="cita.estado === 'PROGRAMADA'">
+
+              Iniciar atención
+
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="empty-state" *ngIf="citasProgramadas.length === 0">
+
+          <div class="empty-icon">📅</div>
+
+          <h3>No existen citas programadas</h3>
+
+          <p>
+            El paciente no cuenta con citas registradas o pendientes.
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- INASISTENCIAS -->
+      <section class="timeline" *ngIf="tab === 'inasistencias'">
+
+        <div class="timeline-item" *ngFor="let cita of citasNoAsistidas">
+
+          <div class="icon danger">
+            !
+          </div>
+
+          <div class="timeline-content">
+
+            <div class="timeline-head">
+              <h3>{{ cita.tipoCita }}</h3>
+
+              <span class="badge danger">
+                No asistió
+              </span>
+            </div>
+
+            <p><strong>Fecha:</strong> {{ cita.fecha }} {{ cita.hora }}</p>
+            <p><strong>Especialidad:</strong> {{ cita.especialidad }}</p>
+            <p><strong>Motivo:</strong> {{ cita.motivoConsulta }}</p>
+
+          </div>
+
+        </div>
+
+        <div class="empty-state" *ngIf="citasNoAsistidas.length === 0">
+
+          <div class="empty-icon">✅</div>
+
+          <h3>Sin inasistencias registradas</h3>
+
+          <p>
+            El paciente no tiene inasistencias registradas.
+          </p>
+
+        </div>
+
+      </section>
+
     </section>
 
   </ng-container>
