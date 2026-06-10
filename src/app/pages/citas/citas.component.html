@@ -49,18 +49,23 @@
 
       <div class="form-group">
         <label>Especialidad</label>
-        <input type="text" [(ngModel)]="cita.especialidad">
+        <input type="text" placeholder="Ej. Medicina general" [(ngModel)]="cita.especialidad">
       </div>
 
       <div class="form-group full">
         <label>Motivo de consulta</label>
-        <textarea [(ngModel)]="cita.motivoConsulta"></textarea>
+        <textarea placeholder="Describe el motivo de consulta" [(ngModel)]="cita.motivoConsulta"></textarea>
       </div>
     </div>
 
     <div class="actions">
-      <button class="btn-secondary" (click)="modoNuevaCita = false">Cancelar</button>
-      <button class="btn-primary" (click)="guardar()">Guardar cita</button>
+      <button class="btn-secondary" (click)="modoNuevaCita = false">
+        Cancelar
+      </button>
+
+      <button class="btn-primary" (click)="guardar()">
+        Guardar cita
+      </button>
     </div>
   </section>
 
@@ -68,7 +73,8 @@
 
     <section class="panel citas-panel">
       <div class="panel-title">
-        <h2>Citas programadas</h2>
+        <h2>Citas del día</h2>
+        <p>{{ formatearFecha(fechaSeleccionada) }}</p>
       </div>
 
       <table>
@@ -84,7 +90,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let c of citas">
+          <tr *ngFor="let c of citasDelDia">
             <td>{{ c.hora }}</td>
             <td>{{ c.pacienteNombre || c.paciente?.nombres || 'Paciente' }}</td>
             <td>{{ c.motivoConsulta }}</td>
@@ -103,32 +109,73 @@
             </td>
           </tr>
 
-          <tr *ngIf="citas.length === 0">
-            <td colspan="6" class="empty">No hay citas registradas.</td>
+          <tr *ngIf="citasDelDia.length === 0">
+            <td colspan="6" class="empty">
+              No hay citas registradas para este día.
+            </td>
           </tr>
         </tbody>
       </table>
     </section>
 
     <aside class="side-panel">
+
       <div class="calendar-card">
-        <h2>Calendario</h2>
-        <p class="calendar-month">Mayo 2026</p>
+        <div class="calendar-header">
+          <button class="calendar-nav" (click)="mesAnterior()">‹</button>
+          <h2>{{ nombreMesActual }}</h2>
+          <button class="calendar-nav" (click)="mesSiguiente()">›</button>
+        </div>
 
         <div class="calendar-grid">
-          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
-          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
-          <span>8</span><span>9</span><span class="active-day">10</span><span>11</span><span>12</span><span>13</span><span>14</span>
-          <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span>
+          <span class="day-name" *ngFor="let d of diasSemana">
+            {{ d }}
+          </span>
+
+          <button
+            class="calendar-day"
+            *ngFor="let item of diasCalendario"
+            [class.empty-day]="!item.fecha"
+            [class.active-day]="item.seleccionado"
+            [class.has-citas]="item.tieneCitas"
+            (click)="seleccionarDia(item)">
+
+            {{ item.dia }}
+
+            <span *ngIf="item.tieneCitas" class="dot"></span>
+          </button>
         </div>
       </div>
 
       <div class="summary-card">
         <h2>Resumen del día</h2>
-        <p>Citas registradas <strong>{{ citas.length }}</strong></p>
-        <p>Citas confirmadas <strong>{{ citas.length }}</strong></p>
-        <p>Citas pendientes <strong>0</strong></p>
+
+        <p>
+          Fecha seleccionada
+          <strong>{{ formatearFecha(fechaSeleccionada) }}</strong>
+        </p>
+
+        <p>
+          Citas del día
+          <strong>{{ citasDelDia.length }}</strong>
+        </p>
+
+        <p>
+          Programadas
+          <strong>{{ contarPorEstado('PROGRAMADA') }}</strong>
+        </p>
+
+        <p>
+          No asistió
+          <strong>{{ contarPorEstado('NO_ASISTIO') }}</strong>
+        </p>
+
+        <p>
+          Canceladas
+          <strong>{{ contarPorEstado('CANCELADA') }}</strong>
+        </p>
       </div>
+
     </aside>
 
   </div>
