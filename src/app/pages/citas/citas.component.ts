@@ -25,6 +25,7 @@ export class CitasComponent implements OnInit {
   busquedaMedico = '';
 
   mensaje = '';
+  tipoMensaje: 'success' | 'error' | '' = '';
   modoNuevaCita = false;
 
   fechaSeleccionada: Date = new Date();
@@ -212,13 +213,18 @@ export class CitasComponent implements OnInit {
 
 guardar(): void {
 
+  this.mensaje = '';
+  this.tipoMensaje = '';
+
   if (!this.cita.paciente.id || !this.cita.medico.id) {
     this.mensaje = 'Paciente y médico son obligatorios';
+    this.tipoMensaje = 'error';
     return;
   }
 
   if (!this.cita.fecha || !this.cita.hora) {
     this.mensaje = 'Fecha y hora son obligatorias';
+    this.tipoMensaje = 'error';
     return;
   }
 
@@ -237,18 +243,26 @@ guardar(): void {
 
   this.http.post(`${this.api}/citas`, payload, this.getHeaders()).subscribe({
     next: () => {
-      this.mensaje = 'Cita registrada correctamente';
+      this.mensaje = 'Cita guardada correctamente';
+      this.tipoMensaje = 'success';
+
       this.modoNuevaCita = false;
       this.limpiarFormulario();
       this.cargarCitas();
+
+      setTimeout(() => {
+        this.mensaje = '';
+        this.tipoMensaje = '';
+      }, 3500);
     },
     error: err => {
       console.error('Error al guardar cita', err);
+
       this.mensaje = err.error?.message || 'Error al guardar cita';
+      this.tipoMensaje = 'error';
     }
   });
 }
-
   limpiarFormulario(): void {
     this.cita = {
       paciente: { id: null },
