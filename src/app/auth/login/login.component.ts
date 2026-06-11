@@ -18,7 +18,6 @@ export class LoginComponent implements OnInit {
   password = '';
 
   error = '';
-
   loading = false;
 
   constructor(
@@ -27,74 +26,52 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-
-    // REDIRECCIÓN AUTOMÁTICA
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/dashboard']);
     }
-
   }
 
   login(): void {
 
     this.error = '';
 
-    // VALIDACIÓN
     if (!this.username || !this.password) {
-
       this.error = 'Complete todos los campos';
-
       return;
     }
-
-    if (!navigator.onLine && this.authService.isLoggedIn()) {
-    this.router.navigate(['/dashboard']);
-    return;
-  }
 
     this.loading = true;
 
     this.authService.login({
-
       username: this.username,
       password: this.password
-
     }).subscribe({
 
       next: (res) => {
 
-        // GUARDAR SESIÓN
-        this.authService.saveSession(res);
+        this.loading = false;
 
-        // REDIRECCIÓN
+        if (res.modoOffline) {
+          console.warn('Ingreso autorizado en modo offline');
+        }
+
         this.router.navigate(['/dashboard']);
-
       },
 
       error: (err) => {
 
         console.error(err);
-
         this.loading = false;
 
-        if (err.status === 401) {
-
+        if (err?.mensaje) {
+          this.error = err.mensaje;
+        } else if (err?.status === 401) {
           this.error = 'Usuario o contraseña incorrectos';
-
-        } else if (err.status === 0) {
-
-          this.error = 'No se pudo conectar al servidor';
-
         } else {
-
-          this.error = 'Error al iniciar sesión';
-
+          this.error = 'No se pudo iniciar sesión. Si estás offline, primero debes iniciar sesión una vez con internet.';
         }
-
       }
 
     });
-
   }
-
 }
