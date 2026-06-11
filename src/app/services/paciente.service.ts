@@ -18,7 +18,6 @@ export class PacienteService {
   ) {}
 
   listar(): Observable<Paciente[]> {
-  if (navigator.onLine) {
     return new Observable(observer => {
       this.http.get<Paciente[]>(this.api).subscribe({
         next: async (data) => {
@@ -31,7 +30,7 @@ export class PacienteService {
           observer.complete();
         },
         error: async (err) => {
-          console.warn('No se pudo cargar backend. Leyendo IndexedDB...', err);
+          console.warn('Backend no disponible. Cargando pacientes offline...', err);
 
           const pacientes = await this.indexedDb.obtenerTodos('pacientes');
           observer.next(pacientes);
@@ -41,39 +40,52 @@ export class PacienteService {
     });
   }
 
-  return from(this.indexedDb.obtenerTodos('pacientes')) as Observable<Paciente[]>;
-}
-
   obtener(id: number): Observable<Paciente> {
-    if (navigator.onLine) {
-      return this.http.get<Paciente>(`${this.api}/${id}`);
-    }
-
-    return from(
-      this.indexedDb.obtenerTodos('pacientes')
-        .then((pacientes: any[]) =>
-          pacientes.find(p =>
-            Number(p.id) === Number(id) ||
-            Number(p.pacienteId) === Number(id)
-          )
-        )
-    ) as Observable<Paciente>;
-  }
-
-  registrar(paciente: any): Observable<any> {
-  paciente.uuidLocal = paciente.uuidLocal || crypto.randomUUID();
-  paciente.estadoSync = 'PENDIENTE';
-  paciente.fechaCreacionLocal = new Date().toISOString();
-
-  if (navigator.onLine) {
     return new Observable(observer => {
-      this.http.post<Paciente>(this.api, paciente).subscribe({
-        next: (data) => {
+      this.http.get<Paciente>(`${this.api}/${id}`).subscribe({
+        next: async (data: any) => {
+          data.uuidLocal = data.uuidLocal || String(data.id);
+          await this.indexedDb.guardar('pacientes', data);
+
           observer.next(data);
           observer.complete();
         },
         error: async (err) => {
-          console.warn('Backend no disponible. Guardando offline...', err);
+          console.warn('Backend no disponible. Buscando paciente offline...', err);
+
+          const pacientes = await this.indexedDb.obtenerTodos('pacientes');
+
+          const paciente = pacientes.find(p =>
+            Number(p.id) === Number(id) ||
+            Number(p.pacienteId) === Number(id) ||
+            String(p.uuidLocal) === String(id)
+          );
+
+          observer.next(paciente);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  registrar(paciente: any): Observable<any> {
+    paciente.uuidLocal = paciente.uuidLocal || crypto.randomUUID();
+    paciente.estadoSync = 'PENDIENTE';
+    paciente.fechaCreacionLocal = new Date().toISOString();
+
+    return new Observable(observer => {
+      this.http.post<Paciente>(this.api, paciente).subscribe({
+        next: async (data: any) => {
+          data.uuidLocal = data.uuidLocal || String(data.id);
+          data.estadoSync = 'SINCRONIZADO';
+
+          await this.indexedDb.guardar('pacientes', data);
+
+          observer.next(data);
+          observer.complete();
+        },
+        error: async (err) => {
+          console.warn('Backend no disponible. Guardando paciente offline...', err);
 
           await this.indexedDb.guardar('pacientes', paciente);
           await this.indexedDb.agregarPendiente('PACIENTE', 'CREAR', paciente);
@@ -85,44 +97,61 @@ export class PacienteService {
     });
   }
 
-  return from(
-    this.indexedDb.guardar('pacientes', paciente)
-      .then(() => this.indexedDb.agregarPendiente('PACIENTE', 'CREAR', paciente))
-      .then(() => paciente)
-  );
-}
-
   actualizar(id: number, paciente: any): Observable<any> {
-    if (navigator.onLine) {
-      return this.http.put<Paciente>(`${this.api}/${id}`, paciente);
-    }
-
-    paciente.uuidLocal = paciente.uuidLocal || crypto.randomUUID();
+    paciente.uuidLocal = paciente.uuidLocal || String(id);
     paciente.id = id;
     paciente.estadoSync = 'PENDIENTE';
     paciente.fechaActualizacionLocal = new Date().toISOString();
 
-    return from(
-      this.indexedDb.guardar('pacientes', paciente)
-        .then(() =>
-          this.indexedDb.agregarPendiente('PACIENTE', 'ACTUALIZAR', paciente)
-        )
-        .then(() => paciente)
-    );
+    return new Observable(observer => {
+      this.http.put<Paciente>(`${this.api}/${id}`, paciente).subscribe({
+        next: async (data: any) => {
+          data.uuidLocal = data.uuidLocal || String(data.id);
+          data.estadoSync = 'SINCRONIZADO';
+
+          await this.indexedDb.guardar('pacientes', data);
+
+          observer.next(data);
+          observer.complete();
+        },
+        error: async (err) => {
+          console.warn('Backend no disponible. Actualizando paciente offline...', err);
+
+          await this.indexedDb.guardar('pacientes', paciente);
+          await this.indexedDb.agregarPendiente('PACIENTE', 'ACTUALIZAR', paciente);
+
+          observer.next(paciente);
+          observer.complete();
+        }
+      });
+    });
   }
 
   baja(id: number): Observable<any> {
-    if (navigator.onLine) {
-      return this.http.patch<Paciente>(`${this.api}/${id}/baja`, {});
-    }
+    return new Observable(observer => {
+      this.http.patch<Paciente>(`${this.api}/${id}/baja`, {}).subscribe({
+        next: async (data: any) => {
+          data.uuidLocal = data.uuidLocal || String(data.id);
+          data.estadoSync = 'SINCRONIZADO';
 
-    return from(
-      this.indexedDb.obtenerTodos('pacientes')
-        .then(async (pacientes: any[]) => {
-          const paciente = pacientes.find(p => Number(p.id) === Number(id));
+          await this.indexedDb.guardar('pacientes', data);
+
+          observer.next(data);
+          observer.complete();
+        },
+        error: async (err) => {
+          console.warn('Backend no disponible. Dando baja offline...', err);
+
+          const pacientes = await this.indexedDb.obtenerTodos('pacientes');
+
+          const paciente = pacientes.find(p =>
+            Number(p.id) === Number(id) ||
+            String(p.uuidLocal) === String(id)
+          );
 
           if (!paciente) {
-            throw new Error('Paciente no encontrado offline');
+            observer.error('Paciente no encontrado offline');
+            return;
           }
 
           paciente.estado = false;
@@ -132,13 +161,14 @@ export class PacienteService {
           await this.indexedDb.guardar('pacientes', paciente);
           await this.indexedDb.agregarPendiente('PACIENTE', 'BAJA', paciente);
 
-          return paciente;
-        })
-    );
+          observer.next(paciente);
+          observer.complete();
+        }
+      });
+    });
   }
 
   buscar(criterio: string): Observable<Paciente[]> {
-  if (navigator.onLine) {
     return new Observable(observer => {
       this.http.get<Paciente[]>(`${this.api}/buscar?criterio=${criterio}`)
         .subscribe({
@@ -147,7 +177,7 @@ export class PacienteService {
             observer.complete();
           },
           error: async (err) => {
-            console.warn('Buscar backend falló. Buscando offline...', err);
+            console.warn('Backend no disponible. Buscando pacientes offline...', err);
 
             const pacientes = await this.indexedDb.obtenerTodos('pacientes');
             const texto = criterio.toLowerCase();
@@ -164,18 +194,4 @@ export class PacienteService {
         });
     });
   }
-
-  return from(
-    this.indexedDb.obtenerTodos('pacientes')
-      .then((pacientes: any[]) => {
-        const texto = criterio.toLowerCase();
-
-        return pacientes.filter(p =>
-          `${p.nombres || ''}`.toLowerCase().includes(texto) ||
-          `${p.apellidos || ''}`.toLowerCase().includes(texto) ||
-          `${p.numeroDocumento || ''}`.includes(texto)
-        );
-      })
-  ) as Observable<Paciente[]>;
-}
 }

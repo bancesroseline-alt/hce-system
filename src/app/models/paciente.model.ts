@@ -22,7 +22,7 @@ export interface Paciente {
   estado: boolean;
 
   uuidLocal?: string;
-estadoSync?: string;
-fechaCreacionLocal?: string;
-fechaActualizacionLocal?: string;
+  estadoSync?: string;
+  fechaCreacionLocal?: string;
+  fechaActualizacionLocal?: string;
 }
