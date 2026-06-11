@@ -15,10 +15,14 @@
     </div>
 
     <div class="hero-badge">
-      <span class="pulse"></span>
-      Sistema activo
-    </div>
-  </section>
+  <span class="pulse"></span>
+
+  {{ sistemaOnline
+      ? 'Sistema online'
+      : 'Sistema offline'
+  }}
+
+</div>
 
   <!-- TARJETAS RESUMEN -->
   <div class="summary-cards">
@@ -196,5 +200,3 @@
     </section>
 
   </div>
-
-</div>
