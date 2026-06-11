@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+
+import { PacienteService } from '../../services/paciente.service';
+import { CitaOfflineService } from '../../services/cita-offline.service';
+import { AtencionOfflineService } from '../../services/atencion-offline.service';
 
 @Component({
   selector: 'app-registro-atencion',
@@ -21,8 +24,6 @@ export class RegistroAtencionComponent implements OnInit {
 
   modoEmergencia = false;
   mensaje = '';
-
-  private api = 'https://hce-backend.onrender.com/api';
 
   atencion: any = {
     pacienteId: null,
@@ -46,16 +47,18 @@ export class RegistroAtencionComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient
+    private pacienteService: PacienteService,
+    private citaOfflineService: CitaOfflineService,
+    private atencionOfflineService: AtencionOfflineService
   ) {}
 
   ngOnInit(): void {
     const pacienteParam =
-  this.route.snapshot.paramMap.get('pacienteId') ||
-  this.route.snapshot.paramMap.get('id');
+      this.route.snapshot.paramMap.get('pacienteId') ||
+      this.route.snapshot.paramMap.get('id');
 
     const citaParam = this.route.snapshot.paramMap.get('citaId');
-    
+
     this.pacienteId = Number(pacienteParam);
     this.citaId = citaParam ? Number(citaParam) : null;
 
@@ -83,23 +86,8 @@ export class RegistroAtencionComponent implements OnInit {
     }
   }
 
-  getHeaders() {
-    const token = localStorage.getItem('token');
-
-    if (!token) return {};
-
-    return {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${token}`
-      })
-    };
-  }
-
   cargarPaciente(): void {
-    this.http.get<any>(
-      `${this.api}/pacientes/${this.pacienteId}`,
-      this.getHeaders()
-    ).subscribe({
+    this.pacienteService.obtener(this.pacienteId).subscribe({
       next: data => {
         this.paciente = data;
       },
@@ -128,12 +116,12 @@ export class RegistroAtencionComponent implements OnInit {
   }
 
   cargarCita(id: number): void {
-    this.http.get<any[]>(
-      `${this.api}/citas`,
-      this.getHeaders()
-    ).subscribe({
+    this.citaOfflineService.listar().subscribe({
       next: citas => {
-        const cita = (citas || []).find(c => Number(c.id) === Number(id));
+        const cita = (citas || []).find(c =>
+          Number(c.id) === Number(id) ||
+          Number(c.uuidLocal) === Number(id)
+        );
 
         if (!cita) {
           this.mensaje = 'No se encontró la cita seleccionada';
@@ -142,7 +130,7 @@ export class RegistroAtencionComponent implements OnInit {
 
         this.citaOrigen = cita;
 
-        this.atencion.citaId = cita.id;
+        this.atencion.citaId = cita.id || null;
         this.atencion.fechaHora = `${cita.fecha}T${cita.hora}`;
         this.atencion.tipoAtencion =
           cita.tipoCita === 'PREVENTIVA' ? 'PREVENTIVA' : 'CONSULTA';
@@ -224,15 +212,15 @@ export class RegistroAtencionComponent implements OnInit {
       citaId: this.atencion.citaId ? Number(this.atencion.citaId) : null
     };
 
-    console.log('Payload atención:', payload);
-
-    this.http.post(
-      `${this.api}/atenciones`,
-      payload,
-      this.getHeaders()
-    ).subscribe({
+    this.atencionOfflineService.registrar(payload).subscribe({
       next: () => {
-        this.router.navigate(['/historias-clinicas', this.pacienteId]);
+        this.mensaje = navigator.onLine
+          ? 'Atención registrada correctamente'
+          : 'Atención guardada offline. Se sincronizará cuando vuelva internet';
+
+        setTimeout(() => {
+          this.router.navigate(['/historias-clinicas', this.pacienteId]);
+        }, 1500);
       },
       error: err => {
         console.error('Error al guardar atención', err);

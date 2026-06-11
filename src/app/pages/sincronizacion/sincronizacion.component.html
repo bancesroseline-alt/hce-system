@@ -1,1 +1,22 @@
-<p>sincronizacion works!</p>
+<h2>Sincronización</h2>
+
+<p *ngIf="online">Estado: Con conexión</p>
+<p *ngIf="!online">Estado: Modo offline</p>
+
+<button (click)="sincronizar()" [disabled]="sincronizando || !online">
+  Sincronizar pendientes
+</button>
+
+<p>{{ mensaje }}</p>
+
+<h3>Pendientes</h3>
+
+<ul>
+  <li *ngFor="let p of pendientes">
+    {{ p.entidad }} - {{ p.accion }} - {{ p.estado }}
+  </li>
+</ul>
+
+<p *ngIf="pendientes.length === 0">
+  No hay registros pendientes por sincronizar.
+</p>

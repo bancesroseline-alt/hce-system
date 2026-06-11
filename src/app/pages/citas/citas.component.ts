@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+
+import { CitaOfflineService } from '../../services/cita-offline.service';
+import { PacienteService } from '../../services/paciente.service';
 
 @Component({
   selector: 'app-citas',
@@ -12,8 +14,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
   styleUrls: ['./citas.component.css']
 })
 export class CitasComponent implements OnInit {
-
-  api = 'https://hce-backend.onrender.com/api';
 
   citas: any[] = [];
   citasDelDia: any[] = [];
@@ -50,7 +50,8 @@ export class CitasComponent implements OnInit {
   };
 
   constructor(
-    private http: HttpClient,
+    private citaOfflineService: CitaOfflineService,
+    private pacienteService: PacienteService,
     private route: ActivatedRoute
   ) {}
 
@@ -67,35 +68,22 @@ export class CitasComponent implements OnInit {
     this.cargarCitas();
   }
 
-  getHeaders() {
-    const token = localStorage.getItem('token');
+  cargarCitas(): void {
+    this.citaOfflineService.listar().subscribe({
+      next: data => {
+        this.citas = (data || []).sort((a, b) =>
+          `${a.fecha} ${a.hora}`.localeCompare(`${b.fecha} ${b.hora}`)
+        );
 
-    if (!token) return {};
-
-    return {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${token}`
-      })
-    };
+        this.filtrarCitasPorDia();
+        this.generarCalendario();
+      },
+      error: err => console.error('Error al cargar citas', err)
+    });
   }
 
-  cargarCitas(): void {
-  this.http.get<any[]>(`${this.api}/citas`, this.getHeaders()).subscribe({
-    next: data => {
-
-      this.citas = (data || []).sort((a, b) =>
-        `${a.fecha} ${a.hora}`.localeCompare(`${b.fecha} ${b.hora}`)
-      );
-
-      this.filtrarCitasPorDia();
-      this.generarCalendario();
-    },
-    error: err => console.error('Error al cargar citas', err)
-  });
-}
-
   cargarPacientes(): void {
-    this.http.get<any[]>(`${this.api}/pacientes`, this.getHeaders()).subscribe({
+    this.pacienteService.listar().subscribe({
       next: data => {
         this.pacientes = data || [];
 
@@ -117,7 +105,7 @@ export class CitasComponent implements OnInit {
   cargarMedicos(): void {
     const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
 
-    this.http.get<any[]>(`${this.api}/usuarios`, this.getHeaders()).subscribe({
+    this.citaOfflineService.listarMedicos().subscribe({
       next: data => {
         this.medicos = (data || []).filter(u => this.normalizarRol(u.rol) === 'MEDICO');
 
@@ -134,15 +122,11 @@ export class CitasComponent implements OnInit {
           this.busquedaMedico = this.obtenerNombreUsuario(usuario);
         }
       },
-      error: err => {
-        console.error('Error al cargar médicos', err);
-
-        if (this.normalizarRol(usuario.rol) === 'MEDICO' && usuario.id) {
+      error: () => {
+        if (usuario.id) {
           this.medicos = [usuario];
           this.cita.medico.id = usuario.id;
           this.busquedaMedico = this.obtenerNombreUsuario(usuario);
-        } else {
-          this.medicos = [];
         }
       }
     });
@@ -211,62 +195,58 @@ export class CitasComponent implements OnInit {
     this.busquedaMedico = '';
   }
 
-  // =========================
-// GUARDAR
-// =========================
+  guardar(): void {
+    this.mensaje = '';
+    this.tipoMensaje = '';
 
-guardar(): void {
-
-  this.mensaje = '';
-  this.tipoMensaje = '';
-
-  if (!this.cita.paciente.id || !this.cita.medico.id) {
-    this.mensaje = 'Paciente y médico son obligatorios';
-    this.tipoMensaje = 'error';
-    return;
-  }
-
-  if (!this.cita.fecha || !this.cita.hora) {
-    this.mensaje = 'Fecha y hora son obligatorias';
-    this.tipoMensaje = 'error';
-    return;
-  }
-
-  const payload = {
-    pacienteId: Number(this.cita.paciente.id),
-    medicoId: Number(this.cita.medico.id),
-    tipoCita: this.cita.tipoCita,
-    fecha: this.cita.fecha,
-    hora: this.cita.hora,
-    especialidad: this.cita.especialidad,
-    motivoConsulta: this.cita.motivoConsulta,
-    estado: this.cita.estado
-  };
-
-  console.log('Payload cita:', payload);
-
-  this.http.post(`${this.api}/citas`, payload, this.getHeaders()).subscribe({
-    next: () => {
-      this.mensaje = 'Cita guardada correctamente';
-      this.tipoMensaje = 'success';
-
-      this.modoNuevaCita = false;
-      this.limpiarFormulario();
-      this.cargarCitas();
-
-      setTimeout(() => {
-        this.mensaje = '';
-        this.tipoMensaje = '';
-      }, 3500);
-    },
-    error: err => {
-      console.error('Error al guardar cita', err);
-
-      this.mensaje = err.error?.message || 'Error al guardar cita';
+    if (!this.cita.paciente.id || !this.cita.medico.id) {
+      this.mensaje = 'Paciente y médico son obligatorios';
       this.tipoMensaje = 'error';
+      return;
     }
-  });
-}
+
+    if (!this.cita.fecha || !this.cita.hora) {
+      this.mensaje = 'Fecha y hora son obligatorias';
+      this.tipoMensaje = 'error';
+      return;
+    }
+
+    const payload = {
+      pacienteId: Number(this.cita.paciente.id),
+      medicoId: Number(this.cita.medico.id),
+      tipoCita: this.cita.tipoCita,
+      fecha: this.cita.fecha,
+      hora: this.cita.hora,
+      especialidad: this.cita.especialidad,
+      motivoConsulta: this.cita.motivoConsulta,
+      estado: this.cita.estado
+    };
+
+    this.citaOfflineService.registrar(payload).subscribe({
+      next: () => {
+        this.mensaje = navigator.onLine
+          ? 'Cita guardada correctamente'
+          : 'Cita guardada offline. Se sincronizará cuando vuelva internet';
+
+        this.tipoMensaje = 'success';
+
+        this.modoNuevaCita = false;
+        this.limpiarFormulario();
+        this.cargarCitas();
+
+        setTimeout(() => {
+          this.mensaje = '';
+          this.tipoMensaje = '';
+        }, 3500);
+      },
+      error: err => {
+        console.error('Error al guardar cita', err);
+        this.mensaje = err.error?.message || 'Error al guardar cita';
+        this.tipoMensaje = 'error';
+      }
+    });
+  }
+
   limpiarFormulario(): void {
     this.cita = {
       paciente: { id: null },
@@ -350,10 +330,9 @@ guardar(): void {
   }
 
   filtrarCitasPorDia(): void {
-  const iso = this.formatearFecha(this.fechaSeleccionada);
-
-  this.citasDelDia = this.citas.filter(c => c.fecha === iso);
-}
+    const iso = this.formatearFecha(this.fechaSeleccionada);
+    this.citasDelDia = this.citas.filter(c => c.fecha === iso);
+  }
 
   formatearFecha(fecha: Date): string {
     const y = fecha.getFullYear();
@@ -367,35 +346,26 @@ guardar(): void {
   }
 
   cambiarEstado(cita: any, nuevoEstado: string): void {
+    this.citaOfflineService.actualizarEstado(cita, nuevoEstado).subscribe({
+      next: () => {
+        this.mensaje = navigator.onLine
+          ? 'Estado actualizado correctamente'
+          : 'Estado guardado offline. Se sincronizará luego';
 
-  cita.estado = nuevoEstado;
+        this.tipoMensaje = 'success';
 
-  this.http.put(
-    `${this.api}/citas/${cita.id}/estado`,
-    {
-      estado: nuevoEstado
-    },
-    this.getHeaders()
-  ).subscribe({
-    next: () => {
+        setTimeout(() => {
+          this.mensaje = '';
+          this.tipoMensaje = '';
+        }, 3000);
 
-      this.mensaje = 'Estado actualizado correctamente';
-      this.tipoMensaje = 'success';
-
-      setTimeout(() => {
-        this.mensaje = '';
-        this.tipoMensaje = '';
-      }, 3000);
-
-      this.cargarCitas();
-    },
-    error: err => {
-      console.error('Error al actualizar estado', err);
-
-      this.mensaje = 'Error al actualizar estado';
-      this.tipoMensaje = 'error';
-    }
-  });
-
-}
+        this.cargarCitas();
+      },
+      error: err => {
+        console.error('Error al actualizar estado', err);
+        this.mensaje = 'Error al actualizar estado';
+        this.tipoMensaje = 'error';
+      }
+    });
+  }
 }
