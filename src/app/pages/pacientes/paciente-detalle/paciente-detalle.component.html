@@ -87,8 +87,14 @@
 
       <button
         class="btn-save"
-        [routerLink]="['/citas/paciente', paciente.id]">
+        [routerLink]="['/pacientes', paciente.id, 'citas']">
         Ver citas
+      </button>
+
+      <button
+        class="btn-save btn-emergencia"
+        [routerLink]="['/atenciones/emergencia', paciente.id]">
+        Atención de emergencia
       </button>
 
     </div>

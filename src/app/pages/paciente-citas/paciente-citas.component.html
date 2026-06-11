@@ -1,0 +1,259 @@
+<div class="paciente-citas-page">
+
+  <div class="page-header">
+    <div>
+      <h1 *ngIf="!modoEditar">Historial de citas</h1>
+      <h1 *ngIf="modoEditar">
+        {{ citaEditando?.estado === 'ATENDIDA' ? 'Detalle de la cita' : 'Editar cita' }}
+      </h1>
+
+      <p>
+        <a routerLink="/pacientes">Pacientes</a>
+        <span>›</span>
+        <span *ngIf="!modoEditar">Historial de citas</span>
+        <span *ngIf="modoEditar">
+          {{ citaEditando?.estado === 'ATENDIDA' ? 'Detalle de cita' : 'Editar cita' }}
+        </span>
+      </p>
+    </div>
+
+    <button class="btn-volver" routerLink="/pacientes">
+      Volver
+    </button>
+  </div>
+
+  <div *ngIf="mensaje" class="alerta">
+    {{ mensaje }}
+  </div>
+
+  <section class="paciente-card" *ngIf="paciente">
+    <div class="avatar"></div>
+
+    <div class="paciente-info">
+      <h2>{{ paciente.nombres }} {{ paciente.apellidos }}</h2>
+
+      <div class="datos">
+        <span>DNI: {{ paciente.numeroDocumento }}</span>
+        <span>{{ paciente.edad || '-' }} años</span>
+        <span>{{ paciente.sexo || '-' }}</span>
+      </div>
+    </div>
+
+    <span class="estado-paciente" [class.inactivo]="paciente.estado === false">
+      {{ paciente.estado === false ? 'Inactivo' : 'Activo' }}
+    </span>
+  </section>
+
+  <!-- HISTORIAL -->
+  <section class="historial-card" *ngIf="!modoEditar">
+
+    <div class="filtros">
+      <div>
+        <label>Desde</label>
+        <input type="date" [(ngModel)]="filtroDesde">
+      </div>
+
+      <div>
+        <label>Hasta</label>
+        <input type="date" [(ngModel)]="filtroHasta">
+      </div>
+
+      <div>
+        <label>Estado</label>
+        <select [(ngModel)]="filtroEstado">
+          <option value="TODOS">Todos</option>
+          <option value="PROGRAMADA">Programada</option>
+          <option value="ATENDIDA">Atendida</option>
+          <option value="CANCELADA">Cancelada</option>
+          <option value="NO_ASISTIO">No asistió</option>
+        </select>
+      </div>
+
+      <button class="btn-buscar" type="button" (click)="aplicarFiltros()">
+        Buscar
+      </button>
+    </div>
+
+    <h2>Historial de citas</h2>
+
+    <div *ngIf="cargando" class="empty">
+      Cargando citas...
+    </div>
+
+    <div *ngIf="!cargando && citasFiltradas.length === 0" class="empty-state">
+      <div class="empty-icon">📅</div>
+      <h3>No hay citas registradas</h3>
+      <p>El paciente seleccionado no tiene citas registradas en el rango de fechas consultado.</p>
+
+      <button class="btn-limpiar" type="button" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </button>
+    </div>
+
+    <table *ngIf="!cargando && citasFiltradas.length > 0">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Especialidad</th>
+          <th>Motivo</th>
+          <th>Estado</th>
+          <th>Profesional</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let c of citasFiltradas">
+          <td>{{ c.fecha }}</td>
+          <td>{{ c.hora }}</td>
+          <td>{{ c.especialidad }}</td>
+          <td>{{ c.motivoConsulta }}</td>
+
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'programada': c.estado === 'PROGRAMADA',
+                'atendida': c.estado === 'ATENDIDA',
+                'cancelada': c.estado === 'CANCELADA',
+                'no_asistio': c.estado === 'NO_ASISTIO'
+              }">
+              {{ c.estado }}
+            </span>
+          </td>
+
+          <td>{{ c.medicoNombre || obtenerNombreMedico(c.medicoId) }}</td>
+
+          <td>
+            <button class="btn-detalle" type="button" (click)="abrirDetalle(c)">
+              {{ c.estado === 'ATENDIDA' ? 'Ver' : 'Ver / Editar' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </section>
+
+  <!-- DETALLE / EDITAR -->
+  <section class="detalle-grid" *ngIf="modoEditar && citaEditando">
+
+    <div class="detalle-card">
+      <h2>Información de la cita</h2>
+
+      <div class="alerta-info" *ngIf="citaEditando.estado === 'ATENDIDA'">
+        Esta cita ya fue atendida. Solo puede visualizarse y no permite modificaciones.
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Tipo de cita *</label>
+          <select
+            [(ngModel)]="citaEditando.tipoCita"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            <option value="CONSULTA">Consulta</option>
+            <option value="PREVENTIVA">Preventiva</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha *</label>
+          <input
+            type="date"
+            [(ngModel)]="citaEditando.fecha"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
+        </div>
+
+        <div class="form-group">
+          <label>Hora *</label>
+          <input
+            type="time"
+            [(ngModel)]="citaEditando.hora"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
+        </div>
+
+        <div class="form-group">
+          <label>Especialidad *</label>
+          <input
+            type="text"
+            [(ngModel)]="citaEditando.especialidad"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
+        </div>
+
+        <div class="form-group full">
+          <label>Motivo de consulta *</label>
+          <textarea
+            [(ngModel)]="citaEditando.motivoConsulta"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
+          </textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Médico *</label>
+          <select
+            [(ngModel)]="citaEditando.medicoId"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            <option [ngValue]="null">Seleccione médico</option>
+            <option *ngFor="let m of medicos" [ngValue]="m.id">
+              {{ m.nombres }} {{ m.apellidos }} - {{ m.username }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Estado</label>
+          <select
+            [(ngModel)]="citaEditando.estado"
+            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            <option value="PROGRAMADA">Programada</option>
+            <option value="CANCELADA">Cancelada</option>
+            <option value="NO_ASISTIO">No asistió</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <aside class="prediccion-card">
+      <h2>Predicción de inasistencia</h2>
+
+      <div class="riesgo-circle">
+        <span>{{ calcularRiesgo(citaEditando) }}%</span>
+      </div>
+
+      <h3>{{ textoRiesgo(citaEditando) }}</h3>
+      <p>Probabilidad estimada de inasistencia según el modelo de predicción.</p>
+
+      <div class="acciones-card">
+        <h4>Acciones</h4>
+
+        <button
+          class="btn-guardar"
+          type="button"
+          (click)="guardarCambios()"
+          *ngIf="citaEditando.estado !== 'ATENDIDA'">
+          Guardar cambios
+        </button>
+
+        <button
+          class="btn-secondary"
+          type="button"
+          (click)="cancelarEdicion()">
+          Volver
+        </button>
+
+        <button
+          class="btn-danger"
+          type="button"
+          *ngIf="citaEditando.estado !== 'ATENDIDA'"
+          (click)="citaEditando.estado = 'CANCELADA'; guardarCambios()">
+          Cancelar cita
+        </button>
+      </div>
+    </aside>
+
+  </section>
+
+</div>

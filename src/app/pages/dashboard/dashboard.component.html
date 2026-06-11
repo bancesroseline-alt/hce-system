@@ -1,87 +1,200 @@
 <div class="dashboard-container">
-  <div class="top-row">
 
+  <!-- HERO -->
+  <section class="dashboard-hero">
     <div>
-      <h1>Bienvenido, {{ rolUsuario }} {{ nombreUsuario }}</h1>
-      <p>Aquí tienes un resumen general del sistema</p>
-    </div>
-  </div>
+      <span class="eyebrow">Panel principal</span>
 
+      <h1>
+        Bienvenido, {{ rolUsuario }} {{ nombreUsuario }}
+      </h1>
+
+      <p>
+        Resumen operativo del sistema de historias clínicas electrónicas.
+      </p>
+    </div>
+
+    <div class="hero-badge">
+      <span class="pulse"></span>
+      Sistema activo
+    </div>
+  </section>
+
+  <!-- TARJETAS RESUMEN -->
   <div class="summary-cards">
-    <div class="summary-card">
-      <h3>Pacientes</h3>
-      <strong>{{ totalPacientes }}</strong>
-      <span>Total registrados</span>
+
+    <div class="summary-card card-pacientes">
+      <div class="card-icon">👥</div>
+
+      <div>
+        <h3>Pacientes</h3>
+        <strong>{{ totalPacientes }}</strong>
+        <span>Total registrados</span>
+      </div>
     </div>
 
-    <div class="summary-card">
-      <h3>Citas hoy</h3>
-      <strong>{{ citasHoy }}</strong>
-      <span>Total programadas</span>
+    <div class="summary-card card-citas">
+      <div class="card-icon">📅</div>
+
+      <div>
+        <h3>Citas hoy</h3>
+        <strong>{{ citasHoy }}</strong>
+        <span>Total programadas</span>
+      </div>
     </div>
 
-    <div class="summary-card">
-      <h3>% Inasistencia</h3>
-      <strong>{{ porcentajeInasistencia || 0 }}%</strong>
-      <span>Promedio mensual</span>
+    <div class="summary-card card-riesgo">
+      <div class="card-icon">📊</div>
+
+      <div>
+        <h3>% Inasistencia</h3>
+        <strong>{{ porcentajeInasistencia || 0 }}%</strong>
+        <span>Promedio mensual</span>
+      </div>
     </div>
+
   </div>
 
+  <!-- CONTENIDO -->
   <div class="content-grid">
+
+    <!-- CITAS DEL DÍA -->
     <section class="panel citas-panel">
+
       <div class="panel-header">
-        <h2>Citas del día</h2>
-        <button routerLink="/citas">Ver todas</button>
+        <div>
+          <h2>Citas pendientes</h2>
+          <p>Pacientes programados para la fecha actual</p>
+        </div>
+
+        <button routerLink="/citas">
+          Ver todas
+        </button>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Hora</th>
-            <th>Paciente</th>
-            <th>Motivo</th>
-            <th>Estado</th>
-            <th>Riesgo ML</th>
-            <th></th>
-          </tr>
-        </thead>
+      <div class="table-wrapper">
 
-        <tbody>
-          <tr *ngFor="let cita of citasDelDia">
-            <td>{{ cita.hora }}</td>
-            <td>{{ cita.paciente }}</td>
-            <td>{{ cita.motivo }}</td>
-            <td><span class="estado">{{ cita.estado }}</span></td>
-            <td>
-              <span class="riesgo" [ngClass]="cita.riesgo?.toLowerCase()">
-                ● {{ cita.riesgo }}
-              </span>
-            </td>
-            <td>︙</td>
-          </tr>
+        <table>
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Paciente</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+              <th>Riesgo ML</th>
+              <th></th>
+            </tr>
+          </thead>
 
-          <tr *ngIf="citasDelDia.length === 0">
-            <td colspan="6" class="empty">No hay citas registradas hoy</td>
-          </tr>
-        </tbody>
-      </table>
+          <tbody>
+            <tr *ngFor="let cita of citasDelDia">
+              <td class="hora">{{ cita.hora }}</td>
 
-      <a class="link" routerLink="/citas">Ver más citas ></a>
+              <td>
+                <div class="paciente-cell">
+                  <div class="mini-avatar">
+                    {{ (cita.paciente?.nombres || cita.pacienteNombre || 'P').charAt(0) }}
+                  </div>
+
+                  <div>
+                    <strong>
+                      {{ cita.paciente?.nombres || cita.pacienteNombre || 'Sin nombre' }}
+                      {{ cita.paciente?.apellidos || '' }}
+                    </strong>
+
+                    <small>
+                      DNI {{ cita.paciente?.numeroDocumento || cita.numeroDocumento || '-' }}
+                    </small>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                {{ cita.motivoConsulta || cita.motivo || '-' }}
+              </td>
+
+              <td>
+                <span
+                  class="estado"
+                  [ngClass]="{
+                    'estado-programada': cita.estado === 'PROGRAMADA',
+                    'estado-atendida': cita.estado === 'ATENDIDA',
+                    'estado-cancelada': cita.estado === 'CANCELADA',
+                    'estado-no-asistio': cita.estado === 'NO_ASISTIO'
+                  }">
+                  {{ cita.estado }}
+                </span>
+              </td>
+
+              <td>
+                <span
+                  class="riesgo"
+                  [ngClass]="(cita.riesgo || 'bajo').toLowerCase()">
+                  {{ cita.riesgo || 'Bajo' }}
+                </span>
+              </td>
+
+              <td class="actions-cell">
+                <button class="btn-more" type="button">
+                  ⋮
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="citasDelDia.length === 0">
+              <td colspan="6" class="empty">
+                <div class="empty-box">
+                  <div class="empty-icon">📅</div>
+                  <strong>No hay citas registradas hoy</strong>
+                  <span>Cuando registres una cita para hoy aparecerá aquí.</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <a class="link" routerLink="/citas">
+        Ver más citas →
+      </a>
+
     </section>
 
+    <!-- ACTIVIDAD RECIENTE -->
     <section class="panel activity-panel">
-      <h2>Actividad reciente</h2>
 
-      <div class="activity" *ngFor="let act of actividades">
-        <strong>{{ act.titulo }}</strong>
-        <p>{{ act.detalle }}<br>{{ act.tiempo }}</p>
+      <div class="panel-header simple">
+        <div>
+          <h2>Actividad reciente</h2>
+          <p>Últimos movimientos del sistema</p>
+        </div>
       </div>
 
-      <div *ngIf="actividades.length === 0" class="empty">
-        Sin actividad reciente
+      <div class="activity-list" *ngIf="actividades.length > 0">
+        <div class="activity" *ngFor="let act of actividades">
+          <div class="activity-dot"></div>
+
+          <div>
+            <strong>{{ act.titulo }}</strong>
+            <p>{{ act.detalle }}</p>
+            <span>{{ act.tiempo }}</span>
+          </div>
+        </div>
       </div>
 
-      <a class="link">Ver todas las actividades</a>
+      <div *ngIf="actividades.length === 0" class="empty activity-empty">
+        <div class="empty-icon">🕒</div>
+        <strong>Sin actividad reciente</strong>
+        <span>Aún no hay movimientos registrados.</span>
+      </div>
+
+      <a class="link">
+        Ver todas las actividades →
+      </a>
+
     </section>
+
   </div>
+
 </div>

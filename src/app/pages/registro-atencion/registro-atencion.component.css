@@ -1,0 +1,116 @@
+.atencion-page {
+  padding: 28px;
+  background: #f7f9fc;
+  min-height: calc(100vh - 68px);
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  margin: 0;
+  color: #0f172a;
+}
+
+.page-header p {
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.patient-card {
+  background: white;
+  border: 1px solid #dbe3ec;
+  border-radius: 12px;
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, .08);
+}
+
+.avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #d9d9d9;
+}
+
+.estado-activo {
+  margin-left: auto;
+  background: #dcfce7;
+  color: #16a34a;
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  background: white;
+  border: 1px solid #dbe3ec;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-section h2 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.form-section label {
+  font-weight: 700;
+  color: #334155;
+  font-size: 13px;
+}
+
+.form-section input,
+.form-section select,
+.form-section textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.form-section textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.btn-primary {
+  background: #0ea5e9;
+  color: white;
+  border: none;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid #cbd5e1;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -2,25 +2,22 @@ export interface Cita {
 
   id?: number;
 
-  paciente?: {
-    id?: number;
-    nombres?: string;
-    apellidos?: string;
+  paciente: {
+    id: number;
   };
 
-  medico?: {
-    id?: number;
-    username?: string;
+  medico: {
+    id: number;
   };
 
-  tipoCita?: string;
+  tipoCita: 'CONSULTA' | 'CONTROL' | 'EMERGENCIA';
 
-  fecha?: string;
-  hora?: string;
+  fecha: string;
+  hora: string;
 
-  especialidad?: string;
+  especialidad: string;
 
-  motivoConsulta?: string;
+  motivoConsulta: string;
 
-  estado?: 'PROGRAMADA' | 'ATENDIDA' | 'CANCELADA';
+  estado: 'PROGRAMADA' | 'ATENDIDA' | 'CANCELADA';
 }

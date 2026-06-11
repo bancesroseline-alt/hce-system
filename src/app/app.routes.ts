@@ -57,30 +57,34 @@ export const routes: Routes = [
           import('./pages/pacientes/paciente-detalle/paciente-detalle.component')
             .then(m => m.PacienteDetalleComponent)
       },
-
+      
       // =====================
       // HISTORIAS CLÍNICAS
       // =====================
-      {
+           {
         path: 'historias-clinicas',
         loadComponent: () =>
           import('./pages/historia/historia.component')
             .then(m => m.HistoriaComponent)
       },
-
       {
         path: 'historias-clinicas/:id',
         loadComponent: () =>
           import('./pages/historia/historia.component')
             .then(m => m.HistoriaComponent)
       },
-
       {
         path: 'atenciones/nueva/:pacienteId',
         loadComponent: () =>
           import('./pages/registro-atencion/registro-atencion.component')
             .then(m => m.RegistroAtencionComponent)
-      }
+      },
+      {
+        path: 'atenciones/nueva/:pacienteId/cita/:citaId',
+        loadComponent: () =>
+          import('./pages/registro-atencion/registro-atencion.component')
+            .then(m => m.RegistroAtencionComponent)
+      },
 
       // =====================
       // CITAS
@@ -105,6 +109,20 @@ export const routes: Routes = [
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
       },
+
+              {
+          path: 'pacientes/:id/citas',
+          loadComponent: () =>
+            import('./pages/paciente-citas/paciente-citas.component')
+              .then(m => m.PacienteCitasComponent)
+        },
+
+        {
+          path: 'atenciones/emergencia/:pacienteId',
+          loadComponent: () =>
+            import('./pages/registro-atencion/registro-atencion.component')
+              .then(m => m.RegistroAtencionComponent)
+        },
 
       // =====================
       // OTROS MÓDULOS
