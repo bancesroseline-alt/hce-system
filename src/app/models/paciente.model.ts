@@ -20,4 +20,9 @@ export interface Paciente {
   antecedentes: string;
 
   estado: boolean;
+
+  uuidLocal?: string;
+estadoSync?: string;
+fechaCreacionLocal?: string;
+fechaActualizacionLocal?: string;
 }

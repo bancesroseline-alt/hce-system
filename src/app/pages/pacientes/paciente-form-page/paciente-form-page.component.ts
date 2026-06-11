@@ -17,7 +17,6 @@ export class PacienteFormPageComponent {
 
   mensaje = '';
 
-  // 🔵 EDITAR / CREAR CONTROL
   modoEdicion = false;
   idPaciente: number | null = null;
 
@@ -42,7 +41,6 @@ export class PacienteFormPageComponent {
     private route: ActivatedRoute
   ) {}
 
-  // CARGAR SI ES EDICIÓN
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
 
@@ -52,10 +50,15 @@ export class PacienteFormPageComponent {
         this.modoEdicion = true;
         this.idPaciente = Number(id);
 
-        // CARGAR DATOS DEL PACIENTE
         this.pacienteService.obtener(this.idPaciente)
-          .subscribe(data => {
-            this.paciente = data;
+          .subscribe({
+            next: (data) => {
+              this.paciente = data;
+            },
+            error: (err) => {
+              console.error(err);
+              alert('Error al cargar paciente');
+            }
           });
       }
 
@@ -92,15 +95,14 @@ export class PacienteFormPageComponent {
       return;
     }
 
-    // =========================
-    // MODO EDICIÓN
-    // =========================
     if (this.modoEdicion) {
 
       this.pacienteService.actualizar(this.idPaciente!, this.paciente)
         .subscribe({
           next: () => {
-            this.mensaje = 'Paciente actualizado correctamente';
+            this.mensaje = navigator.onLine
+              ? 'Paciente actualizado correctamente'
+              : 'Paciente actualizado offline correctamente';
 
             setTimeout(() => {
               this.router.navigate(['/pacientes']);
@@ -112,47 +114,60 @@ export class PacienteFormPageComponent {
           }
         });
 
-    } 
-    // =========================
-    // MODO CREAR
-    // =========================
-    else {
+      return;
+    }
 
-      this.pacienteService.buscar(this.paciente.numeroDocumento)
+    // MODO CREAR OFFLINE
+    if (!navigator.onLine) {
+
+      this.pacienteService.registrar(this.paciente)
         .subscribe({
+          next: () => {
+            this.mensaje = 'Paciente guardado offline correctamente';
 
-          next: (data) => {
-
-            if (data.length > 0) {
-              alert('Ya existe un paciente con ese documento');
-              return;
-            }
-
-            this.pacienteService.registrar(this.paciente)
-              .subscribe({
-
-                next: () => {
-                  this.mensaje = 'Paciente registrado correctamente';
-
-                  setTimeout(() => {
-                    this.router.navigate(['/pacientes']);
-                  }, 2000);
-                },
-
-                error: (err) => {
-                  console.error(err);
-                  alert('Error al registrar paciente');
-                }
-
-              });
-
+            setTimeout(() => {
+              this.router.navigate(['/pacientes']);
+            }, 2000);
           },
-
           error: (err) => {
             console.error(err);
+            alert('Error al guardar paciente offline');
+          }
+        });
+
+      return;
+    }
+
+    // MODO CREAR ONLINE
+    this.pacienteService.buscar(this.paciente.numeroDocumento)
+      .subscribe({
+        next: (data) => {
+
+          if (data.length > 0) {
+            alert('Ya existe un paciente con ese documento');
+            return;
           }
 
-        });
-    }
+          this.pacienteService.registrar(this.paciente)
+            .subscribe({
+              next: () => {
+                this.mensaje = 'Paciente registrado correctamente';
+
+                setTimeout(() => {
+                  this.router.navigate(['/pacientes']);
+                }, 2000);
+              },
+              error: (err) => {
+                console.error(err);
+                alert('Error al registrar paciente');
+              }
+            });
+
+        },
+        error: (err) => {
+          console.error(err);
+          alert('No se pudo validar el documento con el servidor');
+        }
+      });
   }
 }
