@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+
+import { PacienteService } from '../../services/paciente.service';
+import { CitaOfflineService } from '../../services/cita-offline.service';
+import { AtencionOfflineService } from '../../services/atencion-offline.service';
 
 @Component({
   selector: 'app-historia',
@@ -22,11 +25,11 @@ export class HistoriaComponent implements OnInit {
 
   tab: 'atenciones' | 'citas' | 'inasistencias' = 'atenciones';
 
-  private api = 'https://hce-backend.onrender.com/api';
-
   constructor(
     private route: ActivatedRoute,
-    private http: HttpClient
+    private pacienteService: PacienteService,
+    private citaOfflineService: CitaOfflineService,
+    private atencionOfflineService: AtencionOfflineService
   ) {}
 
   ngOnInit(): void {
@@ -42,42 +45,59 @@ export class HistoriaComponent implements OnInit {
   }
 
   cargarListadoHistorias(): void {
-    this.http.get<any[]>(`${this.api}/pacientes`)
+    this.pacienteService.listar()
       .subscribe({
         next: data => {
           this.pacientes = data || [];
         },
         error: error => {
           console.error('Error al cargar pacientes', error);
+          this.pacientes = [];
         }
       });
   }
 
   cargarDetallePaciente(pacienteId: number): void {
-    this.http.get<any>(`${this.api}/historias-clinicas/paciente/${pacienteId}`)
+
+    this.pacienteService.obtener(pacienteId)
       .subscribe({
         next: data => {
-          this.paciente = data.paciente;
-
-          const atencionesRecibidas = data.atenciones || [];
-
-          this.atenciones = this.eliminarAtencionesDuplicadas(atencionesRecibidas);
+          this.paciente = data;
         },
         error: error => {
-          console.error('Error al cargar historia clínica', error);
+          console.error('Error al cargar paciente', error);
+          this.paciente = null;
         }
       });
 
-    this.http.get<any[]>(`${this.api}/citas/paciente/${pacienteId}`)
+    this.atencionOfflineService.listarPorPaciente(pacienteId)
+      .subscribe({
+        next: data => {
+          this.atenciones = this.eliminarAtencionesDuplicadas(data || []);
+        },
+        error: error => {
+          console.error('Error al cargar atenciones', error);
+          this.atenciones = [];
+        }
+      });
+
+    this.citaOfflineService.listar()
       .subscribe({
         next: citas => {
-          const citasUnicas = this.eliminarCitasDuplicadas(citas || []);
+          const citasPaciente = (citas || []).filter(c =>
+            Number(c.pacienteId) === Number(pacienteId) ||
+            Number(c.paciente?.id) === Number(pacienteId)
+          );
+
+          const citasUnicas = this.eliminarCitasDuplicadas(citasPaciente);
 
           this.citasProgramadas = citasUnicas.filter(c => c.estado !== 'NO_ASISTIO');
           this.citasNoAsistidas = citasUnicas.filter(c => c.estado === 'NO_ASISTIO');
         },
         error: error => {
           console.error('Error al cargar citas del paciente', error);
+          this.citasProgramadas = [];
+          this.citasNoAsistidas = [];
         }
       });
   }
@@ -88,7 +108,7 @@ export class HistoriaComponent implements OnInit {
     atenciones.forEach(a => {
       const clave = a.id
         ? `ID-${a.id}`
-        : `${a.tipoAtencion}-${a.fechaHora}-${a.motivoConsulta}-${a.diagnostico}-${a.tratamientoIndicado}`;
+        : `${a.uuidLocal || ''}-${a.tipoAtencion}-${a.fechaHora}-${a.motivoConsulta}-${a.diagnostico}`;
 
       if (!mapa.has(clave)) {
         mapa.set(clave, a);
@@ -104,7 +124,7 @@ export class HistoriaComponent implements OnInit {
     citas.forEach(c => {
       const clave = c.id
         ? `ID-${c.id}`
-        : `${c.tipoCita}-${c.fecha}-${c.hora}-${c.motivoConsulta}`;
+        : `${c.uuidLocal || ''}-${c.tipoCita}-${c.fecha}-${c.hora}-${c.motivoConsulta}`;
 
       if (!mapa.has(clave)) {
         mapa.set(clave, c);
@@ -113,5 +133,4 @@ export class HistoriaComponent implements OnInit {
 
     return Array.from(mapa.values());
   }
-
 }

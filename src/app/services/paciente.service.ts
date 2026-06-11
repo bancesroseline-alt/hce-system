@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, from } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { Paciente } from '../models/paciente.model';
 import { IndexedDbService } from './indexed-db.service';
@@ -23,6 +23,7 @@ export class PacienteService {
         next: async (data) => {
           for (const paciente of data as any[]) {
             paciente.uuidLocal = paciente.uuidLocal || String(paciente.id);
+            paciente.estadoSync = 'SINCRONIZADO';
             await this.indexedDb.guardar('pacientes', paciente);
           }
 
@@ -40,11 +41,13 @@ export class PacienteService {
     });
   }
 
-  obtener(id: number): Observable<Paciente> {
+  obtener(id: number | string): Observable<Paciente> {
     return new Observable(observer => {
       this.http.get<Paciente>(`${this.api}/${id}`).subscribe({
         next: async (data: any) => {
           data.uuidLocal = data.uuidLocal || String(data.id);
+          data.estadoSync = 'SINCRONIZADO';
+
           await this.indexedDb.guardar('pacientes', data);
 
           observer.next(data);
@@ -55,11 +58,16 @@ export class PacienteService {
 
           const pacientes = await this.indexedDb.obtenerTodos('pacientes');
 
-          const paciente = pacientes.find(p =>
+          const paciente = pacientes.find((p: any) =>
             Number(p.id) === Number(id) ||
             Number(p.pacienteId) === Number(id) ||
             String(p.uuidLocal) === String(id)
           );
+
+          if (!paciente) {
+            observer.error('Paciente no encontrado offline');
+            return;
+          }
 
           observer.next(paciente);
           observer.complete();
@@ -97,16 +105,16 @@ export class PacienteService {
     });
   }
 
-  actualizar(id: number, paciente: any): Observable<any> {
-    paciente.uuidLocal = paciente.uuidLocal || String(id);
-    paciente.id = id;
+  actualizar(id: number | string, paciente: any): Observable<any> {
+    paciente.uuidLocal = paciente.uuidLocal || String(paciente.id || id);
+    paciente.id = paciente.id || id;
     paciente.estadoSync = 'PENDIENTE';
     paciente.fechaActualizacionLocal = new Date().toISOString();
 
     return new Observable(observer => {
       this.http.put<Paciente>(`${this.api}/${id}`, paciente).subscribe({
         next: async (data: any) => {
-          data.uuidLocal = data.uuidLocal || String(data.id);
+          data.uuidLocal = data.uuidLocal || String(data.id || paciente.uuidLocal);
           data.estadoSync = 'SINCRONIZADO';
 
           await this.indexedDb.guardar('pacientes', data);
@@ -127,11 +135,11 @@ export class PacienteService {
     });
   }
 
-  baja(id: number): Observable<any> {
+  baja(id: number | string): Observable<any> {
     return new Observable(observer => {
       this.http.patch<Paciente>(`${this.api}/${id}/baja`, {}).subscribe({
         next: async (data: any) => {
-          data.uuidLocal = data.uuidLocal || String(data.id);
+          data.uuidLocal = data.uuidLocal || String(data.id || id);
           data.estadoSync = 'SINCRONIZADO';
 
           await this.indexedDb.guardar('pacientes', data);
@@ -140,12 +148,13 @@ export class PacienteService {
           observer.complete();
         },
         error: async (err) => {
-          console.warn('Backend no disponible. Dando baja offline...', err);
+          console.warn('Backend no disponible. Dando de baja paciente offline...', err);
 
           const pacientes = await this.indexedDb.obtenerTodos('pacientes');
 
-          const paciente = pacientes.find(p =>
+          const paciente = pacientes.find((p: any) =>
             Number(p.id) === Number(id) ||
+            Number(p.pacienteId) === Number(id) ||
             String(p.uuidLocal) === String(id)
           );
 
@@ -182,7 +191,7 @@ export class PacienteService {
             const pacientes = await this.indexedDb.obtenerTodos('pacientes');
             const texto = criterio.toLowerCase();
 
-            const filtrados = pacientes.filter(p =>
+            const filtrados = pacientes.filter((p: any) =>
               `${p.nombres || ''}`.toLowerCase().includes(texto) ||
               `${p.apellidos || ''}`.toLowerCase().includes(texto) ||
               `${p.numeroDocumento || ''}`.includes(texto)
