@@ -1,76 +1,133 @@
-<div class="top-bar">
+<div class="pacientes-page">
 
-  <input
-  type="text"
-  placeholder="Buscar paciente por nombre o DNI ..."
-  [(ngModel)]="buscarTexto"
-  (input)="buscar()"
-/>
-
-  <div class="actions">
-
-    <button class="btn-filter">Filtros</button>
+  <section class="page-header">
+    <div>
+      <span class="eyebrow">Gestión clínica</span>
+      <h1>Pacientes</h1>
+      <p>Administra los pacientes registrados en el sistema HCE.</p>
+    </div>
 
     <button class="btn-new" routerLink="/pacientes/nuevo">
-      + Nuevo Paciente
+      <span>+</span> Nuevo paciente
     </button>
+  </section>
 
-  </div>
+  <section class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div>
+        <strong>{{ pacientes.length }}</strong>
+        <span>Total pacientes</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon active">✓</div>
+      <div>
+        <strong>{{ pacientes.length }}</strong>
+        <span>Registros visibles</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="patient-card">
+
+    <div class="toolbar">
+      <div class="search-box">
+        <span>🔎</span>
+        <input
+          type="text"
+          placeholder="Buscar paciente por nombre, apellido o DNI..."
+          [(ngModel)]="buscarTexto"
+          (input)="buscar()"
+        />
+      </div>
+
+      <button class="btn-filter">
+        Filtros
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>DNI</th>
+            <th>Edad</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let p of pacientes">
+
+            <td>
+              <div class="patient-cell">
+                <div class="avatar">
+                  {{ (p.nombres || 'P').charAt(0) }}
+                </div>
+
+                <div>
+                  <strong>{{ p.nombres }} {{ p.apellidos }}</strong>
+                  <small>{{ p.sexo || 'Sin sexo registrado' }}</small>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span class="dni">{{ p.numeroDocumento }}</span>
+            </td>
+
+            <td>{{ p.edad || '-' }}</td>
+
+            <td>{{ p.telefono || '-' }}</td>
+
+            <td>
+              <span class="estado" [class.activo]="p.estado" [class.inactivo]="!p.estado">
+                {{ p.estado ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+
+            <td>
+              <div class="acciones">
+                <button
+                  class="btn-icon view"
+                  title="Ver paciente"
+                  [routerLink]="['/pacientes', p.id || p.uuidLocal]">
+                  👁
+                </button>
+
+                <button
+                  class="btn-icon edit"
+                  title="Editar paciente"
+                  [routerLink]="['/pacientes/editar', p.id || p.uuidLocal]">
+                  ✏️
+                </button>
+              </div>
+            </td>
+
+          </tr>
+
+          <tr *ngIf="pacientes.length === 0">
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-icon">👤</div>
+                <strong>No hay pacientes registrados</strong>
+                <span>Cuando registres pacientes aparecerán en esta tabla.</span>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+    </div>
+
+  </section>
 
 </div>
-
-<div class="table-container">
-
-  <table>
-
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>DNI</th>
-        <th>Edad</th>
-        <th>Teléfono</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-
-    <tbody>
-
-      <tr *ngFor="let p of pacientes">
-
-        <td>{{ p.nombres }} {{ p.apellidos }}</td>
-        <td>{{ p.numeroDocumento }}</td>
-        <td>{{ p.edad }}</td>
-        <td>{{ p.telefono }}</td>
-
-        <td>
-          <span class="estado" [class.activo]="p.estado" [class.inactivo]="!p.estado">
-            {{ p.estado ? 'Activo' : 'Inactivo' }}
-          </span>
-        </td>
-
-        <td class="acciones">
-
-          <button
-    class="btn-icon view"
-    [routerLink]="['/pacientes', p.id]"
-    >
-    👁
-    </button>
-
-          <button
-  class="btn-icon edit"
-  [routerLink]="['/pacientes/editar', p.id]">
-  ✏
-</button>
-
-        </td>
-
-      </tr>
-
-    </tbody>
-
-  </table>
-
-</div>
-
