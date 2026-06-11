@@ -17,28 +17,37 @@ export class CitaOfflineService {
   ) {}
 
   listar(): Observable<any[]> {
-    return new Observable(observer => {
-      this.http.get<any[]>(`${this.api}/citas`).subscribe({
-        next: async (data) => {
-          for (const cita of data as any[]) {
-            cita.uuidLocal = cita.uuidLocal || String(cita.id);
-            cita.estadoSync = 'SINCRONIZADO';
-            await this.indexedDb.guardar('citas', cita);
+  return new Observable(observer => {
+    this.http.get<any[]>(`${this.api}/citas`).subscribe({
+      next: async (data) => {
+        for (const cita of data as any[]) {
+          cita.uuidLocal = cita.uuidLocal || String(cita.id);
+          cita.estadoSync = 'SINCRONIZADO';
+
+          if (cita.paciente?.id && !cita.pacienteId) {
+            cita.pacienteId = cita.paciente.id;
           }
 
-          observer.next(data);
-          observer.complete();
-        },
-        error: async (err) => {
-          console.warn('Backend no disponible. Cargando citas offline...', err);
+          if (cita.medico?.id && !cita.medicoId) {
+            cita.medicoId = cita.medico.id;
+          }
 
-          const citas = await this.indexedDb.obtenerTodos('citas');
-          observer.next(citas);
-          observer.complete();
+          await this.indexedDb.guardar('citas', cita);
         }
-      });
+
+        observer.next(data);
+        observer.complete();
+      },
+      error: async (err) => {
+        console.warn('Backend no disponible. Cargando citas offline...', err);
+
+        const citas = await this.indexedDb.obtenerTodos('citas');
+        observer.next(citas);
+        observer.complete();
+      }
     });
-  }
+  });
+}
 
   registrar(cita: any): Observable<any> {
     cita.uuidLocal = cita.uuidLocal || crypto.randomUUID();

@@ -45,17 +45,17 @@ export class HistoriaComponent implements OnInit {
   }
 
   cargarListadoHistorias(): void {
-    this.pacienteService.listar()
-      .subscribe({
-        next: data => {
-          this.pacientes = data || [];
-        },
-        error: error => {
-          console.error('Error al cargar pacientes', error);
-          this.pacientes = [];
-        }
-      });
-  }
+  this.pacienteService.listar()
+    .subscribe({
+      next: data => {
+        this.pacientes = data || [];
+      },
+      error: error => {
+        console.error('Error al cargar pacientes', error);
+        this.pacientes = [];
+      }
+    });
+}
 
   cargarDetallePaciente(pacienteId: number): void {
 
