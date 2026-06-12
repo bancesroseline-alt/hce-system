@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PrediccionService } from 'src/app/services/prediccion.service';
+import { PrediccionService } from '../../services/prediccion.service';
 
 @Component({
   selector: 'app-prediccion',
