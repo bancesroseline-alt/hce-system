@@ -1,0 +1,24 @@
+.modal-prediccion{
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,.4);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 9999;
+}
+
+.prediccion-card{
+background: white;
+padding: 24px;
+border-radius: 12px;
+min-width: 400px;
+max-width: 500px;
+box-shadow: 0 4px 15px rgba(0,0,0,.2);
+}
+
+.btn-cerrar{
+margin-top: 15px;
+padding: 8px 16px;
+cursor: pointer;
+}
