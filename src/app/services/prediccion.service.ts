@@ -1,98 +1,69 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { forkJoin, map, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PrediccionService {
 
-  private apiBackend = 'https://hce-backend.onrender.com';
-  private apiML = 'https://ml-api-inasistencias.onrender.com';
+  private apiCitas = 'https://hce-backend.onrender.com';
+  private apiML = 'https://ml-api-inasistencias.onrender.com/predict';
 
   constructor(private http: HttpClient) {}
 
-  // 1. Obtener citas reales del backend
-  obtenerCitasHoy(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiBackend}/api/citas`);
+  obtenerCitasHoy() {
+    return this.http.get<any[]>(this.apiCitas);
   }
 
-  // 2. Llamar al modelo ML
-  predecir(citas: any[]): Observable<any[]> {
+  predecirCita(cita: any) {
+    const payload = {
+      edad: cita.edad,
+      sexo: cita.sexo,
+      tipo_cita: cita.tipoCita,
+      especialidad: cita.especialidad,
+      dia_semana: cita.diaSemana,
+      hora: Number(cita.hora),
+      antecedentes_inasistencias: cita.antecedentesInasistencias,
+      cantidad_citas_previas: cita.cantidadCitasPrevias
+    };
 
-    const payload = citas.map(c => ({
-      edad: c.edad,
-      sexo: c.sexo,
-      tipo_cita: c.tipoCita,
-      especialidad: c.especialidad,
-      dia_semana: c.diaSemana,
-      hora: c.hora,
-      antecedentes_inasistencias: c.antecedentesInasistencias,
-      cantidad_citas_previas: c.cantidadCitasPrevias
-    }));
+    return this.http.post<any>(this.apiML, payload).pipe(
+      map(res => {
+        let nivel = 'BAJO';
 
-    return this.http.post<any[]>(`${this.apiML}/predict`, payload);
+        if (res.prediccion === 1 || res.probabilidad >= 0.7) {
+          nivel = 'ALTO';
+        } else if (res.probabilidad >= 0.4) {
+          nivel = 'MEDIO';
+        }
+
+        return {
+          paciente: cita.paciente,
+          nivelRiesgo: nivel,
+          probabilidadInasistencia: res.probabilidad,
+          recomendacion: this.generarRecomendacion(nivel)
+        };
+      })
+    );
   }
 
-  // 3. Flujo completo
   obtenerAlertas() {
     return this.obtenerCitasHoy().pipe(
-      map(citas => {
-
-        // ⚠️ IMPORTANTE: aquí debes llamar predict dentro de otro flujo
-        return { citas };
-
-      })
+      switchMap(citas =>
+        forkJoin(citas.map(cita => this.predecirCita(cita)))
+      )
     );
   }
 
-  // 4. Flujo recomendado REAL (uso en component)
-  ejecutarPrediccion(citas: any[]): Observable<any[]> {
-
-    const payload = citas.map(c => ({
-      edad: c.edad,
-      sexo: c.sexo,
-      tipo_cita: c.tipoCita,
-      especialidad: c.especialidad,
-      dia_semana: c.diaSemana,
-      hora: c.hora,
-      antecedentes_inasistencias: c.antecedentesInasistencias,
-      cantidad_citas_previas: c.cantidadCitasPrevias
-    }));
-
-    return this.http.post<any[]>(`${this.apiML}/predict`, payload).pipe(
-      map(predicciones => {
-
-        return predicciones.map((p, i) => {
-
-          const cita = citas[i]; // 👈 clave: match por índice, no ID
-
-          return {
-            paciente: {
-              nombres: cita?.cliente?.nombre || 'Sin nombre'
-            },
-            nivelRiesgo: p.nivelRiesgo,
-            probabilidadInasistencia: p.probabilidadInasistencia,
-            recomendacion: this.generarRecomendacion(p.nivelRiesgo)
-          };
-
-        });
-
-      })
-    );
-  }
-
-  private generarRecomendacion(nivel: string): string {
-
+  private generarRecomendacion(nivel: string) {
     switch (nivel) {
       case 'ALTO':
-        return 'Seguimiento urgente';
+        return 'Seguimiento inmediato';
       case 'MEDIO':
         return 'Monitoreo preventivo';
-      case 'BAJO':
-        return 'Sin acción';
       default:
-        return 'No definido';
+        return 'Sin acción';
     }
   }
 }
