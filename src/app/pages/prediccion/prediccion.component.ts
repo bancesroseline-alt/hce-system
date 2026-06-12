@@ -1,12 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { PrediccionService } from '../../services/prediccion.service';
 
 @Component({
   selector: 'app-prediccion',
-  standalone: true,
-  imports: [],
   templateUrl: './prediccion.component.html',
-  styleUrl: './prediccion.component.css'
+  styleUrls: ['./prediccion.component.css']
 })
-export class PrediccionComponent {
+export class PrediccionComponent implements OnInit {
 
+  alertas: any[] = [];
+  totalAlertas = 0;
+
+  constructor(
+    private prediccionService: PrediccionService
+  ) {}
+
+  ngOnInit(): void {
+    this.cargarAlertas();
+  }
+
+  cargarAlertas(): void {
+
+    this.prediccionService.obtenerAlertas().subscribe({
+      next: (data) => {
+        this.alertas = data;
+        this.totalAlertas = data.length;
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+
+  }
 }
