@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+interface Paciente {
+  nombres: string;
+}
+
 interface Alerta {
-  paciente?: {
-    nombres: string;
-  };
+  paciente?: Paciente;
   nivelRiesgo: 'ALTO' | 'MEDIO' | 'BAJO';
   probabilidadInasistencia: number;
   recomendacion: string;
@@ -21,7 +23,6 @@ export class PrediccionComponent implements OnInit {
 
   alertas: Alerta[] = [];
 
-  // listas derivadas (IMPORTANTE: aquí y NO en HTML)
   alertasAltas: Alerta[] = [];
   alertasMedias: Alerta[] = [];
   alertasBajas: Alerta[] = [];
@@ -29,10 +30,20 @@ export class PrediccionComponent implements OnInit {
   totalAlertas = 0;
 
   ngOnInit(): void {
-    // simulación (reemplaza con tu servicio)
+    // Mock seguro (reemplaza con tu servicio)
     this.alertas = [
-      { nivelRiesgo: 'ALTO', probabilidadInasistencia: 0.85, recomendacion: 'Seguimiento urgente', paciente: { nombres: 'Juan' } },
-      { nivelRiesgo: 'BAJO', probabilidadInasistencia: 0.15, recomendacion: 'Sin acción', paciente: { nombres: 'Maria' } }
+      {
+        nivelRiesgo: 'ALTO',
+        probabilidadInasistencia: 0.82,
+        recomendacion: 'Seguimiento inmediato',
+        paciente: { nombres: 'Juan Perez' }
+      },
+      {
+        nivelRiesgo: 'BAJO',
+        probabilidadInasistencia: 0.12,
+        recomendacion: 'Sin acción',
+        paciente: { nombres: 'Maria Lopez' }
+      }
     ];
 
     this.procesarAlertas();
