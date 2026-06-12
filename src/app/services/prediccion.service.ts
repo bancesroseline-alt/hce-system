@@ -3,25 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-providedIn: 'root'
+  providedIn: 'root'
 })
 export class PrediccionService {
 
-private api =
-'https://hce-backend.onrender.com/api/predicciones';
+  private api = 'https://hce-backend.onrender.com/api/predicciones';
 
-constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-predecir(data: any): Observable<any> {
-return this.http.post<any>(
-`${this.api}/inasistencia`,
-data
-);
-}
+  obtenerAlertas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/alertas`);
+  }
 
-listarAlertas(): Observable<any[]> {
-return this.http.get<any[]>(
-`${this.api}/alertas`
-);
-}
+  obtenerPorPaciente(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/paciente/${id}`);
+  }
 }
