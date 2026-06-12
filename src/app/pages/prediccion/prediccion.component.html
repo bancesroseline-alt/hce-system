@@ -1,6 +1,7 @@
+
 <div class="container">
 
-  <!-- KPIs -->
+  <!-- KPI DASHBOARD -->
   <div class="kpi-container">
 
     <div class="kpi-card">
@@ -10,25 +11,30 @@
 
     <div class="kpi-card danger">
       <h3>Riesgo alto</h3>
-      <p>{{ alertas.filter(a => a.nivelRiesgo === 'ALTO').length }}</p>
+      <p>{{ alertasAltas.length }}</p>
+    </div>
+
+    <div class="kpi-card warning">
+      <h3>Riesgo medio</h3>
+      <p>{{ alertasMedias.length }}</p>
     </div>
 
     <div class="kpi-card success">
       <h3>Bajo riesgo</h3>
-      <p>{{ alertas.filter(a => a.nivelRiesgo === 'BAJO').length }}</p>
+      <p>{{ alertasBajas.length }}</p>
     </div>
 
   </div>
 
-  <!-- Mensaje general -->
+  <!-- MENSAJES -->
   <div class="alert-card" *ngIf="totalAlertas > 0">
     <h2>⚠ Sistema de predicción activo</h2>
-    <p>Se han detectado pacientes con riesgo de inasistencia.</p>
+    <p>Se detectaron pacientes con riesgo de inasistencia.</p>
   </div>
 
   <div class="alert-card success" *ngIf="totalAlertas === 0">
     <h2>Sin alertas</h2>
-    <p>No existen pacientes con riesgo alto de inasistencia.</p>
+    <p>No existen pacientes con riesgo actualmente.</p>
   </div>
 
   <!-- TABLA -->
@@ -48,8 +54,7 @@
       <tr *ngFor="let alerta of alertas">
 
         <td>
-          {{ alerta.paciente?.nombres }}
-          {{ alerta.paciente?.apellidos }}
+          {{ alerta.paciente?.nombres }} {{ alerta.paciente?.apellidos }}
         </td>
 
         <td>
