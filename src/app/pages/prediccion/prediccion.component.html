@@ -21,6 +21,7 @@
 
   <div class="tabla" *ngIf="alertas.length > 0">
     <table>
+
       <thead>
         <tr>
           <th>Paciente</th>
@@ -33,22 +34,27 @@
       <tbody>
         <tr *ngFor="let alerta of alertas">
 
-          <td>{{ alerta.paciente?.nombres }}</td>
+          <td>
+            {{ alerta.paciente?.nombres || 'Sin datos' }}
+          </td>
 
           <td>
-            <span [class]="alerta.nivelRiesgo.toLowerCase()">
+            <span [ngClass]="alerta.nivelRiesgo">
               {{ alerta.nivelRiesgo }}
             </span>
           </td>
 
           <td>
-            {{ (alerta.probabilidadInasistencia * 100).toFixed(0) }}%
+            {{ alerta.probabilidadInasistencia * 100 | number:'1.0-0' }}%
           </td>
 
-          <td>{{ alerta.recomendacion }}</td>
+          <td>
+            {{ alerta.recomendacion }}
+          </td>
 
         </tr>
       </tbody>
+
     </table>
   </div>
 
