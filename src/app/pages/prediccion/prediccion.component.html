@@ -1,39 +1,63 @@
-<div
-  class="modal-prediccion"
-  *ngIf="mostrarPrediccion">
+<div class="container">
 
-  <div class="prediccion-card">
+  <div class="alert-card" *ngIf="totalAlertas > 0">
 
-<h2>Predicción de Inasistencia</h2>
+    <h2>⚠ Existen {{ totalAlertas }} alertas de inasistencia</h2>
 
-<p>
-  <strong>Paciente:</strong>
-  {{ prediccionResultado?.pacienteId }}
-</p>
-
-<p>
-  <strong>Probabilidad:</strong>
-  {{ (prediccionResultado?.probabilidadInasistencia * 100).toFixed(2) }} %
-</p>
-
-<p>
-  <strong>Nivel de Riesgo:</strong>
-  {{ prediccionResultado?.nivelRiesgo }}
-</p>
-
-<p>
-  <strong>Recomendación:</strong>
-  {{ prediccionResultado?.recomendacion }}
-</p>
-
-<button
-  class="btn-cerrar"
-  (click)="mostrarPrediccion = false">
-
-  Cerrar
-
-</button>
+    <p>
+      Hay pacientes con riesgo de inasistencia según las predicciones.
+    </p>
 
   </div>
+
+  <div class="alert-card success" *ngIf="totalAlertas === 0">
+
+    <h2>Sin alertas</h2>
+
+    <p>
+      No existen pacientes con riesgo alto de inasistencia.
+    </p>
+
+  </div>
+
+  <table *ngIf="alertas.length > 0">
+
+    <thead>
+
+      <tr>
+        <th>Paciente</th>
+        <th>Probabilidad</th>
+        <th>Riesgo</th>
+        <th>Recomendación</th>
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+      <tr *ngFor="let alerta of alertas">
+
+        <td>
+          {{ alerta.paciente?.nombres }}
+          {{ alerta.paciente?.apellidos }}
+        </td>
+
+        <td>
+          {{ (alerta.probabilidadInasistencia * 100) | number:'1.0-0' }}%
+        </td>
+
+        <td>
+          {{ alerta.nivelRiesgo }}
+        </td>
+
+        <td>
+          {{ alerta.recomendacion }}
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
 
 </div>
