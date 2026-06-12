@@ -1,77 +1,59 @@
-<div class="container">
+<div class="dashboard">
 
-  <!-- DASHBOARD -->
-  <div class="dashboard">
+  <div class="cards">
 
-    <div class="card danger">
-      <h3>Total alertas</h3>
-      <p>{{ alertas.length }}</p>
-    </div>
-
-    <div class="card red">
-      <h3>Riesgo alto</h3>
+    <div class="card alto">
+      <h3>Alto Riesgo</h3>
       <p>{{ alertasAltas.length }}</p>
     </div>
 
-    <div class="card orange">
-      <h3>Riesgo medio</h3>
+    <div class="card medio">
+      <h3>Medio Riesgo</h3>
       <p>{{ alertasMedias.length }}</p>
     </div>
 
-    <div class="card green">
-      <h3>Riesgo bajo</h3>
+    <div class="card bajo">
+      <h3>Bajo Riesgo</h3>
       <p>{{ alertasBajas.length }}</p>
     </div>
 
   </div>
 
-  <!-- MENSAJE -->
-  <div class="alert-card" *ngIf="alertas.length > 0">
-    <h2>⚠ Alertas detectadas</h2>
-    <p>Pacientes con riesgo de inasistencia.</p>
+  <div class="tabla" *ngIf="alertas.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Riesgo</th>
+          <th>Probabilidad</th>
+          <th>Recomendación</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let alerta of alertas">
+
+          <td>{{ alerta.paciente?.nombres }}</td>
+
+          <td>
+            <span [class]="alerta.nivelRiesgo.toLowerCase()">
+              {{ alerta.nivelRiesgo }}
+            </span>
+          </td>
+
+          <td>
+            {{ (alerta.probabilidadInasistencia * 100).toFixed(0) }}%
+          </td>
+
+          <td>{{ alerta.recomendacion }}</td>
+
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <div class="alert-card success" *ngIf="alertas.length === 0">
-    <h2>Sin alertas</h2>
-    <p>No hay riesgos detectados.</p>
+  <div *ngIf="totalAlertas === 0" class="empty">
+    Sin alertas disponibles
   </div>
-
-  <!-- TABLA -->
-  <table *ngIf="alertas.length > 0">
-
-    <thead>
-      <tr>
-        <th>Paciente</th>
-        <th>Probabilidad</th>
-        <th>Riesgo</th>
-        <th>Recomendación</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr *ngFor="let alerta of alertas">
-
-        <td>
-          {{ alerta.paciente?.nombres }} {{ alerta.paciente?.apellidos }}
-        </td>
-
-        <td>
-          {{ (alerta.probabilidadInasistencia * 100) | number:'1.0-0' }}%
-        </td>
-
-        <td>
-          <span [ngClass]="alerta.nivelRiesgo?.toLowerCase()">
-            {{ alerta.nivelRiesgo }}
-          </span>
-        </td>
-
-        <td>
-          {{ alerta.recomendacion }}
-        </td>
-
-      </tr>
-    </tbody>
-
-  </table>
 
 </div>
