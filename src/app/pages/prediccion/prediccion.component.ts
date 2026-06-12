@@ -10,9 +10,9 @@ export class PrediccionComponent implements OnInit {
 
   alertas: any[] = [];
 
-  totalAlertas = 0;
-  alto = 0;
-  bajo = 0;
+  alertasAltas: any[] = [];
+  alertasMedias: any[] = [];
+  alertasBajas: any[] = [];
 
   constructor(private service: PrediccionService) {}
 
@@ -21,13 +21,14 @@ export class PrediccionComponent implements OnInit {
   }
 
   cargarAlertas(): void {
-    this.service.obtenerAlertas().subscribe(data => {
+    this.service.obtenerAlertas().subscribe((data: any[]) => {
+
       this.alertas = data || [];
 
-      this.totalAlertas = this.alertas.length;
+      this.alertasAltas = this.alertas.filter(a => a.nivelRiesgo === 'ALTO');
+      this.alertasMedias = this.alertas.filter(a => a.nivelRiesgo === 'MEDIO');
+      this.alertasBajas = this.alertas.filter(a => a.nivelRiesgo === 'BAJO');
 
-      this.alto = this.alertas.filter(a => a.nivelRiesgo === 'ALTO').length;
-      this.bajo = this.alertas.filter(a => a.nivelRiesgo === 'BAJO').length;
     });
   }
 }
