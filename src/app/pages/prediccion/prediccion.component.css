@@ -118,3 +118,18 @@ tr:hover {
     padding: 12px;
   }
 }
+
+.red {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.orange {
+  color: #fd7e14;
+  font-weight: bold;
+}
+
+.green {
+  color: #28a745;
+  font-weight: bold;
+}
