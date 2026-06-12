@@ -1,135 +1,61 @@
-
-.container {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+.dashboard {
+  padding: 20px;
   font-family: Arial, sans-serif;
-  background: #f8f9fa;
 }
 
-/* ================= KPI ================= */
-.kpi-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.kpi-card {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-  text-align: center;
-}
-
-.kpi-card h3 {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-}
-
-.kpi-card p {
-  font-size: 26px;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-.kpi-card.danger p {
-  color: #dc3545;
-}
-
-.kpi-card.warning p {
-  color: #ffc107;
-}
-
-.kpi-card.success p {
-  color: #28a745;
-}
-
-/* ================= ALERTAS ================= */
-.alert-card {
-  background: #fff3cd;
-  border: 1px solid #ffeeba;
-  padding: 20px;
-  border-radius: 12px;
+.cards {
+  display: flex;
+  gap: 15px;
   margin-bottom: 20px;
 }
 
-.alert-card.success {
-  background: #d4edda;
-  border-color: #c3e6cb;
+.card {
+  flex: 1;
+  padding: 15px;
+  border-radius: 10px;
+  color: white;
+  text-align: center;
 }
 
-/* ================= TABLA ================= */
-table {
+.card.alto {
+  background: #e74c3c;
+}
+
+.card.medio {
+  background: #f39c12;
+}
+
+.card.bajo {
+  background: #2ecc71;
+}
+
+.tabla table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
 }
 
-th {
-  background: #0d6efd;
-  color: white;
-  padding: 14px;
-  text-align: left;
+.tabla th, .tabla td {
+  border: 1px solid #ddd;
+  padding: 10px;
 }
 
-td {
-  padding: 14px;
-  border-bottom: 1px solid #eee;
-}
-
-tr:hover {
-  background: #f1f7ff;
-}
-
-/* ================= RIESGO ================= */
 .alto {
-  color: #dc3545;
+  color: #e74c3c;
   font-weight: bold;
 }
 
 .medio {
-  color: #ffc107;
+  color: #f39c12;
   font-weight: bold;
 }
 
 .bajo {
-  color: #28a745;
+  color: #2ecc71;
   font-weight: bold;
 }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 768px) {
-
-  .kpi-container {
-    grid-template-columns: 1fr;
-  }
-
-  table {
-    font-size: 14px;
-  }
-
-  .container {
-    padding: 12px;
-  }
-}
-
-.red {
-  color: #dc3545;
-  font-weight: bold;
-}
-
-.orange {
-  color: #fd7e14;
-  font-weight: bold;
-}
-
-.green {
-  color: #28a745;
-  font-weight: bold;
+.empty {
+  text-align: center;
+  margin-top: 20px;
+  color: gray;
 }
