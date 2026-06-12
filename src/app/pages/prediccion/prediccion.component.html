@@ -1,1 +1,39 @@
-<p>prediccion works!</p>
+<div
+  class="modal-prediccion"
+  *ngIf="mostrarPrediccion">
+
+  <div class="prediccion-card">
+
+<h2>Predicción de Inasistencia</h2>
+
+<p>
+  <strong>Paciente:</strong>
+  {{ prediccionResultado?.pacienteId }}
+</p>
+
+<p>
+  <strong>Probabilidad:</strong>
+  {{ (prediccionResultado?.probabilidadInasistencia * 100).toFixed(2) }} %
+</p>
+
+<p>
+  <strong>Nivel de Riesgo:</strong>
+  {{ prediccionResultado?.nivelRiesgo }}
+</p>
+
+<p>
+  <strong>Recomendación:</strong>
+  {{ prediccionResultado?.recomendacion }}
+</p>
+
+<button
+  class="btn-cerrar"
+  (click)="mostrarPrediccion = false">
+
+  Cerrar
+
+</button>
+
+  </div>
+
+</div>
