@@ -7,21 +7,17 @@ import { forkJoin, map, switchMap } from 'rxjs';
 })
 export class PrediccionService {
 
-  private apiCitas = 'https://hce-backend.onrender.com';
+  private apiCitas = 'https://hce-backend.onrender.com/api/citas/hoy';
   private apiML = 'https://ml-api-inasistencias.onrender.com/predict';
 
   constructor(private http: HttpClient) {}
 
-obtenerCitasHoy() {
-  return this.http.get<any[]>(this.apiCitas).pipe(
-    map(res => {
-      console.log("CITAS REALES BACKEND:", res);
-      return res;
-    })
-  );
-}
+  obtenerCitasHoy() {
+    return this.http.get<any[]>(this.apiCitas);
+  }
 
-  predecirCita(cita: any) {
+  predecir(cita: any) {
+
     const payload = {
       edad: cita.edad,
       sexo: cita.sexo,
@@ -35,6 +31,7 @@ obtenerCitasHoy() {
 
     return this.http.post<any>(this.apiML, payload).pipe(
       map(res => {
+
         let nivel = 'BAJO';
 
         if (res.prediccion === 1 || res.probabilidad >= 0.7) {
@@ -44,7 +41,10 @@ obtenerCitasHoy() {
         }
 
         return {
-          paciente: cita.paciente,
+          paciente: {
+            nombres: cita.nombres,
+            apellidos: cita.apellidos
+          },
           nivelRiesgo: nivel,
           probabilidadInasistencia: res.probabilidad,
           recomendacion: this.generarRecomendacion(nivel)
@@ -56,7 +56,7 @@ obtenerCitasHoy() {
   obtenerAlertas() {
     return this.obtenerCitasHoy().pipe(
       switchMap(citas =>
-        forkJoin(citas.map(cita => this.predecirCita(cita)))
+        forkJoin(citas.map(c => this.predecir(c)))
       )
     );
   }
