@@ -12,9 +12,14 @@ export class PrediccionService {
 
   constructor(private http: HttpClient) {}
 
-  obtenerCitasHoy() {
-    return this.http.get<any[]>(this.apiCitas);
-  }
+obtenerCitasHoy() {
+  return this.http.get<any[]>(this.apiCitas).pipe(
+    map(res => {
+      console.log("CITAS REALES BACKEND:", res);
+      return res;
+    })
+  );
+}
 
   predecirCita(cita: any) {
     const payload = {
