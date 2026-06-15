@@ -225,26 +225,46 @@
     </section>
 
     <!-- BOTONES -->
-    <div class="form-actions">
+<div class="form-actions">
 
-      <button
-        type="button"
-        class="btn-secondary"
-        [routerLink]="['/historias-clinicas', pacienteId]">
+  <button
+    type="button"
+    class="btn-secondary"
+    [routerLink]="['/historias-clinicas', pacienteId]">
 
-        Cancelar
+    Volver
 
-      </button>
+  </button>
 
-      <button
-        type="submit"
-        class="btn-primary">
+  <button
+    *ngIf="citaOrigen"
+    type="button"
+    class="btn-warning"
+    (click)="marcarNoAsistio()">
 
-        {{ modoEmergencia ? 'Guardar emergencia' : 'Guardar atención' }}
+    No asistió
 
-      </button>
+  </button>
 
-    </div>
+  <button
+    *ngIf="citaOrigen"
+    type="button"
+    class="btn-danger"
+    (click)="cancelarCita()">
+
+    Cancelar cita
+
+  </button>
+
+  <button
+    type="submit"
+    class="btn-primary">
+
+    {{ modoEmergencia ? 'Guardar emergencia' : 'Guardar atención' }}
+
+  </button>
+
+</div>
 
   </form>
 
