@@ -486,3 +486,41 @@ td .btn-primary {
   padding: 8px 14px;
   font-size: 13px;
 }
+
+.cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  flex: 1;
+  padding: 18px;
+  border-radius: 12px;
+  text-align: center;
+  color: white !important;
+}
+
+.card h3 {
+  color: white !important;
+  margin: 0;
+}
+
+.card p {
+  color: white !important;
+  font-size: 28px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.card.alto {
+  background: #e74c3c;
+}
+
+.card.medio {
+  background: #f39c12;
+}
+
+.card.bajo {
+  background: #2ecc71;
+}
