@@ -212,33 +212,38 @@ export class RegistroAtencionComponent implements OnInit {
       citaId: this.atencion.citaId ? Number(this.atencion.citaId) : null
     };
 
-    this.atencionOfflineService.registrar(payload).subscribe({
-      next: () => {
+this.atencionOfflineService.registrar(payload).subscribe({
+  next: () => {
 
-  if (this.citaOrigen) {
+    if (this.citaOrigen) {
 
-    this.citaOfflineService
-      .actualizarEstado(this.citaOrigen, 'ATENDIDA')
-      .subscribe({
-        next: () => {
-          console.log('Cita marcada como ATENDIDA');
-        },
-        error: err => {
-          console.error('Error actualizando estado de cita', err);
-        }
-      });
+      this.citaOfflineService
+        .actualizarEstado(this.citaOrigen, 'ATENDIDA')
+        .subscribe({
+          next: () => {
+            console.log('Cita marcada como ATENDIDA');
+          },
+          error: err => {
+            console.error('Error actualizando estado de cita', err);
+          }
+        });
 
+    }
+
+    this.mensaje = navigator.onLine
+      ? 'Atención registrada correctamente'
+      : 'Atención guardada offline. Se sincronizará cuando vuelva internet';
+
+    setTimeout(() => {
+      this.router.navigate(['/historias-clinicas', this.pacienteId]);
+    }, 1500);
+  },
+
+  error: err => {
+    console.error(err);
+    this.mensaje = 'Error al registrar atención';
   }
-
-  this.mensaje = navigator.onLine
-    ? 'Atención registrada correctamente'
-    : 'Atención guardada offline. Se sincronizará cuando vuelva internet';
-
-  setTimeout(() => {
-    this.router.navigate(['/historias-clinicas', this.pacienteId]);
-  }, 1500);
-},
-    });
+});
   }
 
   marcarNoAsistio(): void {
