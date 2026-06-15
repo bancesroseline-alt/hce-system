@@ -240,4 +240,44 @@ export class RegistroAtencionComponent implements OnInit {
 },
     });
   }
+
+  marcarNoAsistio(): void {
+
+  if (!this.citaOrigen) {
+    return;
+  }
+
+  this.citaOfflineService
+    .actualizarEstado(this.citaOrigen, 'NO_ASISTIO')
+    .subscribe(() => {
+
+      this.mensaje = 'Cita marcada como NO ASISTIÓ';
+
+      setTimeout(() => {
+        this.router.navigate(['/citas']);
+      }, 1000);
+
+    });
+
+}
+
+cancelarCita(): void {
+
+  if (!this.citaOrigen) {
+    return;
+  }
+
+  this.citaOfflineService
+    .actualizarEstado(this.citaOrigen, 'CANCELADA')
+    .subscribe(() => {
+
+      this.mensaje = 'Cita cancelada correctamente';
+
+      setTimeout(() => {
+        this.router.navigate(['/citas']);
+      }, 1000);
+
+    });
+
+}
 }
