@@ -214,18 +214,30 @@ export class RegistroAtencionComponent implements OnInit {
 
     this.atencionOfflineService.registrar(payload).subscribe({
       next: () => {
-        this.mensaje = navigator.onLine
-          ? 'Atención registrada correctamente'
-          : 'Atención guardada offline. Se sincronizará cuando vuelva internet';
 
-        setTimeout(() => {
-          this.router.navigate(['/historias-clinicas', this.pacienteId]);
-        }, 1500);
-      },
-      error: err => {
-        console.error('Error al guardar atención', err);
-        this.mensaje = err.error?.message || 'Error al registrar atención';
-      }
+  if (this.citaOrigen) {
+
+    this.citaOfflineService
+      .actualizarEstado(this.citaOrigen, 'ATENDIDA')
+      .subscribe({
+        next: () => {
+          console.log('Cita marcada como ATENDIDA');
+        },
+        error: err => {
+          console.error('Error actualizando estado de cita', err);
+        }
+      });
+
+  }
+
+  this.mensaje = navigator.onLine
+    ? 'Atención registrada correctamente'
+    : 'Atención guardada offline. Se sincronizará cuando vuelva internet';
+
+  setTimeout(() => {
+    this.router.navigate(['/historias-clinicas', this.pacienteId]);
+  }, 1500);
+},
     });
   }
 }
