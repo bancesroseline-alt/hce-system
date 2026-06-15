@@ -267,41 +267,29 @@
             </td>
 
             <td>{{ c.tipoCita }}</td>
-
 <td>
-
-  <select
-    [ngModel]="c.estado"
-    (ngModelChange)="cambiarEstado(c, $event)"
-    class="form-select">
-
-    <option value="PROGRAMADA">
-      PROGRAMADA
-    </option>
-
-    <option value="ATENDIDA">
-      ATENDIDA
-    </option>
-
-    <option value="NO_ASISTIO">
-      NO_ASISTIO
-    </option>
-
-    <option value="CANCELADA">
-      CANCELADA
-    </option>
-
-  </select>
 
   <button
     *ngIf="c.estado === 'PROGRAMADA'"
-    class="btn-action mt-2"
+    class="btn-action"
     type="button"
     [routerLink]="['/atenciones/nueva', c.pacienteId || c.paciente?.id, 'cita', c.id]">
 
     Atender
 
   </button>
+
+  <span *ngIf="c.estado === 'ATENDIDA'">
+    ✓ Atendida
+  </span>
+
+  <span *ngIf="c.estado === 'CANCELADA'">
+    Cancelada
+  </span>
+
+  <span *ngIf="c.estado === 'NO_ASISTIO'">
+    No asistió
+  </span>
 
 </td>
 
