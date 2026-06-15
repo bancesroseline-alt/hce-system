@@ -114,3 +114,13 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.btn-warning {
+  background: #f59e0b;
+  color: white;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
