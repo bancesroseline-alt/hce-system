@@ -1,0 +1,73 @@
+<div class="trazabilidad-page">
+
+  <section class="page-header">
+    <div>
+      <h1>Trazabilidad</h1>
+      <p>Validacion de integridad de atenciones medicas mediante hashes.</p>
+    </div>
+  </section>
+
+  <section class="query-panel">
+    <label>
+      ID de atencion medica
+      <input type="number" [(ngModel)]="atencionId" placeholder="Ej. 15">
+    </label>
+
+    <div class="actions">
+      <button type="button" (click)="consultar()" [disabled]="cargando">
+        {{ cargando ? 'Consultando...' : 'Consultar historial' }}
+      </button>
+      <button type="button" class="secondary" (click)="validar()">
+        Validar integridad
+      </button>
+    </div>
+  </section>
+
+  <div *ngIf="mensaje" class="alert error">
+    {{ mensaje }}
+  </div>
+
+  <div *ngIf="resultadoValidacion" class="alert success">
+    {{ resultadoValidacion }}
+  </div>
+
+  <section class="history-panel">
+    <div class="panel-title">
+      <h2>Historial blockchain</h2>
+      <span>{{ historial.length }} eventos</span>
+    </div>
+
+    <table *ngIf="historial.length > 0">
+      <thead>
+        <tr>
+          <th>Operacion</th>
+          <th>Usuario</th>
+          <th>Hash</th>
+          <th>Hash anterior</th>
+          <th>Fecha</th>
+          <th>Integridad</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of historial">
+          <td>{{ item.tipoOperacion }}</td>
+          <td>{{ item.usuarioId }}</td>
+          <td class="hash">{{ item.hashRegistro }}</td>
+          <td class="hash">{{ item.hashAnterior || '-' }}</td>
+          <td>{{ item.fechaRegistro }}</td>
+          <td>
+            <span class="status" [class.invalid]="item.integridadValida === false">
+              {{ item.integridadValida === false ? 'Invalida' : 'Valida' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="empty" *ngIf="historial.length === 0">
+      No hay eventos de trazabilidad cargados.
+    </p>
+  </section>
+
+</div>

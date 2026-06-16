@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
 
@@ -35,6 +36,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/pacientes/pacientes.component')
             .then(m => m.PacientesComponent)
+      },
+
+      {
+        path: 'usuarios',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+          import('./pages/usuarios/usuarios-admin.component')
+            .then(m => m.UsuariosAdminComponent)
       },
 
       {
@@ -91,6 +101,8 @@ export const routes: Routes = [
       // =====================
       {
         path: 'citas',
+        canActivate: [roleGuard],
+        data: { roles: ['MEDICO', 'ENFERMERO'] },
         loadComponent: () =>
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
@@ -98,6 +110,8 @@ export const routes: Routes = [
 
       {
         path: 'citas/paciente/:id',
+        canActivate: [roleGuard],
+        data: { roles: ['MEDICO', 'ENFERMERO'] },
         loadComponent: () =>
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
@@ -105,6 +119,8 @@ export const routes: Routes = [
 
       {
         path: 'citas/nueva/:id',
+        canActivate: [roleGuard],
+        data: { roles: ['MEDICO', 'ENFERMERO'] },
         loadComponent: () =>
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
@@ -129,6 +145,8 @@ export const routes: Routes = [
       // =====================
       {
         path: 'prediccion',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MEDICO'] },
         loadComponent: () =>
           import('./pages/prediccion/prediccion.component')
             .then(m => m.PrediccionComponent)
@@ -142,7 +160,18 @@ export const routes: Routes = [
       },
 
       {
+        path: 'trazabilidad',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MEDICO'] },
+        loadComponent: () =>
+          import('./pages/trazabilidad/trazabilidad.component')
+            .then(m => m.TrazabilidadComponent)
+      },
+
+      {
         path: 'reportes',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MEDICO'] },
         loadComponent: () =>
           import('./pages/reportes/reportes.component')
             .then(m => m.ReportesComponent)

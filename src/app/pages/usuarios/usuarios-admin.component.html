@@ -1,0 +1,169 @@
+<div class="usuarios-page">
+
+  <section class="usuarios-header">
+    <div>
+      <h1>Usuarios nuevos</h1>
+      <p>Inicio &gt; Usuarios</p>
+    </div>
+
+    <div class="system-status">
+      <span></span>
+      Sistema: Online
+    </div>
+  </section>
+
+  <div
+    *ngIf="mensaje"
+    class="alert"
+    [class.success]="tipoMensaje === 'success'"
+    [class.error]="tipoMensaje === 'error'">
+    {{ mensaje }}
+  </div>
+
+  <section class="form-shell">
+    <div class="form-column">
+      <h2>Datos personales</h2>
+
+      <label>
+        Nombre completo
+        <input
+          type="text"
+          [(ngModel)]="usuario.nombres"
+          (blur)="autocompletarUsername()"
+          placeholder="Nombres">
+      </label>
+
+      <label>
+        Apellidos
+        <input
+          type="text"
+          [(ngModel)]="usuario.apellidos"
+          (blur)="autocompletarUsername()"
+          placeholder="Apellidos">
+      </label>
+
+      <label>
+        DNI/NIF *
+        <input
+          type="text"
+          [(ngModel)]="datosApoyo.documento"
+          placeholder="Documento de identidad">
+      </label>
+
+      <label>
+        Telefono
+        <input
+          type="text"
+          [(ngModel)]="datosApoyo.telefono"
+          placeholder="+51 999 999 999">
+      </label>
+
+      <label>
+        Correo electronico personal
+        <input
+          type="email"
+          [(ngModel)]="datosApoyo.correoPersonal"
+          (blur)="autocompletarUsername()"
+          placeholder="correo@dominio.com">
+      </label>
+    </div>
+
+    <div class="form-column">
+      <h2>Credenciales y roles</h2>
+
+      <label>
+        Correo de usuario
+        <input
+          type="text"
+          [(ngModel)]="usuario.username"
+          placeholder="usuario o correo institucional">
+      </label>
+
+      <label>
+        Contrasena
+        <input
+          type="password"
+          [(ngModel)]="usuario.password"
+          placeholder="Contrasena">
+      </label>
+
+      <div class="strength">
+        <span [class.active]="fortalezaPassword() >= 1"></span>
+        <span [class.active]="fortalezaPassword() >= 2"></span>
+        <span [class.active]="fortalezaPassword() >= 3"></span>
+        <span [class.active]="fortalezaPassword() >= 4"></span>
+      </div>
+
+      <label>
+        Confirmar contrasena
+        <input
+          type="password"
+          [(ngModel)]="confirmarPassword"
+          placeholder="Confirmar contrasena">
+      </label>
+
+      <label>
+        Rol de acceso
+        <select [(ngModel)]="usuario.rol">
+          <option value="ADMIN">Administrador</option>
+          <option value="MEDICO">Medico</option>
+          <option value="ENFERMERO">Enfermero</option>
+        </select>
+      </label>
+
+      <label class="toggle-row">
+        <input type="checkbox" [(ngModel)]="usuario.estado">
+        Usuario activo
+      </label>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button type="button" class="secondary" (click)="cargarUsuarios()">Cancelar</button>
+    <button type="button" class="primary" (click)="guardar()" [disabled]="guardando">
+      {{ guardando ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+
+  <section class="list-panel">
+    <div class="panel-title">
+      <h2>Usuarios registrados</h2>
+      <span>{{ usuarios.length }} registros</span>
+    </div>
+
+    <table *ngIf="usuarios.length > 0">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Username</th>
+          <th>Rol</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let u of usuarios">
+          <td>{{ u.nombres }} {{ u.apellidos }}</td>
+          <td>{{ u.username }}</td>
+          <td>
+            <select [ngModel]="u.rol" (ngModelChange)="cambiarRol(u, $event)">
+              <option value="ADMIN">ADMIN</option>
+              <option value="MEDICO">MEDICO</option>
+              <option value="ENFERMERO">ENFERMERO</option>
+            </select>
+          </td>
+          <td>
+            <span class="status" [class.inactive]="u.estado === false">
+              {{ u.estado === false ? 'Inactivo' : 'Activo' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="empty" *ngIf="!cargando && usuarios.length === 0">
+      No hay usuarios registrados.
+    </p>
+  </section>
+
+</div>
