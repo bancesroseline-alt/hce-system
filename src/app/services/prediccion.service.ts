@@ -68,8 +68,16 @@ export class PrediccionService {
     };
 
     return this.http.post<any>(this.apiML, payload).pipe(
-      timeout(6000),
-      map(res => this.mapearRespuesta(cita, Number(res.probabilidad ?? 0), false))
+      timeout(30000),
+      map(res => {
+        const probabilidad = Number(res?.probabilidad);
+
+        if (Number.isNaN(probabilidad)) {
+          throw new Error('La API ML no devolvio una probabilidad valida');
+        }
+
+        return this.mapearRespuesta(cita, probabilidad, false);
+      })
     );
   }
 
