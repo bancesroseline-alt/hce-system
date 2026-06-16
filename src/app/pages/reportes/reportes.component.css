@@ -118,14 +118,16 @@
 
 .kpi-grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
 }
 
 .kpi-card {
-  min-height: 176px;
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr;
+  min-height: 190px;
   overflow: hidden;
-  padding: 20px;
+  padding: 20px 20px 18px;
   position: relative;
 }
 
@@ -137,7 +139,7 @@
   font-weight: 700;
   height: 42px;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   width: 42px;
 }
 
@@ -153,7 +155,7 @@
 .kpi-card strong {
   color: var(--report-text);
   display: block;
-  font-size: 40px;
+  font-size: 38px;
   font-weight: 700;
   line-height: 1;
   margin-top: 10px;
@@ -165,20 +167,23 @@
   font-size: 14px;
   font-weight: 400;
   margin-top: 8px;
+  min-height: 22px;
+  position: relative;
+  z-index: 1;
 }
 
 .sparkline {
-  bottom: 16px;
-  height: 26px;
-  left: 20px;
-  opacity: .8;
-  position: absolute;
-  right: 20px;
+  align-self: end;
+  height: 18px;
+  margin-top: 18px;
+  opacity: .65;
+  position: relative;
+  width: min(120px, 100%);
 }
 
 .sparkline::before {
   background:
-    linear-gradient(135deg, transparent 0 18%, currentColor 18% 23%, transparent 23% 42%, currentColor 42% 47%, transparent 47% 64%, currentColor 64% 69%, transparent 69% 100%);
+    linear-gradient(135deg, transparent 0 18%, currentColor 18% 24%, transparent 24% 42%, currentColor 42% 48%, transparent 48% 64%, currentColor 64% 70%, transparent 70% 100%);
   border-radius: 999px;
   content: "";
   display: block;
@@ -202,11 +207,11 @@
 .analytics-grid {
   display: grid;
   gap: 24px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(360px, 1fr));
 }
 
 .report-card {
-  min-height: 430px;
+  min-height: 380px;
   padding: 20px;
 }
 
@@ -237,8 +242,8 @@
 .risk-layout {
   align-items: center;
   display: grid;
-  gap: 26px;
-  grid-template-columns: 220px 1fr;
+  gap: 30px;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
 }
 
 .donut-chart,
@@ -292,7 +297,7 @@
 .specialty-list,
 .activity-list {
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
 .legend-row {
@@ -360,7 +365,7 @@
   align-items: center;
   display: grid;
   gap: 14px;
-  grid-template-columns: 42px 1fr;
+  grid-template-columns: 42px minmax(0, 1fr);
 }
 
 .specialty-icon,
@@ -382,12 +387,17 @@
 .specialty-content {
   display: grid;
   gap: 8px;
+  min-width: 0;
 }
 
 .specialty-head span {
   color: var(--report-text);
   font-size: 14px;
   font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .specialty-head strong {
@@ -497,11 +507,12 @@
 
 @media (max-width: 1280px) {
   .kpi-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(190px, 1fr));
   }
 }
 
 @media (max-width: 980px) {
+  .kpi-grid,
   .analytics-grid,
   .donut-layout,
   .risk-layout {

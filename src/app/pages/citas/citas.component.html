@@ -247,7 +247,6 @@
           <tr>
             <th>Hora</th>
             <th>Paciente</th>
-            <th>Motivo</th>
             <th>Estado</th>
             <th>Sync</th>
             <th>Tipo</th>
@@ -265,8 +264,6 @@
             <td>
               {{ c.paciente?.nombres || c.pacienteNombre || 'Sin nombre' }}
             </td>
-
-            <td>{{ c.motivoConsulta }}</td>
 
             <td>
 
@@ -330,7 +327,7 @@
 
           <tr *ngIf="(citasVisibles || []).length === 0">
 
-            <td colspan="7" class="empty">
+            <td colspan="6" class="empty">
               <div class="empty-state">
                 <div class="empty-icon">+</div>
                 <strong>{{ mensajeVacio }}</strong>
