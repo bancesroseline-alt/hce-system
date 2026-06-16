@@ -48,8 +48,9 @@
 
 .dashboard-hero h1 {
   margin: 0;
-  font-size: 34px;
-  font-weight: 900;
+  color: #ffffff !important;
+  font-size: 38px;
+  font-weight: 900 !important;
   letter-spacing: -0.8px !important;
 }
 
