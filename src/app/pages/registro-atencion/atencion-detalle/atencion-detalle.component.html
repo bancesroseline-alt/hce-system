@@ -1,140 +1,162 @@
-<div class="atencion-detalle-page">
+<div class="atencion-page">
 
-  <header class="page-header">
+  <div class="page-header">
     <div>
-      <h1>Detalle de atención médica</h1>
-      <nav class="breadcrumbs">
-        <a routerLink="/dashboard">Inicio</a>
+      <h1>Detalle de Atención Médica</h1>
+
+      <p>
+        <a routerLink="/historias-clinicas">Historia Clínica</a>
         <span>›</span>
-        <a routerLink="/historias-clinicas">Historias clínicas</a>
-        <span>›</span>
-        <strong>Atención médica</strong>
-      </nav>
+        <a *ngIf="pacienteId()" [routerLink]="['/historias-clinicas', pacienteId()]">
+          {{ nombrePaciente() }}
+        </a>
+        <span *ngIf="pacienteId()">›</span>
+        <span>Detalle de atención</span>
+      </p>
     </div>
 
     <div class="header-actions">
-      <a class="btn-secondary" *ngIf="pacienteId()" [routerLink]="['/historias-clinicas', pacienteId()]">
-        Volver a historia
-      </a>
-      <a class="btn-secondary" *ngIf="citaId()" [routerLink]="['/citas', citaId()]">
-        Ver cita
-      </a>
+      <span class="modo-badge cita" *ngIf="citaId()">Atención desde cita</span>
+      <span class="modo-badge emergencia" *ngIf="!citaId() && atencion?.tipoAtencion === 'EMERGENCIA'">Emergencia</span>
     </div>
-  </header>
+  </div>
 
-  <section class="state-card" *ngIf="cargando">
+  <div class="alerta" *ngIf="cargando">
     Cargando detalle de la atención...
-  </section>
+  </div>
 
-  <section class="state-card error" *ngIf="!cargando && mensaje">
+  <div class="alerta error" *ngIf="!cargando && mensaje">
     {{ mensaje }}
-  </section>
+  </div>
 
   <ng-container *ngIf="!cargando && atencion">
 
-    <section class="summary-card">
-      <div>
-        <span class="eyebrow">Paciente</span>
+    <section class="patient-card" *ngIf="paciente || atencion">
+      <div class="avatar"></div>
+
+      <div class="patient-info">
         <h2>{{ nombrePaciente() }}</h2>
-        <p>{{ atencion.tipoAtencion || 'Atención médica' }} · {{ atencion.fechaHora | date:'dd/MM/yyyy HH:mm' }}</p>
+
+        <p>
+          DNI: {{ paciente?.numeroDocumento || '-' }} |
+          {{ paciente?.edad || '-' }} años |
+          {{ paciente?.sexo || '-' }}
+        </p>
       </div>
 
-      <div class="status-stack">
-        <span class="badge">{{ atencion.estado || 'COMPLETADA' }}</span>
-        <span class="sync-badge" [ngClass]="claseSync(atencion.estadoSync)">
-          {{ etiquetaSync(atencion.estadoSync) }}
-        </span>
-      </div>
+      <span class="estado-activo" *ngIf="paciente?.estado !== false">
+        Activo
+      </span>
+
+      <span class="estado-inactivo" *ngIf="paciente?.estado === false">
+        Inactivo
+      </span>
     </section>
 
-    <div class="detail-grid">
+    <div class="info-box" *ngIf="cita">
+      Esta atención fue registrada desde una cita programada: {{ cita.especialidad || cita.tipoCita }} del {{ cita.fecha }} {{ cita.hora }}.
+    </div>
 
-      <section class="panel clinical-panel">
-        <div class="panel-title">
-          <h2>Información clínica</h2>
+    <form class="form-grid readonly-form">
+
+      <section class="form-section">
+        <h2>Información de la atención</h2>
+
+        <div class="form-group">
+          <label>Fecha y hora</label>
+          <input type="datetime-local" [value]="fechaHoraInput()" readonly>
         </div>
 
-        <div class="info-grid">
-          <div class="info-item">
-            <span>Motivo</span>
-            <strong>{{ atencion.motivoConsulta || 'Sin motivo registrado' }}</strong>
-          </div>
+        <div class="form-group">
+          <label>Tipo de atención</label>
+          <input type="text" [value]="atencion.tipoAtencion || '-'" readonly>
+        </div>
 
-          <div class="info-item">
-            <span>Diagnóstico</span>
-            <strong>{{ atencion.diagnostico || 'Sin diagnóstico registrado' }}</strong>
-          </div>
+        <div class="form-group">
+          <label>Motivo de consulta</label>
+          <input type="text" [value]="atencion.motivoConsulta || '-'" readonly>
+        </div>
 
-          <div class="info-item full">
-            <span>Tratamiento indicado</span>
-            <strong>{{ atencion.tratamientoIndicado || 'Sin tratamiento registrado' }}</strong>
-          </div>
-
-          <div class="info-item full">
-            <span>Medicamentos</span>
-            <strong>{{ atencion.medicamentos || 'Sin medicamentos registrados' }}</strong>
-          </div>
-
-          <div class="info-item full">
-            <span>Observaciones</span>
-            <strong>{{ atencion.observaciones || 'Sin observaciones' }}</strong>
-          </div>
+        <div class="form-group">
+          <label>Profesional</label>
+          <input type="text" [value]="nombreProfesional()" readonly>
         </div>
       </section>
 
-      <aside class="panel side-panel">
-        <div class="panel-title">
-          <h2>Datos de atención</h2>
+      <section class="form-section">
+        <h2>Signos vitales</h2>
+
+        <div class="form-group">
+          <label>Presión arterial</label>
+          <input type="text" [value]="atencion.presionArterial || '-'" readonly>
         </div>
 
-        <div class="info-grid compact">
-          <div class="info-item">
-            <span>Profesional</span>
-            <strong>{{ nombreProfesional() }}</strong>
-          </div>
-
-          <div class="info-item">
-            <span>Fecha / hora</span>
-            <strong>{{ atencion.fechaHora | date:'dd/MM/yyyy HH:mm' }}</strong>
-          </div>
-
-          <div class="info-item">
-            <span>Cita vinculada</span>
-            <strong>{{ cita ? (cita.especialidad || cita.tipoCita) : (citaId() ? 'Cita registrada' : 'Sin cita') }}</strong>
-          </div>
+        <div class="form-group">
+          <label>Temperatura</label>
+          <input type="text" [value]="atencion.temperatura ?? '-'" readonly>
         </div>
-      </aside>
 
-    </div>
+        <div class="form-group">
+          <label>Saturación</label>
+          <input type="text" [value]="atencion.saturacion ?? '-'" readonly>
+        </div>
 
-    <section class="panel signos-panel">
-      <div class="panel-title">
-        <h2>Signos y medidas</h2>
+        <div class="form-group">
+          <label>Talla</label>
+          <input type="text" [value]="atencion.talla ?? '-'" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>Peso</label>
+          <input type="text" [value]="atencion.peso ?? '-'" readonly>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h2>Evaluación clínica</h2>
+
+        <div class="form-group">
+          <label>Diagnóstico</label>
+          <input type="text" [value]="atencion.diagnostico || '-'" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>Observaciones</label>
+          <textarea readonly [value]="atencion.observaciones || '-'"></textarea>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h2>Tratamiento / Indicaciones</h2>
+
+        <div class="form-group">
+          <label>Tratamiento indicado</label>
+          <textarea readonly [value]="atencion.tratamientoIndicado || '-'"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Medicamentos</label>
+          <textarea readonly [value]="atencion.medicamentos || '-'"></textarea>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <a
+          class="btn-secondary"
+          *ngIf="pacienteId()"
+          [routerLink]="['/historias-clinicas', pacienteId()]">
+          Volver a historia
+        </a>
+
+        <a
+          class="btn-primary"
+          *ngIf="citaId()"
+          [routerLink]="['/citas', citaId()]">
+          Ver cita relacionada
+        </a>
       </div>
 
-      <div class="metrics-grid">
-        <div class="metric">
-          <span>Presión arterial</span>
-          <strong>{{ atencion.presionArterial || '-' }}</strong>
-        </div>
-        <div class="metric">
-          <span>Temperatura</span>
-          <strong>{{ atencion.temperatura ?? '-' }}</strong>
-        </div>
-        <div class="metric">
-          <span>Saturación</span>
-          <strong>{{ atencion.saturacion ?? '-' }}</strong>
-        </div>
-        <div class="metric">
-          <span>Talla</span>
-          <strong>{{ atencion.talla ?? '-' }}</strong>
-        </div>
-        <div class="metric">
-          <span>Peso</span>
-          <strong>{{ atencion.peso ?? '-' }}</strong>
-        </div>
-      </div>
-    </section>
+    </form>
 
   </ng-container>
 

@@ -228,11 +228,18 @@ th {
   background: linear-gradient(135deg, #0284c7, #0369a1);
 }
 
+.timeline-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
 .btn-detalle-atencion {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 10px;
   padding: 9px 15px;
   border-radius: 999px;
   background: #ecfeff;

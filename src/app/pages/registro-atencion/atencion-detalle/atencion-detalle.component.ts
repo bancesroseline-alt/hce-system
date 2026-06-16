@@ -82,6 +82,11 @@ export class AtencionDetalleComponent implements OnInit {
     return this.atencion?.profesionalSalud || this.atencion?.usuarioNombre || 'Sin profesional';
   }
 
+  fechaHoraInput(): string {
+    const valor = this.atencion?.fechaHora || '';
+    return valor ? String(valor).slice(0, 16) : '';
+  }
+
   etiquetaSync(valor: any): string {
     return etiquetaEstadoSync(valor);
   }

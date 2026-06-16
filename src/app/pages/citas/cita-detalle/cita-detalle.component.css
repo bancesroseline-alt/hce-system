@@ -269,26 +269,6 @@
   color: #0369a1;
 }
 
-.table-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: #ecfeff;
-  color: #0f766e;
-  border: 1px solid #99f6e4;
-  font-size: 13px;
-  font-weight: 900;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.table-action:hover {
-  background: #0f766e;
-  color: white;
-}
-
 .atenciones-panel {
   margin-bottom: 22px;
 }

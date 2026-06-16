@@ -156,7 +156,6 @@
               <th>Tratamiento</th>
               <th>Profesional</th>
               <th>Estado</th>
-              <th>Acción</th>
             </tr>
           </thead>
 
@@ -168,13 +167,6 @@
               <td>{{ atencion.tratamientoIndicado || 'Sin tratamiento' }}</td>
               <td>{{ atencion.profesionalSalud || atencion.usuarioNombre || 'Sin profesional' }}</td>
               <td>{{ atencion.estado || 'SIN_ESTADO' }}</td>
-              <td>
-                <a
-                  class="table-action"
-                  [routerLink]="['/atenciones', atencion.id || atencion.uuidLocal]">
-                  Ver detalle
-                </a>
-              </td>
             </tr>
           </tbody>
         </table>
