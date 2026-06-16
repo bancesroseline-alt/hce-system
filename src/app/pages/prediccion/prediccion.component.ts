@@ -9,9 +9,14 @@ interface Paciente {
 
 interface Alerta {
   paciente?: Paciente;
+  pacienteId?: number;
+  nombres?: string;
+  apellidos?: string;
   nivelRiesgo: 'ALTO' | 'MEDIO' | 'BAJO';
   probabilidadInasistencia: number;
   recomendacion: string;
+  cantidadCitasPrevias?: number;
+  cantidadInasistenciasPrevias?: number;
 }
 
 @Component({
@@ -37,7 +42,7 @@ export class PrediccionComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.prediccionService.obtenerAlertas()
+    this.prediccionService.obtenerPrediccionesPacientes()
       .subscribe({
         next: (data: any) => {
 
@@ -66,6 +71,13 @@ export class PrediccionComponent implements OnInit {
       this.alertas.filter(a => a.nivelRiesgo === 'BAJO');
 
     this.totalAlertas = this.alertas.length;
+  }
+
+  nombrePaciente(alerta: Alerta): string {
+    const nombres = alerta.nombres || alerta.paciente?.nombres || '';
+    const apellidos = alerta.apellidos || alerta.paciente?.apellidos || '';
+
+    return `${nombres} ${apellidos}`.trim() || 'Sin datos';
   }
 
 }

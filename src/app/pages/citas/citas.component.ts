@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CitaOfflineService } from '../../services/cita-offline.service';
 import { PacienteService } from '../../services/paciente.service';
@@ -53,7 +53,8 @@ export class CitasComponent implements OnInit {
   constructor(
     private citaOfflineService: CitaOfflineService,
     private pacienteService: PacienteService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   etiquetaSync(valor: any): string {
@@ -373,6 +374,16 @@ export class CitasComponent implements OnInit {
         }, 3000);
 
         this.cargarCitas();
+
+        if (['CANCELADA', 'NO_ASISTIO'].includes(nuevoEstado)) {
+          const pacienteId = cita.pacienteId || cita.paciente?.id;
+
+          if (pacienteId) {
+            this.router.navigate(['/pacientes', pacienteId, 'citas'], {
+              queryParams: { reprogramar: cita.id }
+            });
+          }
+        }
       },
       error: err => {
         console.error('Error al actualizar estado', err);

@@ -95,6 +95,10 @@ export class PrediccionService {
     );
   }
 
+  obtenerPrediccionesPacientes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiPredicciones}/pacientes`).pipe(timeout(30000));
+  }
+
   private async cachearCitas(citas: any[]): Promise<void> {
     for (const cita of citas) {
       cita.uuidLocal = cita.uuidLocal || String(cita.id || crypto.randomUUID());

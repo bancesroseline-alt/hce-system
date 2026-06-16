@@ -32,6 +32,8 @@ export class PacienteCitasComponent implements OnInit {
 
   citaEditando: any = null;
   modoEditar = false;
+  modoReprogramar = false;
+  citaOrigenReprogramacion: any = null;
   prediccionInasistencia: any = null;
   cargandoPrediccion = false;
   errorPrediccion = '';
@@ -82,6 +84,7 @@ export class PacienteCitasComponent implements OnInit {
           this.citas = data || [];
           this.aplicarFiltros();
           this.cargando = false;
+          this.abrirReprogramacionDesdeRuta();
         },
         error: err => {
           console.error('Error al cargar citas del paciente', err);
@@ -162,12 +165,16 @@ export class PacienteCitasComponent implements OnInit {
     };
 
     this.modoEditar = true;
+    this.modoReprogramar = false;
+    this.citaOrigenReprogramacion = null;
     this.mensaje = '';
     this.cargarPrediccionReal();
   }
 
   cancelarEdicion(): void {
     this.modoEditar = false;
+    this.modoReprogramar = false;
+    this.citaOrigenReprogramacion = null;
     this.citaEditando = null;
     this.prediccionInasistencia = null;
     this.errorPrediccion = '';
@@ -212,19 +219,51 @@ export class PacienteCitasComponent implements OnInit {
       hora: this.citaEditando.hora,
       especialidad: this.citaEditando.especialidad,
       motivoConsulta: this.citaEditando.motivoConsulta,
-      estado: this.citaEditando.estado
+      estado: this.modoReprogramar ? 'PROGRAMADA' : this.citaEditando.estado
     };
+
+    if (this.modoReprogramar) {
+      this.citaOfflineService.registrar(payload)
+        .subscribe({
+          next: () => {
+            this.mensaje = navigator.onLine
+              ? 'Cita reprogramada correctamente'
+              : 'Reprogramacion guardada offline. Se sincronizara cuando vuelva internet';
+            this.modoEditar = false;
+            this.modoReprogramar = false;
+            this.citaOrigenReprogramacion = null;
+            this.citaEditando = null;
+            this.cargarCitasPaciente();
+          },
+          error: err => {
+            console.error('Error al reprogramar cita', err);
+            this.mensaje = err.error?.message || 'Error al reprogramar la cita';
+          }
+        });
+
+      return;
+    }
+
+    const requiereReprogramacion = ['CANCELADA', 'NO_ASISTIO'].includes(this.citaEditando.estado);
 
     this.citaOfflineService.actualizar({
       ...this.citaEditando,
       ...payload
     })
       .subscribe({
-        next: () => {
+        next: (actualizada) => {
           this.mensaje = navigator.onLine
             ? 'Cita actualizada correctamente'
             : 'Cita actualizada offline. Se sincronizara cuando vuelva internet';
+
+          if (requiereReprogramacion) {
+            this.prepararReprogramacion(actualizada || this.citaEditando);
+            return;
+          }
+
           this.modoEditar = false;
+          this.modoReprogramar = false;
+          this.citaOrigenReprogramacion = null;
           this.citaEditando = null;
           this.cargarCitasPaciente();
         },
@@ -314,9 +353,23 @@ export class PacienteCitasComponent implements OnInit {
       edad: this.paciente?.edad || 0,
       sexo: this.paciente?.sexo || '',
       diaSemana: this.obtenerDiaSemana(this.citaEditando.fecha),
-      antecedentesInasistencias: citasPrevias.filter(c => c.estado === 'NO_ASISTIO').length,
+      antecedentesInasistencias: this.contarInasistenciasParaModelo(citasPrevias),
       cantidadCitasPrevias: citasPrevias.length
     };
+  }
+
+  private contarInasistenciasParaModelo(citasPrevias: any[]): number {
+    const inasistencias = citasPrevias.filter(c => c.estado === 'NO_ASISTIO').length;
+
+    if (
+      this.modoReprogramar &&
+      this.citaOrigenReprogramacion?.estado === 'NO_ASISTIO' &&
+      !citasPrevias.some(c => Number(c.id) === Number(this.citaOrigenReprogramacion.id))
+    ) {
+      return inasistencias + 1;
+    }
+
+    return inasistencias;
   }
 
   private obtenerDiaSemana(fecha: string): string {
@@ -324,5 +377,38 @@ export class PacienteCitasComponent implements OnInit {
 
     const dias = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     return dias[new Date(`${fecha}T00:00:00`).getDay()];
+  }
+
+  private prepararReprogramacion(citaBase: any): void {
+    this.citaEditando = {
+      ...citaBase,
+      id: null,
+      estado: 'PROGRAMADA',
+      fecha: '',
+      hora: '',
+      pacienteId: citaBase.pacienteId || this.pacienteId,
+      motivoConsulta: citaBase.motivoConsulta
+    };
+
+    this.modoEditar = true;
+    this.modoReprogramar = true;
+    this.citaOrigenReprogramacion = citaBase;
+    this.mensaje = 'La cita quedo registrada como inasistencia/cancelacion. Define la nueva fecha para reprogramarla.';
+    this.cargarCitasPaciente();
+    this.cargarPrediccionReal();
+  }
+
+  private abrirReprogramacionDesdeRuta(): void {
+    const reprogramarId = Number(this.route.snapshot.queryParamMap.get('reprogramar'));
+
+    if (!reprogramarId || this.modoEditar) {
+      return;
+    }
+
+    const cita = this.citas.find(c => Number(c.id) === reprogramarId);
+
+    if (cita && ['CANCELADA', 'NO_ASISTIO'].includes(cita.estado)) {
+      this.prepararReprogramacion(cita);
+    }
   }
 }

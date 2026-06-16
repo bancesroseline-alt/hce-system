@@ -25,6 +25,8 @@
       <thead>
         <tr>
           <th>Paciente</th>
+          <th>Citas previas</th>
+          <th>Inasistencias</th>
           <th>Riesgo</th>
           <th>Probabilidad</th>
           <th>Recomendación</th>
@@ -35,7 +37,15 @@
         <tr *ngFor="let alerta of alertas">
 
           <td>
-            {{ alerta.paciente?.nombres || 'Sin datos' }}
+            {{ nombrePaciente(alerta) }}
+          </td>
+
+          <td>
+            {{ alerta.cantidadCitasPrevias || 0 }}
+          </td>
+
+          <td>
+            {{ alerta.cantidadInasistenciasPrevias || 0 }}
           </td>
 
           <td>
@@ -59,7 +69,7 @@
   </div>
 
   <div *ngIf="totalAlertas === 0" class="empty">
-    Sin alertas disponibles
+    Sin pacientes disponibles para prediccion
   </div>
 
 </div>

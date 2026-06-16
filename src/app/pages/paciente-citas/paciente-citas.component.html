@@ -4,7 +4,7 @@
     <div>
       <h1 *ngIf="!modoEditar">Historial de citas</h1>
       <h1 *ngIf="modoEditar">
-        {{ citaEditando?.estado === 'ATENDIDA' ? 'Detalle de la cita' : 'Editar cita' }}
+        {{ modoReprogramar ? 'Reprogramar cita' : (citaEditando?.estado === 'ATENDIDA' ? 'Detalle de la cita' : 'Editar cita') }}
       </h1>
 
       <p>
@@ -12,7 +12,7 @@
         <span>›</span>
         <span *ngIf="!modoEditar">Historial de citas</span>
         <span *ngIf="modoEditar">
-          {{ citaEditando?.estado === 'ATENDIDA' ? 'Detalle de cita' : 'Editar cita' }}
+          {{ modoReprogramar ? 'Reprogramar cita' : (citaEditando?.estado === 'ATENDIDA' ? 'Detalle de cita' : 'Editar cita') }}
         </span>
       </p>
     </div>
@@ -258,7 +258,7 @@
           type="button"
           (click)="guardarCambios()"
           *ngIf="citaEditando.estado !== 'ATENDIDA'">
-          Guardar cambios
+          {{ modoReprogramar ? 'Guardar reprogramacion' : 'Guardar cambios' }}
         </button>
 
         <button
@@ -271,7 +271,7 @@
         <button
           class="btn-danger"
           type="button"
-          *ngIf="citaEditando.estado !== 'ATENDIDA'"
+          *ngIf="citaEditando.estado !== 'ATENDIDA' && !modoReprogramar"
           (click)="citaEditando.estado = 'CANCELADA'; guardarCambios()">
           Cancelar cita
         </button>
