@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, from } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { IndexedDbService } from './indexed-db.service';
 
@@ -49,6 +49,41 @@ export class CitaOfflineService {
   });
 }
 
+  listarPorPaciente(pacienteId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.http.get<any[]>(`${this.api}/citas/paciente/${pacienteId}`).subscribe({
+        next: async (data) => {
+          for (const cita of data as any[]) {
+            cita.uuidLocal = cita.uuidLocal || String(cita.id);
+            cita.estadoSync = 'SINCRONIZADO';
+            cita.pacienteId = cita.pacienteId || pacienteId;
+
+            if (cita.medico?.id && !cita.medicoId) {
+              cita.medicoId = cita.medico.id;
+            }
+
+            await this.indexedDb.guardar('citas', cita);
+          }
+
+          observer.next(data);
+          observer.complete();
+        },
+        error: async (err) => {
+          console.warn('Backend no disponible. Cargando citas del paciente offline...', err);
+
+          const citas = await this.indexedDb.obtenerTodos('citas');
+          const filtradas = citas.filter((c: any) =>
+            Number(c.pacienteId) === Number(pacienteId) ||
+            Number(c.paciente?.id) === Number(pacienteId)
+          );
+
+          observer.next(filtradas);
+          observer.complete();
+        }
+      });
+    });
+  }
+
   registrar(cita: any): Observable<any> {
     cita.uuidLocal = cita.uuidLocal || crypto.randomUUID();
     cita.estadoSync = 'PENDIENTE';
@@ -86,9 +121,7 @@ export class CitaOfflineService {
 
     return new Observable(observer => {
       if (cita.id) {
-        this.http.put<any>(`${this.api}/citas/${cita.id}/estado`, {
-          estado: nuevoEstado
-        }).subscribe({
+        this.http.patch<any>(`${this.api}/citas/${cita.id}/estado?estado=${nuevoEstado}`, {}).subscribe({
           next: async (data: any) => {
             const citaActualizada = {
               ...cita,

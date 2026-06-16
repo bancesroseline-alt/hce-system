@@ -81,15 +81,10 @@ export class HistoriaComponent implements OnInit {
         }
       });
 
-    this.citaOfflineService.listar()
+    this.citaOfflineService.listarPorPaciente(pacienteId)
       .subscribe({
         next: citas => {
-          const citasPaciente = (citas || []).filter(c =>
-            Number(c.pacienteId) === Number(pacienteId) ||
-            Number(c.paciente?.id) === Number(pacienteId)
-          );
-
-          const citasUnicas = this.eliminarCitasDuplicadas(citasPaciente);
+          const citasUnicas = this.eliminarCitasDuplicadas(citas || []);
 
           this.citasProgramadas = citasUnicas.filter(c => c.estado !== 'NO_ASISTIO');
           this.citasNoAsistidas = citasUnicas.filter(c => c.estado === 'NO_ASISTIO');
