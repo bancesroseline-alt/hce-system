@@ -1,138 +1,209 @@
 <div class="reportes-page">
 
-  <section class="report-header">
+  <section class="report-hero">
     <div>
-      <h1>Reportes locales</h1>
+      <h1>Reportes Locales</h1>
       <p>Indicadores calculados con datos almacenados en este dispositivo.</p>
     </div>
 
-    <button type="button" (click)="generarReporteLocal()" [disabled]="cargando">
-      {{ cargando ? 'Actualizando...' : 'Actualizar' }}
-    </button>
+    <div class="report-actions">
+      <select aria-label="Rango de fecha">
+        <option>Hoy</option>
+      </select>
+
+      <button type="button" (click)="generarReporteLocal()" [disabled]="cargando">
+        <span class="btn-icon">↻</span>
+        {{ cargando ? 'Actualizando...' : 'Actualizar' }}
+      </button>
+    </div>
   </section>
 
   <section class="kpi-grid">
-    <article>
+    <article class="kpi-card accent-blue">
+      <div class="kpi-icon">P</div>
       <span>Pacientes</span>
       <strong>{{ resumen.pacientes }}</strong>
       <small>{{ resumen.pacientesActivos }} activos</small>
+      <div class="sparkline"></div>
     </article>
 
-    <article>
+    <article class="kpi-card accent-green">
+      <div class="kpi-icon">C</div>
       <span>Citas</span>
       <strong>{{ resumen.citas }}</strong>
       <small>{{ resumen.citasHoy }} hoy</small>
+      <div class="sparkline"></div>
     </article>
 
-    <article>
+    <article class="kpi-card accent-indigo">
+      <div class="kpi-icon">A</div>
       <span>Atenciones</span>
       <strong>{{ resumen.atenciones }}</strong>
       <small>Registros clinicos locales</small>
+      <div class="sparkline"></div>
     </article>
 
-    <article>
+    <article class="kpi-card accent-orange">
+      <div class="kpi-icon">%</div>
       <span>Inasistencia</span>
       <strong>{{ porcentajeInasistencia() }}%</strong>
       <small>{{ resumen.inasistencias }} citas no asistidas</small>
+      <div class="sparkline"></div>
     </article>
 
-    <article>
+    <article class="kpi-card accent-teal">
+      <div class="kpi-icon">S</div>
       <span>Pendientes</span>
       <strong>{{ resumen.pendientes }}</strong>
       <small>Por sincronizar</small>
+      <div class="sparkline"></div>
     </article>
 
-    <article>
+    <article class="kpi-card accent-red">
+      <div class="kpi-icon">!</div>
       <span>Errores</span>
       <strong>{{ resumen.errores }}</strong>
       <small>Requieren revision</small>
+      <div class="sparkline"></div>
     </article>
   </section>
 
-  <section class="report-grid">
+  <section class="analytics-grid">
 
-    <div class="panel">
-      <h2>Citas por estado</h2>
-
-      <div class="bar-row" *ngFor="let item of citasPorEstado">
+    <article class="report-card">
+      <div class="card-title">
         <div>
-          <strong>{{ item.estado }}</strong>
-          <span>{{ item.total }} registros</span>
+          <h2>Citas por estado</h2>
+          <p>Distribucion local segun estado de cita</p>
+        </div>
+      </div>
+
+      <div class="donut-layout" *ngIf="citasPorEstado.length > 0">
+        <div class="donut-chart" [style.background]="donutEstadosGradient()">
+          <div>
+            <strong>{{ resumen.citas }}</strong>
+            <span>Citas</span>
+          </div>
         </div>
 
-        <div class="bar">
-          <span [style.width.%]="item.porcentaje"></span>
-        </div>
+        <div class="legend-list">
+          <div class="legend-row" *ngFor="let item of estadosPrincipales()">
+            <div class="legend-head">
+              <span>
+                <i [style.background]="colorEstado(item.estado)"></i>
+                {{ etiquetaEstado(item.estado) }}
+              </span>
+              <strong>{{ item.porcentaje }}%</strong>
+            </div>
 
-        <em>{{ item.porcentaje }}%</em>
+            <div class="progress-track">
+              <div [style.width.%]="item.porcentaje" [style.background]="colorEstado(item.estado)"></div>
+            </div>
+
+            <small>{{ item.total }} registros</small>
+          </div>
+        </div>
       </div>
 
       <p class="empty" *ngIf="citasPorEstado.length === 0">
         No hay citas locales para reportar.
       </p>
-    </div>
+    </article>
 
-    <div class="panel">
-      <h2>Especialidades con mas citas</h2>
+    <article class="report-card">
+      <div class="card-title">
+        <div>
+          <h2>Especialidades con mas citas</h2>
+          <p>Ranking por volumen de citas locales</p>
+        </div>
+      </div>
 
-      <table *ngIf="citasPorEspecialidad.length > 0">
-        <thead>
-          <tr>
-            <th>Especialidad</th>
-            <th>Total</th>
-          </tr>
-        </thead>
+      <div class="specialty-list" *ngIf="citasPorEspecialidad.length > 0">
+        <div class="specialty-row" *ngFor="let item of citasPorEspecialidad">
+          <div class="specialty-icon">+</div>
 
-        <tbody>
-          <tr *ngFor="let item of citasPorEspecialidad">
-            <td>{{ item.especialidad }}</td>
-            <td>{{ item.total }}</td>
-          </tr>
-        </tbody>
-      </table>
+          <div class="specialty-content">
+            <div class="specialty-head">
+              <span>{{ item.especialidad }}</span>
+              <strong>{{ item.total }}</strong>
+            </div>
+
+            <div class="progress-track">
+              <div [style.width.%]="porcentajeEspecialidad(item.total)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <p class="empty" *ngIf="citasPorEspecialidad.length === 0">
         No hay especialidades registradas localmente.
       </p>
-    </div>
+    </article>
 
-    <div class="panel">
-      <h2>Predicciones por riesgo</h2>
+    <article class="report-card">
+      <div class="card-title">
+        <div>
+          <h2>Predicciones por riesgo</h2>
+          <p>Clasificacion del modelo almacenada localmente</p>
+        </div>
+      </div>
 
-      <table *ngIf="prediccionesPorRiesgo.length > 0">
-        <thead>
-          <tr>
-            <th>Riesgo</th>
-            <th>Total</th>
-          </tr>
-        </thead>
+      <div class="risk-layout" *ngIf="prediccionesPorRiesgo.length > 0">
+        <div class="gauge-chart" [style.background]="donutRiesgosGradient()">
+          <div>
+            <strong>{{ totalPredicciones() }}</strong>
+            <span>Predicciones</span>
+          </div>
+        </div>
 
-        <tbody>
-          <tr *ngFor="let item of prediccionesPorRiesgo">
-            <td>{{ item.riesgo }}</td>
-            <td>{{ item.total }}</td>
-          </tr>
-        </tbody>
-      </table>
+        <div class="risk-table">
+          <div class="risk-row" *ngFor="let item of riesgosOrdenados()">
+            <span>
+              <i [style.background]="colorRiesgo(item.riesgo)"></i>
+              {{ etiquetaRiesgo(item.riesgo) }}
+            </span>
+            <strong>{{ porcentajeRiesgo(item.total) }}%</strong>
+          </div>
+        </div>
+      </div>
 
       <p class="empty" *ngIf="prediccionesPorRiesgo.length === 0">
         No hay predicciones locales guardadas.
       </p>
-    </div>
+    </article>
 
-    <div class="panel">
-      <h2>Actividad reciente</h2>
+    <article class="report-card">
+      <div class="card-title">
+        <div>
+          <h2>Actividad reciente</h2>
+          <p>Ultimos movimientos locales del dispositivo</p>
+        </div>
+      </div>
 
-      <div class="activity" *ngFor="let item of actividadReciente">
-        <span>{{ item.tipo }}</span>
-        <strong>{{ item.descripcion }}</strong>
-        <small>{{ item.fecha }}</small>
+      <div class="activity-list" *ngIf="actividadReciente.length > 0">
+        <div class="activity-card" *ngFor="let item of actividadReciente">
+          <div class="activity-icon" [class.cita]="item.tipo === 'Cita'" [class.atencion]="item.tipo === 'Atencion'">
+            {{ item.tipo.charAt(0) }}
+          </div>
+
+          <div class="activity-content">
+            <div class="activity-top">
+              <strong>{{ item.descripcion }}</strong>
+              <span>{{ item.tipo }}</span>
+            </div>
+
+            <div class="activity-meta">
+              <small>{{ fechaActividad(item.fecha) }}</small>
+              <small>{{ horaActividad(item.fecha) }}</small>
+            </div>
+          </div>
+        </div>
       </div>
 
       <p class="empty" *ngIf="actividadReciente.length === 0">
         No hay actividad local reciente.
       </p>
-    </div>
+    </article>
 
   </section>
 

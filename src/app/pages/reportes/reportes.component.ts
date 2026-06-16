@@ -118,6 +118,127 @@ export class ReportesComponent implements OnInit {
       : 0;
   }
 
+  estadosPrincipales(): Array<{ estado: string; total: number; porcentaje: number }> {
+    const estados = ['PROGRAMADA', 'ATENDIDA', 'NO_ASISTIO'];
+
+    return estados.map(estado => {
+      const encontrado = this.citasPorEstado.find(item => item.estado === estado);
+
+      return encontrado || { estado, total: 0, porcentaje: 0 };
+    });
+  }
+
+  etiquetaEstado(estado: string): string {
+    const etiquetas: Record<string, string> = {
+      PROGRAMADA: 'Programada',
+      ATENDIDA: 'Atendida',
+      NO_ASISTIO: 'No asistio',
+      CANCELADA: 'Cancelada',
+      REPROGRAMADA: 'Reprogramada',
+      SIN_DATO: 'Sin dato'
+    };
+
+    return etiquetas[estado] || estado;
+  }
+
+  colorEstado(estado: string): string {
+    const colores: Record<string, string> = {
+      PROGRAMADA: '#2563EB',
+      ATENDIDA: '#10B981',
+      NO_ASISTIO: '#F59E0B',
+      CANCELADA: '#EF4444',
+      REPROGRAMADA: '#8B5CF6',
+      SIN_DATO: '#64748B'
+    };
+
+    return colores[estado] || '#64748B';
+  }
+
+  donutEstadosGradient(): string {
+    return this.crearDonutGradient(
+      this.estadosPrincipales().map(item => ({
+        porcentaje: item.porcentaje,
+        color: this.colorEstado(item.estado)
+      }))
+    );
+  }
+
+  porcentajeEspecialidad(total: number): number {
+    const mayor = Math.max(...this.citasPorEspecialidad.map(item => item.total), 1);
+    return Math.round((total / mayor) * 100);
+  }
+
+  totalPredicciones(): number {
+    return this.prediccionesPorRiesgo.reduce((total, item) => total + item.total, 0);
+  }
+
+  riesgosOrdenados(): Array<{ riesgo: string; total: number }> {
+    const riesgos = ['Bajo', 'Medio', 'Alto'];
+
+    return riesgos.map(riesgo => {
+      const encontrado = this.prediccionesPorRiesgo.find(item =>
+        this.normalizarRiesgo(item.riesgo) === riesgo.toUpperCase()
+      );
+
+      return encontrado || { riesgo, total: 0 };
+    });
+  }
+
+  etiquetaRiesgo(riesgo: string): string {
+    const normalizado = this.normalizarRiesgo(riesgo);
+
+    if (normalizado === 'BAJO') return 'Bajo';
+    if (normalizado === 'MEDIO') return 'Medio';
+    if (normalizado === 'ALTO') return 'Alto';
+    return riesgo || 'Sin dato';
+  }
+
+  colorRiesgo(riesgo: string): string {
+    const normalizado = this.normalizarRiesgo(riesgo);
+
+    if (normalizado === 'BAJO') return '#10B981';
+    if (normalizado === 'MEDIO') return '#F59E0B';
+    if (normalizado === 'ALTO') return '#EF4444';
+    return '#64748B';
+  }
+
+  porcentajeRiesgo(total: number): number {
+    const totalPredicciones = this.totalPredicciones();
+    return totalPredicciones > 0 ? Math.round((total / totalPredicciones) * 100) : 0;
+  }
+
+  donutRiesgosGradient(): string {
+    return this.crearDonutGradient(
+      this.riesgosOrdenados().map(item => ({
+        porcentaje: this.porcentajeRiesgo(item.total),
+        color: this.colorRiesgo(item.riesgo)
+      }))
+    );
+  }
+
+  fechaActividad(fecha: string): string {
+    const valor = new Date(fecha);
+
+    if (Number.isNaN(valor.getTime())) return fecha || '-';
+
+    return valor.toLocaleDateString('es-PE', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  }
+
+  horaActividad(fecha: string): string {
+    const valor = new Date(fecha);
+
+    if (Number.isNaN(valor.getTime())) return '--:--';
+
+    return valor.toLocaleTimeString('es-PE', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
   private agrupar(items: any[], campo: string): Array<{ especialidad: string; total: number }> {
     const mapa = new Map<string, number>();
 
@@ -203,5 +324,35 @@ export class ReportesComponent implements OnInit {
       .split(' ')
       .map(palabra => palabra.charAt(0).toLocaleUpperCase('es-PE') + palabra.slice(1))
       .join(' ');
+  }
+
+  private normalizarRiesgo(valor: any): string {
+    return String(valor || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace('RIESGO_', '')
+      .trim()
+      .toUpperCase();
+  }
+
+  private crearDonutGradient(segmentos: Array<{ porcentaje: number; color: string }>): string {
+    let acumulado = 0;
+    const partes = segmentos
+      .filter(segmento => segmento.porcentaje > 0)
+      .map(segmento => {
+        const inicio = acumulado;
+        acumulado += segmento.porcentaje;
+        return `${segmento.color} ${inicio}% ${acumulado}%`;
+      });
+
+    if (partes.length === 0) {
+      return 'conic-gradient(#E2E8F0 0% 100%)';
+    }
+
+    if (acumulado < 100) {
+      partes.push(`#E2E8F0 ${acumulado}% 100%`);
+    }
+
+    return `conic-gradient(${partes.join(', ')})`;
   }
 }
