@@ -180,7 +180,16 @@ export class PacienteCitasComponent implements OnInit {
     this.errorPrediccion = '';
   }
 
+  esCitaBloqueada(): boolean {
+    return ['ATENDIDA', 'REPROGRAMADA'].includes(this.citaEditando?.estado);
+  }
+
   guardarCambios(): void {
+    if (this.esCitaBloqueada()) {
+      this.mensaje = 'Esta cita solo puede visualizarse';
+      return;
+    }
+
     if (!this.citaEditando.tipoCita) {
       this.mensaje = 'El tipo de cita es obligatorio';
       return;
@@ -244,8 +253,6 @@ export class PacienteCitasComponent implements OnInit {
       return;
     }
 
-    const requiereReprogramacion = ['CANCELADA', 'NO_ASISTIO'].includes(this.citaEditando.estado);
-
     this.citaOfflineService.actualizar({
       ...this.citaEditando,
       ...payload
@@ -255,11 +262,6 @@ export class PacienteCitasComponent implements OnInit {
           this.mensaje = navigator.onLine
             ? 'Cita actualizada correctamente'
             : 'Cita actualizada offline. Se sincronizara cuando vuelva internet';
-
-          if (requiereReprogramacion) {
-            this.prepararReprogramacion(actualizada || this.citaEditando);
-            return;
-          }
 
           this.modoEditar = false;
           this.modoReprogramar = false;
@@ -305,6 +307,29 @@ export class PacienteCitasComponent implements OnInit {
           this.prediccionInasistencia = null;
           this.errorPrediccion = 'No se pudo obtener la prediccion real del modelo ML.';
           this.cargandoPrediccion = false;
+        }
+      });
+  }
+
+  iniciarReprogramacion(): void {
+    if (!this.citaEditando || this.esCitaBloqueada()) {
+      return;
+    }
+
+    const citaOriginal = {
+      ...this.citaEditando,
+      pacienteId: Number(this.pacienteId),
+      estado: 'REPROGRAMADA'
+    };
+
+    this.citaOfflineService.actualizar(citaOriginal)
+      .subscribe({
+        next: (actualizada) => {
+          this.prepararReprogramacion(actualizada || citaOriginal);
+        },
+        error: err => {
+          console.error('Error al marcar cita como reprogramada', err);
+          this.mensaje = err.error?.message || 'Error al iniciar la reprogramacion';
         }
       });
   }
@@ -359,11 +384,13 @@ export class PacienteCitasComponent implements OnInit {
   }
 
   private contarInasistenciasParaModelo(citasPrevias: any[]): number {
-    const inasistencias = citasPrevias.filter(c => c.estado === 'NO_ASISTIO').length;
+    const inasistencias = citasPrevias.filter(c =>
+      c.estado === 'NO_ASISTIO' || c.estado === 'REPROGRAMADA'
+    ).length;
 
     if (
       this.modoReprogramar &&
-      this.citaOrigenReprogramacion?.estado === 'NO_ASISTIO' &&
+      ['NO_ASISTIO', 'REPROGRAMADA'].includes(this.citaOrigenReprogramacion?.estado) &&
       !citasPrevias.some(c => Number(c.id) === Number(this.citaOrigenReprogramacion.id))
     ) {
       return inasistencias + 1;
@@ -393,7 +420,7 @@ export class PacienteCitasComponent implements OnInit {
     this.modoEditar = true;
     this.modoReprogramar = true;
     this.citaOrigenReprogramacion = citaBase;
-    this.mensaje = 'La cita quedo registrada como inasistencia/cancelacion. Define la nueva fecha para reprogramarla.';
+    this.mensaje = 'La cita anterior quedo como REPROGRAMADA. Define la nueva fecha y hora para la cita programada.';
     this.cargarCitasPaciente();
     this.cargarPrediccionReal();
   }
@@ -408,7 +435,8 @@ export class PacienteCitasComponent implements OnInit {
     const cita = this.citas.find(c => Number(c.id) === reprogramarId);
 
     if (cita && ['CANCELADA', 'NO_ASISTIO'].includes(cita.estado)) {
-      this.prepararReprogramacion(cita);
+      this.abrirDetalle(cita);
+      this.mensaje = 'Para crear una nueva cita, presiona Reprogramar. La cita actual quedara como REPROGRAMADA.';
     }
   }
 }

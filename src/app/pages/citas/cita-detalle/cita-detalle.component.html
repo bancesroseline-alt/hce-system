@@ -1,0 +1,184 @@
+<div class="detalle-page">
+
+  <header class="page-header">
+    <div>
+      <h1>Detalle de cita</h1>
+      <nav class="breadcrumbs">
+        <a routerLink="/dashboard">Inicio</a>
+        <span>›</span>
+        <a routerLink="/citas">Citas</a>
+        <span>›</span>
+        <strong>Detalle</strong>
+      </nav>
+    </div>
+
+    <div class="header-actions">
+      <a class="btn-secondary" routerLink="/citas">Volver</a>
+      <a
+        *ngIf="cita && cita.id && cita.estado === 'PROGRAMADA' && pacienteId()"
+        class="btn-primary"
+        [routerLink]="['/atenciones/nueva', pacienteId(), 'cita', cita.id]">
+        Atender cita
+      </a>
+    </div>
+  </header>
+
+  <section class="state-card" *ngIf="cargando">
+    Cargando detalle de la cita...
+  </section>
+
+  <section class="state-card error" *ngIf="!cargando && mensaje">
+    {{ mensaje }}
+  </section>
+
+  <ng-container *ngIf="!cargando && cita">
+
+    <section class="summary-card">
+      <div>
+        <span class="eyebrow">Paciente</span>
+        <h2>{{ nombrePaciente() }}</h2>
+        <p>{{ cita.especialidad || 'Sin especialidad' }} · {{ cita.tipoCita || 'Sin tipo' }}</p>
+      </div>
+
+      <div class="status-stack">
+        <span
+          class="badge"
+          [ngClass]="{
+            'badge-programada': cita.estado === 'PROGRAMADA',
+            'badge-atendida': cita.estado === 'ATENDIDA',
+            'badge-cancelada': cita.estado === 'CANCELADA',
+            'badge-no-asistio': cita.estado === 'NO_ASISTIO',
+            'badge-reprogramada': cita.estado === 'REPROGRAMADA'
+          }">
+          {{ cita.estado || 'SIN_ESTADO' }}
+        </span>
+
+        <span class="sync-badge" [ngClass]="claseSync(cita.estadoSync)">
+          {{ etiquetaSync(cita.estadoSync) }}
+        </span>
+      </div>
+    </section>
+
+    <div class="detail-grid">
+
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Información de la cita</h2>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span>Fecha</span>
+            <strong>{{ cita.fecha || 'Sin fecha' }}</strong>
+          </div>
+
+          <div class="info-item">
+            <span>Hora</span>
+            <strong>{{ cita.hora || 'Sin hora' }}</strong>
+          </div>
+
+          <div class="info-item">
+            <span>Profesional</span>
+            <strong>{{ nombreProfesional() }}</strong>
+          </div>
+
+          <div class="info-item">
+            <span>Especialidad</span>
+            <strong>{{ cita.especialidad || 'Sin especialidad' }}</strong>
+          </div>
+
+          <div class="info-item full">
+            <span>Motivo</span>
+            <strong>{{ cita.motivoConsulta || 'Sin motivo registrado' }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Paciente</h2>
+        </div>
+
+        <div class="info-grid compact">
+          <div class="info-item">
+            <span>Documento</span>
+            <strong>{{ paciente?.numeroDocumento || 'Sin documento' }}</strong>
+          </div>
+
+          <div class="info-item">
+            <span>Edad</span>
+            <strong>{{ paciente?.edad ?? 'Sin dato' }}</strong>
+          </div>
+
+          <div class="info-item">
+            <span>Sexo</span>
+            <strong>{{ paciente?.sexo || 'Sin dato' }}</strong>
+          </div>
+
+          <div class="info-item">
+            <span>Estado</span>
+            <strong>{{ paciente?.estado === false ? 'Inactivo' : 'Activo' }}</strong>
+          </div>
+        </div>
+
+        <a
+          *ngIf="pacienteId()"
+          class="link-action"
+          [routerLink]="['/pacientes', pacienteId()]">
+          Ver perfil del paciente
+        </a>
+      </section>
+
+    </div>
+
+    <section class="panel atenciones-panel">
+      <div class="panel-title split">
+        <div>
+          <h2>Atenciones vinculadas</h2>
+          <p>{{ atenciones.length }} registro(s) asociado(s) a esta cita</p>
+        </div>
+
+        <a
+          *ngIf="pacienteId() && cita.id"
+          class="btn-secondary"
+          [routerLink]="['/atenciones/nueva', pacienteId(), 'cita', cita.id]">
+          Registrar atención
+        </a>
+      </div>
+
+      <div class="table-wrap" *ngIf="atenciones.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha / hora</th>
+              <th>Tipo</th>
+              <th>Diagnóstico</th>
+              <th>Tratamiento</th>
+              <th>Profesional</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let atencion of atenciones">
+              <td>{{ atencion.fechaHora | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ atencion.tipoAtencion || 'Sin tipo' }}</td>
+              <td>{{ atencion.diagnostico || 'Sin diagnóstico' }}</td>
+              <td>{{ atencion.tratamientoIndicado || 'Sin tratamiento' }}</td>
+              <td>{{ atencion.profesionalSalud || atencion.usuarioNombre || 'Sin profesional' }}</td>
+              <td>{{ atencion.estado || 'SIN_ESTADO' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" *ngIf="atenciones.length === 0">
+        <div class="empty-icon">+</div>
+        <h3>No hay atenciones registradas para esta cita</h3>
+        <p>Cuando el personal registre la atención, aparecerá en este detalle.</p>
+      </div>
+    </section>
+
+  </ng-container>
+
+</div>

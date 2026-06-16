@@ -4,7 +4,7 @@
     <div>
       <h1 *ngIf="!modoEditar">Historial de citas</h1>
       <h1 *ngIf="modoEditar">
-        {{ modoReprogramar ? 'Reprogramar cita' : (citaEditando?.estado === 'ATENDIDA' ? 'Detalle de la cita' : 'Editar cita') }}
+        {{ modoReprogramar ? 'Reprogramar cita' : (esCitaBloqueada() ? 'Detalle de la cita' : 'Editar cita') }}
       </h1>
 
       <p>
@@ -12,7 +12,7 @@
         <span>›</span>
         <span *ngIf="!modoEditar">Historial de citas</span>
         <span *ngIf="modoEditar">
-          {{ modoReprogramar ? 'Reprogramar cita' : (citaEditando?.estado === 'ATENDIDA' ? 'Detalle de cita' : 'Editar cita') }}
+          {{ modoReprogramar ? 'Reprogramar cita' : (esCitaBloqueada() ? 'Detalle de cita' : 'Editar cita') }}
         </span>
       </p>
     </div>
@@ -66,6 +66,7 @@
           <option value="ATENDIDA">Atendida</option>
           <option value="CANCELADA">Cancelada</option>
           <option value="NO_ASISTIO">No asistió</option>
+          <option value="REPROGRAMADA">Reprogramada</option>
         </select>
       </div>
 
@@ -118,7 +119,8 @@
                 'programada': c.estado === 'PROGRAMADA',
                 'atendida': c.estado === 'ATENDIDA',
                 'cancelada': c.estado === 'CANCELADA',
-                'no_asistio': c.estado === 'NO_ASISTIO'
+                'no_asistio': c.estado === 'NO_ASISTIO',
+                'reprogramada': c.estado === 'REPROGRAMADA'
               }">
               {{ c.estado }}
             </span>
@@ -134,7 +136,7 @@
 
           <td>
             <button class="btn-detalle" type="button" (click)="abrirDetalle(c)">
-              {{ c.estado === 'ATENDIDA' ? 'Ver' : 'Ver / Editar' }}
+              {{ c.estado === 'ATENDIDA' || c.estado === 'REPROGRAMADA' ? 'Ver' : 'Ver / Editar' }}
             </button>
           </td>
         </tr>
@@ -149,8 +151,8 @@
     <div class="detalle-card">
       <h2>Información de la cita</h2>
 
-      <div class="alerta-info" *ngIf="citaEditando.estado === 'ATENDIDA'">
-        Esta cita ya fue atendida. Solo puede visualizarse y no permite modificaciones.
+      <div class="alerta-info" *ngIf="esCitaBloqueada()">
+        Esta cita ya fue {{ citaEditando.estado === 'ATENDIDA' ? 'atendida' : 'reprogramada' }}. Solo puede visualizarse y no permite modificaciones.
       </div>
 
       <div class="form-grid">
@@ -160,7 +162,7 @@
           <select
             [(ngModel)]="citaEditando.tipoCita"
             (ngModelChange)="programarPrediccion()"
-            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            [disabled]="esCitaBloqueada()">
             <option value="CONSULTA">Consulta</option>
             <option value="PREVENTIVA">Preventiva</option>
           </select>
@@ -172,7 +174,7 @@
             type="date"
             [(ngModel)]="citaEditando.fecha"
             (ngModelChange)="programarPrediccion()"
-            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            [disabled]="!modoReprogramar">
         </div>
 
         <div class="form-group">
@@ -181,7 +183,7 @@
             type="time"
             [(ngModel)]="citaEditando.hora"
             (ngModelChange)="programarPrediccion()"
-            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            [disabled]="!modoReprogramar">
         </div>
 
         <div class="form-group">
@@ -190,14 +192,14 @@
             type="text"
             [(ngModel)]="citaEditando.especialidad"
             (ngModelChange)="programarPrediccion()"
-            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            [disabled]="esCitaBloqueada()">
         </div>
 
         <div class="form-group full">
           <label>Motivo de consulta *</label>
           <textarea
             [(ngModel)]="citaEditando.motivoConsulta"
-            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            [disabled]="esCitaBloqueada()">
           </textarea>
         </div>
 
@@ -205,7 +207,7 @@
           <label>Medico / enfermero *</label>
           <select
             [(ngModel)]="citaEditando.medicoId"
-            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            [disabled]="esCitaBloqueada()">
             <option [ngValue]="null">Seleccione profesional</option>
             <option *ngFor="let m of medicos" [ngValue]="m.id">
               {{ m.nombres }} {{ m.apellidos }} - {{ m.username }}
@@ -217,10 +219,11 @@
           <label>Estado</label>
           <select
             [(ngModel)]="citaEditando.estado"
-            [disabled]="citaEditando.estado === 'ATENDIDA'">
+            [disabled]="esCitaBloqueada() || modoReprogramar">
             <option value="PROGRAMADA">Programada</option>
             <option value="CANCELADA">Cancelada</option>
             <option value="NO_ASISTIO">No asistió</option>
+            <option value="REPROGRAMADA" [disabled]="citaEditando.estado !== 'REPROGRAMADA'">Reprogramada</option>
           </select>
         </div>
 
@@ -257,8 +260,16 @@
           class="btn-guardar"
           type="button"
           (click)="guardarCambios()"
-          *ngIf="citaEditando.estado !== 'ATENDIDA'">
+          *ngIf="!esCitaBloqueada()">
           {{ modoReprogramar ? 'Guardar reprogramacion' : 'Guardar cambios' }}
+        </button>
+
+        <button
+          class="btn-reprogramar"
+          type="button"
+          *ngIf="!esCitaBloqueada() && !modoReprogramar"
+          (click)="iniciarReprogramacion()">
+          Reprogramar
         </button>
 
         <button
@@ -271,7 +282,7 @@
         <button
           class="btn-danger"
           type="button"
-          *ngIf="citaEditando.estado !== 'ATENDIDA' && !modoReprogramar"
+          *ngIf="!esCitaBloqueada() && !modoReprogramar"
           (click)="citaEditando.estado = 'CANCELADA'; guardarCambios()">
           Cancelar cita
         </button>

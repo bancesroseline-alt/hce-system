@@ -143,6 +143,11 @@ td {
   color: #c2410c;
 }
 
+.badge-reprogramada {
+  background-color: #ede9fe;
+  color: #6d28d9;
+}
+
 /* BOTONES GENERALES */
 
 .btn-primary,
@@ -193,6 +198,18 @@ td {
   background: #0f766e;
   color: white;
   transform: translateY(-1px);
+}
+
+.action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-mini {
+  padding: 8px 14px;
+  font-size: 13px;
 }
 
 .btn-guardar {

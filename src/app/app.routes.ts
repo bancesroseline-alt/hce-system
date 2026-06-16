@@ -126,6 +126,15 @@ export const routes: Routes = [
             .then(m => m.CitasComponent)
       },
 
+      {
+        path: 'citas/:id',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
+        loadComponent: () =>
+          import('./pages/citas/cita-detalle/cita-detalle.component')
+            .then(m => m.CitaDetalleComponent)
+      },
+
               {
           path: 'pacientes/:id/citas',
           loadComponent: () =>

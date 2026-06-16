@@ -88,6 +88,11 @@ textarea:disabled {
   color: #c2410c;
 }
 
+.badge.reprogramada {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
 .paciente-card,
 .historial-card,
 .detalle-card,
@@ -176,7 +181,8 @@ textarea:disabled {
 
 .btn-buscar,
 .btn-guardar,
-.btn-detalle {
+.btn-detalle,
+.btn-reprogramar {
   border: none;
   background: #2563eb;
   color: white;
@@ -191,6 +197,11 @@ textarea:disabled {
   padding: 8px 14px;
   background: #0f766e;
   box-shadow: none;
+}
+
+.btn-reprogramar {
+  background: #7c3aed;
+  box-shadow: 0 8px 18px rgba(124, 58, 237, 0.22);
 }
 
 table {
@@ -238,6 +249,11 @@ td {
 .badge.no_asistio {
   background: #fef3c7;
   color: #b45309;
+}
+
+.badge.reprogramada {
+  background: #ede9fe;
+  color: #6d28d9;
 }
 
 .empty,

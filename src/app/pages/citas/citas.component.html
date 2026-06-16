@@ -258,7 +258,8 @@
     'badge-programada': c.estado === 'PROGRAMADA',
     'badge-atendida': c.estado === 'ATENDIDA',
     'badge-cancelada': c.estado === 'CANCELADA',
-    'badge-no-asistio': c.estado === 'NO_ASISTIO'
+    'badge-no-asistio': c.estado === 'NO_ASISTIO',
+    'badge-reprogramada': c.estado === 'REPROGRAMADA'
   }">
 
   {{ c.estado || 'SIN_ESTADO' }}
@@ -275,6 +276,16 @@
 
             <td>{{ c.tipoCita }}</td>
 <td>
+  <div class="action-group">
+
+  <button
+    class="btn-secondary btn-mini"
+    type="button"
+    [routerLink]="['/citas', c.id || c.uuidLocal]">
+
+    Ver detalle
+
+  </button>
 
   <button
     *ngIf="c.estado === 'PROGRAMADA'"
@@ -297,6 +308,12 @@
   <span *ngIf="c.estado === 'NO_ASISTIO'">
     No asistió
   </span>
+
+  <span *ngIf="c.estado === 'REPROGRAMADA'">
+    Reprogramada
+  </span>
+
+  </div>
 
 </td>
 
@@ -402,6 +419,11 @@
         <p>
           <span>No asistió:</span>
           <strong>{{ contarPorEstado('NO_ASISTIO') }}</strong>
+        </p>
+
+        <p>
+          <span>Reprogramadas:</span>
+          <strong>{{ contarPorEstado('REPROGRAMADA') }}</strong>
         </p>
 
       </div>
