@@ -2,7 +2,7 @@
   padding: 32px 38px;
   background:
     radial-gradient(circle at top left, rgba(14, 165, 233, 0.14), transparent 28%),
-    linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%) !important;
   min-height: calc(100vh - 70px);
   font-family: Arial, sans-serif;
   color: #0f172a;
@@ -50,7 +50,7 @@
   margin: 0;
   font-size: 34px;
   font-weight: 900;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.8px !important;
 }
 
 .dashboard-hero p {
@@ -102,14 +102,14 @@
 }
 
 .summary-card {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid #dbe7f3;
-  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid #dbe7f3 !important;
+  border-radius: 22px !important;
   padding: 22px;
   display: flex;
   align-items: center;
   gap: 18px;
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.09);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.09) !important;
   transition: 0.22s ease;
 }
 
@@ -143,21 +143,21 @@
   margin: 0;
   font-size: 14px;
   color: #475569;
-  font-weight: 900;
+  font-weight: 900 !important;
 }
 
 .summary-card strong {
   display: block;
   margin: 5px 0;
   font-size: 34px;
-  font-weight: 900;
+  font-weight: 900 !important;
   color: #0f172a;
 }
 
 .summary-card span {
   font-size: 12px;
   color: #64748b;
-  font-weight: 800;
+  font-weight: 800 !important;
 }
 
 /* CONTENT */
@@ -169,11 +169,11 @@
 }
 
 .panel {
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid #dbe7f3;
-  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid #dbe7f3 !important;
+  border-radius: 24px !important;
   padding: 24px;
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.09);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.09) !important;
 }
 
 .citas-panel,
@@ -192,7 +192,7 @@
 .panel-header h2 {
   margin: 0;
   font-size: 21px;
-  font-weight: 900;
+  font-weight: 900 !important;
   color: #0f172a;
 }
 
@@ -200,17 +200,17 @@
   margin: 5px 0 0;
   color: #64748b;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 700 !important;
 }
 
 .panel-header button {
-  background: #0ea5e9;
-  color: white;
+  background: #0ea5e9 !important;
+  color: white !important;
   border: none;
   border-radius: 999px;
   padding: 10px 18px;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 900 !important;
   cursor: pointer;
   box-shadow: 0 10px 20px rgba(14, 165, 233, 0.24);
   transition: 0.2s ease;
@@ -229,17 +229,17 @@
 
 table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 10px;
+  border-collapse: separate !important;
+  border-spacing: 0 10px !important;
   font-size: 13px;
 }
 
 thead th {
-  background: #eef6ff;
+  background: #eef6ff !important;
   padding: 13px 12px;
   text-align: left;
   color: #475569;
-  font-weight: 900;
+  font-weight: 900 !important;
 }
 
 thead th:first-child {
@@ -255,11 +255,11 @@ tbody tr {
 }
 
 tbody tr:hover td {
-  background: #f8fbff;
+  background: #f8fbff !important;
 }
 
 td {
-  background: white;
+  background: white !important;
   padding: 14px 12px;
   border-bottom: 1px solid #e5edf5;
   color: #334155;
@@ -267,7 +267,7 @@ td {
 }
 
 .hora {
-  font-weight: 900;
+  font-weight: 900 !important;
   color: #0f172a;
 }
 
@@ -285,7 +285,7 @@ td {
   place-items: center;
   background: #dbeafe;
   color: #1d4ed8;
-  font-weight: 900;
+  font-weight: 900 !important;
 }
 
 .paciente-cell strong {
@@ -297,7 +297,7 @@ td {
 .paciente-cell small {
   color: #64748b;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 700 !important;
 }
 
 /* ESTADOS */
@@ -306,7 +306,7 @@ td {
   border-radius: 999px;
   padding: 7px 12px;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 900 !important;
   display: inline-block;
 }
 
@@ -336,7 +336,7 @@ td {
   border-radius: 999px;
   padding: 7px 12px;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 900 !important;
   display: inline-block;
 }
 
@@ -367,7 +367,7 @@ td {
   height: 32px;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 900 !important;
 }
 
 .btn-more:hover {
@@ -380,7 +380,7 @@ td {
 .empty {
   text-align: center;
   color: #64748b;
-  font-weight: 700;
+  font-weight: 700 !important;
   padding: 24px;
 }
 
@@ -437,7 +437,7 @@ td {
 
 .activity strong {
   color: #0f172a;
-  font-weight: 900;
+  font-weight: 900 !important;
   font-size: 13px;
 }
 
@@ -451,7 +451,7 @@ td {
 .activity span {
   color: #94a3b8;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 800 !important;
 }
 
 .link {
@@ -460,7 +460,7 @@ td {
   margin-top: 18px;
   font-size: 13px;
   color: #0284c7;
-  font-weight: 900;
+  font-weight: 900 !important;
   text-decoration: none;
 }
 
