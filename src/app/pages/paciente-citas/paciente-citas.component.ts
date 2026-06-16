@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PacienteService } from '../../services/paciente.service';
 import { CitaOfflineService } from '../../services/cita-offline.service';
+import { PrediccionService } from '../../services/prediccion.service';
 import { claseEstadoSync, etiquetaEstadoSync } from '../../utils/sync-status.util';
 
 @Component({
@@ -31,11 +32,16 @@ export class PacienteCitasComponent implements OnInit {
 
   citaEditando: any = null;
   modoEditar = false;
+  prediccionInasistencia: any = null;
+  cargandoPrediccion = false;
+  errorPrediccion = '';
+  private prediccionTimer: any = null;
 
   constructor(
     private route: ActivatedRoute,
     private pacienteService: PacienteService,
-    private citaOfflineService: CitaOfflineService
+    private citaOfflineService: CitaOfflineService,
+    private prediccionService: PrediccionService
   ) {}
 
   etiquetaSync(valor: any): string {
@@ -157,11 +163,14 @@ export class PacienteCitasComponent implements OnInit {
 
     this.modoEditar = true;
     this.mensaje = '';
+    this.cargarPrediccionReal();
   }
 
   cancelarEdicion(): void {
     this.modoEditar = false;
     this.citaEditando = null;
+    this.prediccionInasistencia = null;
+    this.errorPrediccion = '';
   }
 
   guardarCambios(): void {
@@ -233,21 +242,86 @@ export class PacienteCitasComponent implements OnInit {
     return `${medico.nombres || ''} ${medico.apellidos || ''}`.trim() || medico.username;
   }
 
-  calcularRiesgo(cita: any): number {
-    if (!cita) return 18;
-
-    if (cita.estado === 'CANCELADA') return 75;
-    if (cita.estado === 'NO_ASISTIO') return 85;
-    if (cita.tipoCita === 'PREVENTIVA') return 18;
-
-    return 32;
+  programarPrediccion(): void {
+    clearTimeout(this.prediccionTimer);
+    this.prediccionTimer = setTimeout(() => this.cargarPrediccionReal(), 350);
   }
 
-  textoRiesgo(cita: any): string {
-    const riesgo = this.calcularRiesgo(cita);
+  cargarPrediccionReal(): void {
+    if (!this.citaEditando || !this.paciente) {
+      return;
+    }
+
+    this.cargandoPrediccion = true;
+    this.errorPrediccion = '';
+
+    this.prediccionService.predecirConModelo(this.construirCitaParaModelo())
+      .subscribe({
+        next: data => {
+          this.prediccionInasistencia = data;
+          this.cargandoPrediccion = false;
+        },
+        error: err => {
+          console.error('Error al calcular prediccion real de inasistencia', err);
+          this.prediccionInasistencia = null;
+          this.errorPrediccion = 'No se pudo obtener la prediccion real del modelo ML.';
+          this.cargandoPrediccion = false;
+        }
+      });
+  }
+
+  porcentajeRiesgo(): number {
+    const probabilidad = Number(this.prediccionInasistencia?.probabilidadInasistencia);
+
+    if (Number.isNaN(probabilidad)) {
+      return 0;
+    }
+
+    const porcentaje = probabilidad > 1 ? probabilidad : probabilidad * 100;
+    return Math.max(0, Math.min(100, Math.round(porcentaje)));
+  }
+
+  textoRiesgo(): string {
+    const nivel = this.prediccionInasistencia?.nivelRiesgo;
+
+    if (nivel === 'ALTO') return 'Riesgo alto';
+    if (nivel === 'MEDIO') return 'Riesgo medio';
+    if (nivel === 'BAJO') return 'Riesgo bajo';
+
+    const riesgo = this.porcentajeRiesgo();
 
     if (riesgo < 30) return 'Riesgo bajo';
     if (riesgo < 60) return 'Riesgo medio';
     return 'Riesgo alto';
+  }
+
+  fondoRiesgo(): string {
+    const porcentaje = this.porcentajeRiesgo();
+    const color = porcentaje >= 70 ? '#ef4444' : porcentaje >= 40 ? '#f59e0b' : '#10b981';
+
+    return `conic-gradient(${color} 0 ${porcentaje}%, #e5e7eb ${porcentaje}% 100%)`;
+  }
+
+  private construirCitaParaModelo(): any {
+    const citasPrevias = this.citas.filter(c =>
+      Number(c.id) !== Number(this.citaEditando.id) &&
+      (!this.citaEditando.fecha || !c.fecha || c.fecha <= this.citaEditando.fecha)
+    );
+
+    return {
+      ...this.citaEditando,
+      edad: this.paciente?.edad || 0,
+      sexo: this.paciente?.sexo || '',
+      diaSemana: this.obtenerDiaSemana(this.citaEditando.fecha),
+      antecedentesInasistencias: citasPrevias.filter(c => c.estado === 'NO_ASISTIO').length,
+      cantidadCitasPrevias: citasPrevias.length
+    };
+  }
+
+  private obtenerDiaSemana(fecha: string): string {
+    if (!fecha) return 'MONDAY';
+
+    const dias = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+    return dias[new Date(`${fecha}T00:00:00`).getDay()];
   }
 }

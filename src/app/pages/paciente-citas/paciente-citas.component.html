@@ -159,6 +159,7 @@
           <label>Tipo de cita *</label>
           <select
             [(ngModel)]="citaEditando.tipoCita"
+            (ngModelChange)="programarPrediccion()"
             [disabled]="citaEditando.estado === 'ATENDIDA'">
             <option value="CONSULTA">Consulta</option>
             <option value="PREVENTIVA">Preventiva</option>
@@ -170,6 +171,7 @@
           <input
             type="date"
             [(ngModel)]="citaEditando.fecha"
+            (ngModelChange)="programarPrediccion()"
             [disabled]="citaEditando.estado === 'ATENDIDA'">
         </div>
 
@@ -178,6 +180,7 @@
           <input
             type="time"
             [(ngModel)]="citaEditando.hora"
+            (ngModelChange)="programarPrediccion()"
             [disabled]="citaEditando.estado === 'ATENDIDA'">
         </div>
 
@@ -186,6 +189,7 @@
           <input
             type="text"
             [(ngModel)]="citaEditando.especialidad"
+            (ngModelChange)="programarPrediccion()"
             [disabled]="citaEditando.estado === 'ATENDIDA'">
         </div>
 
@@ -226,12 +230,25 @@
     <aside class="prediccion-card">
       <h2>Predicción de inasistencia</h2>
 
-      <div class="riesgo-circle">
-        <span>{{ calcularRiesgo(citaEditando) }}%</span>
+      <div class="prediccion-loading" *ngIf="cargandoPrediccion">
+        Calculando prediccion real...
       </div>
 
-      <h3>{{ textoRiesgo(citaEditando) }}</h3>
-      <p>Probabilidad estimada de inasistencia según el modelo de predicción.</p>
+      <div class="prediccion-error" *ngIf="!cargandoPrediccion && errorPrediccion">
+        {{ errorPrediccion }}
+      </div>
+
+      <div class="riesgo-circle" *ngIf="!cargandoPrediccion && !errorPrediccion" [style.background]="fondoRiesgo()">
+        <span>{{ porcentajeRiesgo() }}%</span>
+      </div>
+
+      <h3 *ngIf="!cargandoPrediccion && !errorPrediccion">{{ textoRiesgo() }}</h3>
+      <p *ngIf="!cargandoPrediccion && !errorPrediccion">
+        Probabilidad real de inasistencia calculada por el modelo de machine learning.
+      </p>
+      <small class="modelo-label" *ngIf="!cargandoPrediccion && !errorPrediccion">
+        Datos usados: historial del paciente, fecha, hora, tipo y especialidad.
+      </small>
 
       <div class="acciones-card">
         <h4>Acciones</h4>

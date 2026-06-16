@@ -55,6 +55,24 @@ export class PrediccionService {
     );
   }
 
+  predecirConModelo(cita: any): Observable<any> {
+    const payload = {
+      edad: cita.edad || 0,
+      sexo: cita.sexo || '',
+      tipo_cita: cita.tipoCita,
+      especialidad: cita.especialidad,
+      dia_semana: cita.diaSemana || '',
+      hora: Number(`${cita.hora || '10'}`.split(':')[0]),
+      antecedentes_inasistencias: cita.antecedentesInasistencias || 0,
+      cantidad_citas_previas: cita.cantidadCitasPrevias || 0
+    };
+
+    return this.http.post<any>(this.apiML, payload).pipe(
+      timeout(6000),
+      map(res => this.mapearRespuesta(cita, Number(res.probabilidad ?? 0), false))
+    );
+  }
+
   obtenerAlertas(): Observable<any[]> {
     return this.obtenerCitasHoy().pipe(
       switchMap(citas => {

@@ -333,6 +333,36 @@ td {
   font-size: 14px;
 }
 
+.modelo-label {
+  color: #64748b;
+  display: block;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+
+.prediccion-loading,
+.prediccion-error {
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.45;
+  margin: 18px 0;
+  padding: 16px;
+}
+
+.prediccion-loading {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.prediccion-error {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
 .acciones-card {
   margin-top: 24px;
   border: 1px solid #dbe3ec;
