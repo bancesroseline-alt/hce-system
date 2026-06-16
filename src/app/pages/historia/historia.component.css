@@ -228,6 +228,28 @@ th {
   background: linear-gradient(135deg, #0284c7, #0369a1);
 }
 
+.btn-detalle-atencion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: #ecfeff;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-detalle-atencion:hover {
+  background: #0f766e;
+  color: white;
+  transform: translateY(-1px);
+}
+
 .icon-btn {
   font-size: 15px;
 }

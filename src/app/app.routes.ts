@@ -95,6 +95,12 @@ export const routes: Routes = [
           import('./pages/registro-atencion/registro-atencion.component')
             .then(m => m.RegistroAtencionComponent)
       },
+      {
+        path: 'atenciones/:id',
+        loadComponent: () =>
+          import('./pages/registro-atencion/atencion-detalle/atencion-detalle.component')
+            .then(m => m.AtencionDetalleComponent)
+      },
 
       // =====================
       // CITAS

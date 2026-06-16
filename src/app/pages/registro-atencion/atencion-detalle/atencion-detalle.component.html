@@ -1,0 +1,141 @@
+<div class="atencion-detalle-page">
+
+  <header class="page-header">
+    <div>
+      <h1>Detalle de atención médica</h1>
+      <nav class="breadcrumbs">
+        <a routerLink="/dashboard">Inicio</a>
+        <span>›</span>
+        <a routerLink="/historias-clinicas">Historias clínicas</a>
+        <span>›</span>
+        <strong>Atención médica</strong>
+      </nav>
+    </div>
+
+    <div class="header-actions">
+      <a class="btn-secondary" *ngIf="pacienteId()" [routerLink]="['/historias-clinicas', pacienteId()]">
+        Volver a historia
+      </a>
+      <a class="btn-secondary" *ngIf="citaId()" [routerLink]="['/citas', citaId()]">
+        Ver cita
+      </a>
+    </div>
+  </header>
+
+  <section class="state-card" *ngIf="cargando">
+    Cargando detalle de la atención...
+  </section>
+
+  <section class="state-card error" *ngIf="!cargando && mensaje">
+    {{ mensaje }}
+  </section>
+
+  <ng-container *ngIf="!cargando && atencion">
+
+    <section class="summary-card">
+      <div>
+        <span class="eyebrow">Paciente</span>
+        <h2>{{ nombrePaciente() }}</h2>
+        <p>{{ atencion.tipoAtencion || 'Atención médica' }} · {{ atencion.fechaHora | date:'dd/MM/yyyy HH:mm' }}</p>
+      </div>
+
+      <div class="status-stack">
+        <span class="badge">{{ atencion.estado || 'COMPLETADA' }}</span>
+        <span class="sync-badge" [ngClass]="claseSync(atencion.estadoSync)">
+          {{ etiquetaSync(atencion.estadoSync) }}
+        </span>
+      </div>
+    </section>
+
+    <div class="detail-grid">
+
+      <section class="panel clinical-panel">
+        <div class="panel-title">
+          <h2>Información clínica</h2>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span>Motivo</span>
+            <strong>{{ atencion.motivoConsulta || 'Sin motivo registrado' }}</strong>
+          </div>
+
+          <div class="info-item">
+            <span>Diagnóstico</span>
+            <strong>{{ atencion.diagnostico || 'Sin diagnóstico registrado' }}</strong>
+          </div>
+
+          <div class="info-item full">
+            <span>Tratamiento indicado</span>
+            <strong>{{ atencion.tratamientoIndicado || 'Sin tratamiento registrado' }}</strong>
+          </div>
+
+          <div class="info-item full">
+            <span>Medicamentos</span>
+            <strong>{{ atencion.medicamentos || 'Sin medicamentos registrados' }}</strong>
+          </div>
+
+          <div class="info-item full">
+            <span>Observaciones</span>
+            <strong>{{ atencion.observaciones || 'Sin observaciones' }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel side-panel">
+        <div class="panel-title">
+          <h2>Datos de atención</h2>
+        </div>
+
+        <div class="info-grid compact">
+          <div class="info-item">
+            <span>Profesional</span>
+            <strong>{{ nombreProfesional() }}</strong>
+          </div>
+
+          <div class="info-item">
+            <span>Fecha / hora</span>
+            <strong>{{ atencion.fechaHora | date:'dd/MM/yyyy HH:mm' }}</strong>
+          </div>
+
+          <div class="info-item">
+            <span>Cita vinculada</span>
+            <strong>{{ cita ? (cita.especialidad || cita.tipoCita) : (citaId() ? 'Cita registrada' : 'Sin cita') }}</strong>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <section class="panel signos-panel">
+      <div class="panel-title">
+        <h2>Signos y medidas</h2>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <span>Presión arterial</span>
+          <strong>{{ atencion.presionArterial || '-' }}</strong>
+        </div>
+        <div class="metric">
+          <span>Temperatura</span>
+          <strong>{{ atencion.temperatura ?? '-' }}</strong>
+        </div>
+        <div class="metric">
+          <span>Saturación</span>
+          <strong>{{ atencion.saturacion ?? '-' }}</strong>
+        </div>
+        <div class="metric">
+          <span>Talla</span>
+          <strong>{{ atencion.talla ?? '-' }}</strong>
+        </div>
+        <div class="metric">
+          <span>Peso</span>
+          <strong>{{ atencion.peso ?? '-' }}</strong>
+        </div>
+      </div>
+    </section>
+
+  </ng-container>
+
+</div>

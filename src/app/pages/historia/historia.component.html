@@ -187,6 +187,12 @@
             <p><strong>Tratamiento:</strong> {{ atencion.tratamientoIndicado }}</p>
             <p><strong>Profesional:</strong> {{ atencion.profesionalSalud }}</p>
 
+            <a
+              class="btn-detalle-atencion"
+              [routerLink]="['/atenciones', atencion.id || atencion.uuidLocal]">
+              Ver detalle
+            </a>
+
           </div>
 
         </div>
