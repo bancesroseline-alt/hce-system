@@ -10,8 +10,8 @@
   --report-border: #E2E8F0;
 
   display: grid;
-  gap: 24px;
-  padding: 28px;
+  gap: 18px;
+  padding: 22px 28px 28px;
   background: var(--report-bg);
   color: var(--report-text);
   font-family: Inter, "Segoe UI", system-ui, sans-serif;
@@ -42,13 +42,13 @@
   align-items: center;
   display: flex;
   justify-content: space-between;
-  gap: 24px;
-  padding: 24px;
+  gap: 18px;
+  padding: 18px 22px;
 }
 
 .report-hero h1 {
   color: var(--report-text);
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1.1;
@@ -57,9 +57,9 @@
 
 .report-hero p {
   color: var(--report-muted);
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 400;
-  margin: 8px 0 0;
+  margin: 6px 0 0;
 }
 
 .report-actions {
@@ -72,7 +72,7 @@
 .report-actions button {
   border-radius: 12px;
   font-family: inherit;
-  min-height: 44px;
+  min-height: 40px;
   transition: all .25s ease;
 }
 
@@ -118,16 +118,16 @@
 
 .kpi-grid {
   display: grid;
-  gap: 18px;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 10px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .kpi-card {
   display: grid;
   grid-template-rows: auto auto auto auto 1fr;
-  min-height: 190px;
+  min-height: 136px;
   overflow: hidden;
-  padding: 20px 20px 18px;
+  padding: 14px;
   position: relative;
 }
 
@@ -135,18 +135,18 @@
   align-items: center;
   border-radius: 999px;
   display: flex;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
-  height: 42px;
+  height: 32px;
   justify-content: center;
-  margin-bottom: 14px;
-  width: 42px;
+  margin-bottom: 10px;
+  width: 32px;
 }
 
 .kpi-card span {
   color: var(--report-muted);
   display: block;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: .04em;
   text-transform: uppercase;
@@ -155,30 +155,30 @@
 .kpi-card strong {
   color: var(--report-text);
   display: block;
-  font-size: 38px;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .kpi-card small {
   color: var(--report-muted);
   display: block;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 400;
-  margin-top: 8px;
-  min-height: 22px;
+  margin-top: 6px;
+  min-height: 16px;
   position: relative;
   z-index: 1;
 }
 
 .sparkline {
   align-self: end;
-  height: 18px;
-  margin-top: 18px;
+  height: 12px;
+  margin-top: 10px;
   opacity: .65;
   position: relative;
-  width: min(120px, 100%);
+  width: min(82px, 100%);
 }
 
 .sparkline::before {
@@ -206,12 +206,12 @@
 
 .analytics-grid {
   display: grid;
-  gap: 24px;
+  gap: 18px;
   grid-template-columns: repeat(2, minmax(360px, 1fr));
 }
 
 .report-card {
-  min-height: 380px;
+  min-height: 360px;
   padding: 20px;
 }
 
@@ -507,7 +507,31 @@
 
 @media (max-width: 1280px) {
   .kpi-grid {
-    grid-template-columns: repeat(3, minmax(190px, 1fr));
+    grid-template-columns: repeat(3, minmax(170px, 1fr));
+    gap: 14px;
+  }
+
+  .kpi-card {
+    min-height: 150px;
+    padding: 16px;
+  }
+
+  .kpi-icon {
+    height: 38px;
+    width: 38px;
+  }
+
+  .kpi-card strong {
+    font-size: 34px;
+  }
+
+  .kpi-card small {
+    font-size: 13px;
+  }
+
+  .sparkline {
+    height: 15px;
+    width: min(110px, 100%);
   }
 }
 
