@@ -101,7 +101,7 @@
     </header>
 
     <main>
-      <section class="route-header">
+      <section class="route-header" *ngIf="breadcrumbs.length > 1">
         <nav class="breadcrumb" aria-label="Ruta actual">
           <ng-container *ngFor="let item of breadcrumbs; let last = last">
             <a *ngIf="item.route && !last" [routerLink]="item.route">{{ item.label }}</a>
