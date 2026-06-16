@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, timeout } from 'rxjs';
 
 import { IndexedDbService } from './indexed-db.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CitaOfflineService {
 
-  private api = 'https://hce-backend.onrender.com/api';
+  private api = environment.apiBaseUrl;
 
   constructor(
     private http: HttpClient,

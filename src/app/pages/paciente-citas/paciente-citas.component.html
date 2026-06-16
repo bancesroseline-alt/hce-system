@@ -98,6 +98,7 @@
           <th>Especialidad</th>
           <th>Motivo</th>
           <th>Estado</th>
+          <th>Sync</th>
           <th>Profesional</th>
           <th>Acción</th>
         </tr>
@@ -120,6 +121,12 @@
                 'no_asistio': c.estado === 'NO_ASISTIO'
               }">
               {{ c.estado }}
+            </span>
+          </td>
+
+          <td>
+            <span class="sync-badge" [ngClass]="claseSync(c.estadoSync)">
+              {{ etiquetaSync(c.estadoSync) }}
             </span>
           </td>
 

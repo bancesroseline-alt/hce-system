@@ -5,6 +5,7 @@ import { PacienteService } from '../../services/paciente.service';
 import { Paciente } from '../../models/paciente.model';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { claseEstadoSync, etiquetaEstadoSync } from '../../utils/sync-status.util';
 
 @Component({
   selector: 'app-pacientes',
@@ -22,6 +23,14 @@ export class PacientesComponent implements OnInit {
   buscarTexto: string = '';
 
   constructor(private pacienteService: PacienteService) {}
+
+  etiquetaSync(valor: any): string {
+    return etiquetaEstadoSync(valor);
+  }
+
+  claseSync(valor: any): string {
+    return claseEstadoSync(valor);
+  }
 
   ngOnInit(): void {
     this.listarPacientes();

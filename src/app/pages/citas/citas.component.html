@@ -231,6 +231,7 @@
             <th>Paciente</th>
             <th>Motivo</th>
             <th>Estado</th>
+            <th>Sync</th>
             <th>Tipo</th>
             <th>Acciones</th>
           </tr>
@@ -266,6 +267,12 @@
 
             </td>
 
+            <td>
+              <span class="sync-badge" [ngClass]="claseSync(c.estadoSync)">
+                {{ etiquetaSync(c.estadoSync) }}
+              </span>
+            </td>
+
             <td>{{ c.tipoCita }}</td>
 <td>
 
@@ -297,7 +304,7 @@
 
           <tr *ngIf="(citasDelDia || []).length === 0">
 
-            <td colspan="6" class="empty">
+            <td colspan="7" class="empty">
               No hay citas registradas
             </td>
 

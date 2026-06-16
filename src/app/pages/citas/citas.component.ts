@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { CitaOfflineService } from '../../services/cita-offline.service';
 import { PacienteService } from '../../services/paciente.service';
+import { claseEstadoSync, etiquetaEstadoSync } from '../../utils/sync-status.util';
 
 @Component({
   selector: 'app-citas',
@@ -54,6 +55,14 @@ export class CitasComponent implements OnInit {
     private pacienteService: PacienteService,
     private route: ActivatedRoute
   ) {}
+
+  etiquetaSync(valor: any): string {
+    return etiquetaEstadoSync(valor);
+  }
+
+  claseSync(valor: any): string {
+    return claseEstadoSync(valor);
+  }
 
   ngOnInit(): void {
     const pacienteId = Number(this.route.snapshot.paramMap.get('id'));

@@ -1,1 +1,139 @@
-<p>reportes works!</p>
+<div class="reportes-page">
+
+  <section class="report-header">
+    <div>
+      <h1>Reportes locales</h1>
+      <p>Indicadores calculados con datos almacenados en este dispositivo.</p>
+    </div>
+
+    <button type="button" (click)="generarReporteLocal()" [disabled]="cargando">
+      {{ cargando ? 'Actualizando...' : 'Actualizar' }}
+    </button>
+  </section>
+
+  <section class="kpi-grid">
+    <article>
+      <span>Pacientes</span>
+      <strong>{{ resumen.pacientes }}</strong>
+      <small>{{ resumen.pacientesActivos }} activos</small>
+    </article>
+
+    <article>
+      <span>Citas</span>
+      <strong>{{ resumen.citas }}</strong>
+      <small>{{ resumen.citasHoy }} hoy</small>
+    </article>
+
+    <article>
+      <span>Atenciones</span>
+      <strong>{{ resumen.atenciones }}</strong>
+      <small>Registros clinicos locales</small>
+    </article>
+
+    <article>
+      <span>Inasistencia</span>
+      <strong>{{ porcentajeInasistencia() }}%</strong>
+      <small>{{ resumen.inasistencias }} citas no asistidas</small>
+    </article>
+
+    <article>
+      <span>Pendientes</span>
+      <strong>{{ resumen.pendientes }}</strong>
+      <small>Por sincronizar</small>
+    </article>
+
+    <article>
+      <span>Errores</span>
+      <strong>{{ resumen.errores }}</strong>
+      <small>Requieren revision</small>
+    </article>
+  </section>
+
+  <section class="report-grid">
+
+    <div class="panel">
+      <h2>Citas por estado</h2>
+
+      <div class="bar-row" *ngFor="let item of citasPorEstado">
+        <div>
+          <strong>{{ item.estado }}</strong>
+          <span>{{ item.total }} registros</span>
+        </div>
+
+        <div class="bar">
+          <span [style.width.%]="item.porcentaje"></span>
+        </div>
+
+        <em>{{ item.porcentaje }}%</em>
+      </div>
+
+      <p class="empty" *ngIf="citasPorEstado.length === 0">
+        No hay citas locales para reportar.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>Especialidades con mas citas</h2>
+
+      <table *ngIf="citasPorEspecialidad.length > 0">
+        <thead>
+          <tr>
+            <th>Especialidad</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of citasPorEspecialidad">
+            <td>{{ item.especialidad }}</td>
+            <td>{{ item.total }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="empty" *ngIf="citasPorEspecialidad.length === 0">
+        No hay especialidades registradas localmente.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>Predicciones por riesgo</h2>
+
+      <table *ngIf="prediccionesPorRiesgo.length > 0">
+        <thead>
+          <tr>
+            <th>Riesgo</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of prediccionesPorRiesgo">
+            <td>{{ item.riesgo }}</td>
+            <td>{{ item.total }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="empty" *ngIf="prediccionesPorRiesgo.length === 0">
+        No hay predicciones locales guardadas.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>Actividad reciente</h2>
+
+      <div class="activity" *ngFor="let item of actividadReciente">
+        <span>{{ item.tipo }}</span>
+        <strong>{{ item.descripcion }}</strong>
+        <small>{{ item.fecha }}</small>
+      </div>
+
+      <p class="empty" *ngIf="actividadReciente.length === 0">
+        No hay actividad local reciente.
+      </p>
+    </div>
+
+  </section>
+
+</div>

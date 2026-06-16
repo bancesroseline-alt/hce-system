@@ -486,3 +486,28 @@ td .btn-primary {
   padding: 8px 14px;
   font-size: 13px;
 }
+.sync-badge {
+  display: inline-flex;
+  align-items: center;
+  min-width: 88px;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sync-sincronizado {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.sync-pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.sync-error_sync {
+  background: #fee2e2;
+  color: #991b1b;
+}

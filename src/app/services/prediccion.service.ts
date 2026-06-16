@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, forkJoin, from, map, of, switchMap, timeout } from 'rxjs';
 import { IndexedDbService } from './indexed-db.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PrediccionService {
 
-  private apiCitas = 'https://hce-backend.onrender.com/api/citas';
-  private apiML = 'https://ml-api-inasistencias.onrender.com/predict';
+  private apiCitas = `${environment.apiBaseUrl}/citas`;
+  private apiML = environment.mlApiUrl;
 
   constructor(
     private http: HttpClient,

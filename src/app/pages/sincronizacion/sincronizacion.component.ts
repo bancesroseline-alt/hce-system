@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { IndexedDbService } from '../../services/indexed-db.service';
 import { SyncQueueService } from '../../services/sync-queue.service';
+import { claseEstadoSync, etiquetaEstadoSync } from '../../utils/sync-status.util';
 
 @Component({
   selector: 'app-sincronizacion',
@@ -14,6 +15,10 @@ import { SyncQueueService } from '../../services/sync-queue.service';
 export class SincronizacionComponent implements OnInit {
 
   pendientes: any[] = [];
+  errores: any[] = [];
+  conflictos: any[] = [];
+  detalleSeleccionado: any = null;
+
   mensaje = '';
   sincronizando = false;
 
@@ -27,22 +32,30 @@ export class SincronizacionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cargarPendientes();
+    this.cargarDatos();
 
     window.addEventListener('online', () => {
       this.sincronizar();
     });
   }
 
-  cargarPendientes(): void {
+  cargarDatos(): void {
     this.indexedDb.obtenerPendientes()
       .then(data => this.pendientes = data)
+      .catch(err => console.error(err));
+
+    this.indexedDb.obtenerTodos('syncErrors')
+      .then(data => this.errores = data)
+      .catch(err => console.error(err));
+
+    this.indexedDb.obtenerTodos('conflicts')
+      .then(data => this.conflictos = data)
       .catch(err => console.error(err));
   }
 
   sincronizar(): void {
     if (!navigator.onLine) {
-      this.mensaje = 'No hay conexión a internet';
+      this.mensaje = 'No hay conexion a internet';
       return;
     }
 
@@ -51,15 +64,69 @@ export class SincronizacionComponent implements OnInit {
 
     this.syncQueue.sincronizarPendientes()
       .then(() => {
-        this.mensaje = 'Sincronización finalizada';
-        this.cargarPendientes();
+        this.mensaje = 'Sincronizacion finalizada';
+        this.detalleSeleccionado = null;
+        this.cargarDatos();
       })
       .catch(err => {
         console.error(err);
-        this.mensaje = 'Error durante la sincronización';
+        this.mensaje = 'Error durante la sincronizacion';
       })
       .finally(() => {
         this.sincronizando = false;
       });
+  }
+
+  verDetalle(item: any): void {
+    this.detalleSeleccionado = item;
+  }
+
+  async resolverConLocal(conflicto: any): Promise<void> {
+    const pendiente = await this.indexedDb.obtenerPorUuid('syncQueue', conflicto.uuidLocal);
+
+    if (pendiente) {
+      pendiente.estado = 'PENDIENTE';
+      pendiente.fechaResolucionConflicto = new Date().toISOString();
+      await this.indexedDb.guardar('syncQueue', pendiente);
+    }
+
+    conflicto.estado = 'RESUELTO_LOCAL';
+    conflicto.fechaResolucion = new Date().toISOString();
+    await this.indexedDb.guardar('conflicts', conflicto);
+    this.mensaje = 'Conflicto resuelto usando la version local';
+    this.cargarDatos();
+  }
+
+  async resolverConRemoto(conflicto: any): Promise<void> {
+    const pendiente = await this.indexedDb.obtenerPorUuid('syncQueue', conflicto.uuidLocal);
+
+    if (pendiente) {
+      pendiente.estado = 'SINCRONIZADO';
+      pendiente.fechaResolucionConflicto = new Date().toISOString();
+      await this.indexedDb.guardar('syncQueue', pendiente);
+    }
+
+    conflicto.estado = 'RESUELTO_REMOTO';
+    conflicto.fechaResolucion = new Date().toISOString();
+    await this.indexedDb.guardar('conflicts', conflicto);
+    this.mensaje = 'Conflicto resuelto usando la version remota';
+    this.detalleSeleccionado = null;
+    this.cargarDatos();
+  }
+
+  cerrarDetalle(): void {
+    this.detalleSeleccionado = null;
+  }
+
+  etiquetaSync(valor: any): string {
+    return etiquetaEstadoSync(valor);
+  }
+
+  claseSync(valor: any): string {
+    return claseEstadoSync(valor);
+  }
+
+  detalleJson(valor: any): string {
+    return JSON.stringify(valor, null, 2);
   }
 }

@@ -4,13 +4,14 @@ import { Observable } from 'rxjs';
 import { timeout } from 'rxjs';
 
 import { IndexedDbService } from './indexed-db.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AtencionOfflineService {
 
-  private api = 'https://hce-backend.onrender.com/api';
+  private api = environment.apiBaseUrl;
 
   constructor(
     private http: HttpClient,

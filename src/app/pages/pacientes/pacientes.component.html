@@ -39,6 +39,7 @@
             <th>Edad</th>
             <th>Teléfono</th>
             <th>Estado</th>
+            <th>Sync</th>
             <th class="text-center">Acciones</th>
           </tr>
         </thead>
@@ -75,6 +76,12 @@
             </td>
 
             <td>
+              <span class="sync-badge" [ngClass]="claseSync(p.estadoSync)">
+                {{ etiquetaSync(p.estadoSync) }}
+              </span>
+            </td>
+
+            <td>
               <div class="acciones">
                 <button
                   class="btn-icon view"
@@ -95,7 +102,7 @@
           </tr>
 
           <tr *ngIf="pacientes.length === 0">
-            <td colspan="6">
+            <td colspan="7">
               <div class="empty-state">
                 <div class="empty-icon">👤</div>
                 <strong>No hay pacientes registrados</strong>

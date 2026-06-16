@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class IndexedDbService {
 
   private dbName = 'hce_offline_db';
-  private dbVersion = 2;
+  private dbVersion = 3;
   private db!: IDBDatabase;
   private dbReady!: Promise<IDBDatabase>;
 
@@ -18,6 +18,8 @@ export class IndexedDbService {
     'usuarios',
     'dashboard',
     'reportes',
+    'syncErrors',
+    'conflicts',
     'syncQueue'
   ];
 
@@ -129,5 +131,51 @@ export class IndexedDbService {
     pendiente.fechaSincronizacion = new Date().toISOString();
 
     return this.guardar('syncQueue', pendiente);
+  }
+
+  async marcarErrorSync(uuidLocal: string, error: any): Promise<any> {
+    const pendiente = await this.obtenerPorUuid('syncQueue', uuidLocal);
+
+    if (!pendiente) {
+      throw new Error('Pendiente no encontrado');
+    }
+
+    pendiente.estado = 'ERROR_SYNC';
+    pendiente.fechaError = new Date().toISOString();
+    pendiente.error = this.normalizarError(error);
+
+    await this.guardar('syncErrors', {
+      uuidLocal,
+      entidad: pendiente.entidad,
+      accion: pendiente.accion,
+      data: pendiente.data,
+      error: pendiente.error,
+      fechaError: pendiente.fechaError,
+      estado: 'ERROR_SYNC'
+    });
+
+    return this.guardar('syncQueue', pendiente);
+  }
+
+  async registrarConflicto(pendiente: any, remoto: any, motivo: string): Promise<any> {
+    const conflicto = {
+      uuidLocal: pendiente.uuidLocal,
+      entidad: pendiente.entidad,
+      accion: pendiente.accion,
+      local: pendiente.data,
+      remoto,
+      motivo,
+      estado: 'PENDIENTE',
+      fechaRegistro: new Date().toISOString()
+    };
+
+    return this.guardar('conflicts', conflicto);
+  }
+
+  private normalizarError(error: any): string {
+    return error?.error?.message ||
+      error?.message ||
+      error?.statusText ||
+      'Error desconocido durante la sincronizacion';
   }
 }

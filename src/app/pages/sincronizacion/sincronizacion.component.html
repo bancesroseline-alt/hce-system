@@ -1,22 +1,172 @@
-<h2>Sincronización</h2>
+<div class="sync-page">
 
-<p *ngIf="online">Estado: Con conexión</p>
-<p *ngIf="!online">Estado: Modo offline</p>
+  <section class="sync-header">
+    <div>
+      <h1>Sincronizacion</h1>
+      <p>Gestion de pendientes, errores y conflictos locales.</p>
+    </div>
 
-<button (click)="sincronizar()" [disabled]="sincronizando || !online">
-  Sincronizar pendientes
-</button>
+    <div class="sync-actions">
+      <span class="connection" [class.offline]="!online">
+        {{ online ? 'Con conexion' : 'Modo offline' }}
+      </span>
 
-<p>{{ mensaje }}</p>
+      <button type="button" (click)="sincronizar()" [disabled]="sincronizando || !online">
+        {{ sincronizando ? 'Sincronizando...' : 'Sincronizar pendientes' }}
+      </button>
+    </div>
+  </section>
 
-<h3>Pendientes</h3>
+  <div *ngIf="mensaje" class="message">
+    {{ mensaje }}
+  </div>
 
-<ul>
-  <li *ngFor="let p of pendientes">
-    {{ p.entidad }} - {{ p.accion }} - {{ p.estado }}
-  </li>
-</ul>
+  <section class="summary-grid">
+    <article>
+      <span>Pendientes</span>
+      <strong>{{ pendientes.length }}</strong>
+    </article>
 
-<p *ngIf="pendientes.length === 0">
-  No hay registros pendientes por sincronizar.
-</p>
+    <article>
+      <span>Errores</span>
+      <strong>{{ errores.length }}</strong>
+    </article>
+
+    <article>
+      <span>Conflictos</span>
+      <strong>{{ conflictos.length }}</strong>
+    </article>
+  </section>
+
+  <section class="sync-grid">
+
+    <div class="panel">
+      <div class="panel-title">
+        <h2>Pendientes</h2>
+      </div>
+
+      <table *ngIf="pendientes.length > 0">
+        <thead>
+          <tr>
+            <th>Entidad</th>
+            <th>Accion</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Detalle</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let p of pendientes">
+            <td>{{ p.entidad }}</td>
+            <td>{{ p.accion }}</td>
+            <td>
+              <span class="sync-badge" [ngClass]="claseSync(p.estado)">
+                {{ etiquetaSync(p.estado) }}
+              </span>
+            </td>
+            <td>{{ p.fechaCreacionLocal || '-' }}</td>
+            <td>
+              <button type="button" class="link-btn" (click)="verDetalle(p)">
+                Ver
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="empty" *ngIf="pendientes.length === 0">
+        No hay registros pendientes por sincronizar.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">
+        <h2>Errores de sincronizacion</h2>
+      </div>
+
+      <table *ngIf="errores.length > 0">
+        <thead>
+          <tr>
+            <th>Entidad</th>
+            <th>Accion</th>
+            <th>Error</th>
+            <th>Detalle</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let e of errores">
+            <td>{{ e.entidad }}</td>
+            <td>{{ e.accion }}</td>
+            <td>{{ e.error }}</td>
+            <td>
+              <button type="button" class="link-btn" (click)="verDetalle(e)">
+                Ver
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="empty" *ngIf="errores.length === 0">
+        No hay errores registrados.
+      </p>
+    </div>
+
+    <div class="panel full">
+      <div class="panel-title">
+        <h2>Conflictos</h2>
+      </div>
+
+      <table *ngIf="conflictos.length > 0">
+        <thead>
+          <tr>
+            <th>Entidad</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>Detalle</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let c of conflictos">
+            <td>{{ c.entidad }}</td>
+            <td>{{ c.motivo }}</td>
+            <td>
+              <span class="sync-badge sync-pendiente">
+                {{ c.estado }}
+              </span>
+            </td>
+            <td>
+              <button type="button" class="link-btn" (click)="verDetalle(c)">
+                Comparar
+              </button>
+              <button type="button" class="link-btn" (click)="resolverConLocal(c)" *ngIf="c.estado === 'PENDIENTE'">
+                Usar local
+              </button>
+              <button type="button" class="link-btn" (click)="resolverConRemoto(c)" *ngIf="c.estado === 'PENDIENTE'">
+                Usar remoto
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="empty" *ngIf="conflictos.length === 0">
+        No hay conflictos detectados.
+      </p>
+    </div>
+
+  </section>
+
+  <section class="detail-panel" *ngIf="detalleSeleccionado">
+    <div class="detail-header">
+      <h2>Detalle del registro</h2>
+      <button type="button" (click)="cerrarDetalle()">Cerrar</button>
+    </div>
+
+    <pre>{{ detalleJson(detalleSeleccionado) }}</pre>
+  </section>
+
+</div>

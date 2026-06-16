@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { timeout } from 'rxjs';
 import { IndexedDbService } from './indexed-db.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SyncQueueService {
 
-  private api = 'https://hce-backend.onrender.com/api';
+  private api = environment.apiBaseUrl;
 
   constructor(
     private http: HttpClient,
@@ -41,8 +42,12 @@ export class SyncQueueService {
           await this.sincronizarPrediccion(pendiente);
         }
 
+        await this.marcarEntidadSincronizada(pendiente);
         await this.indexedDb.marcarSincronizado(pendiente.uuidLocal);
       } catch (error) {
+        await this.marcarEntidadConError(pendiente, error);
+        await this.indexedDb.marcarErrorSync(pendiente.uuidLocal, error);
+        await this.registrarConflictoSiAplica(pendiente, error);
         console.error('Error sincronizando pendiente:', pendiente, error);
       }
     }
@@ -132,6 +137,51 @@ export class SyncQueueService {
 
   private sincronizarPrediccion(pendiente: any): Promise<any> {
     return Promise.resolve(pendiente.data);
+  }
+
+  private async registrarConflictoSiAplica(pendiente: any, error: any): Promise<void> {
+    const status = error?.status;
+    const mensaje = error?.error?.message || error?.message || '';
+
+    if (status === 409 || /conflict|conflicto|duplicado|registrado/i.test(mensaje)) {
+      await this.indexedDb.registrarConflicto(
+        pendiente,
+        error?.error || null,
+        mensaje || 'Posible conflicto entre registro local y remoto'
+      );
+    }
+  }
+
+  private async marcarEntidadSincronizada(pendiente: any): Promise<void> {
+    const store = this.obtenerStoreEntidad(pendiente.entidad);
+
+    if (!store || !pendiente.data?.uuidLocal) return;
+
+    await this.indexedDb.guardar(store, {
+      ...pendiente.data,
+      estadoSync: 'SINCRONIZADO',
+      fechaSincronizacion: new Date().toISOString()
+    });
+  }
+
+  private async marcarEntidadConError(pendiente: any, error: any): Promise<void> {
+    const store = this.obtenerStoreEntidad(pendiente.entidad);
+
+    if (!store || !pendiente.data?.uuidLocal) return;
+
+    await this.indexedDb.guardar(store, {
+      ...pendiente.data,
+      estadoSync: 'ERROR_SYNC',
+      errorSync: error?.error?.message || error?.message || 'Error de sincronizacion'
+    });
+  }
+
+  private obtenerStoreEntidad(entidad: string): string | null {
+    if (entidad === 'PACIENTE') return 'pacientes';
+    if (entidad === 'CITA') return 'citas';
+    if (entidad === 'ATENCION') return 'atenciones';
+    if (entidad === 'PREDICCION') return 'predicciones';
+    return null;
   }
 
   private mapearCitaPayload(cita: any): any {

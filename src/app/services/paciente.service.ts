@@ -5,13 +5,14 @@ import { timeout } from 'rxjs';
 
 import { Paciente } from '../models/paciente.model';
 import { IndexedDbService } from './indexed-db.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PacienteService {
 
-  private api = 'https://hce-backend.onrender.com/api/pacientes';
+  private api = `${environment.apiBaseUrl}/pacientes`;
 
   constructor(
     private http: HttpClient,
