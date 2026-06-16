@@ -28,6 +28,7 @@ export class CitasComponent implements OnInit {
   mensaje = '';
   tipoMensaje: 'success' | 'error' | '' = '';
   modoNuevaCita = false;
+  vistaCitas: 'dia' | 'todas' = 'dia';
 
   fechaSeleccionada: Date = new Date();
   diasCalendario: any[] = [];
@@ -339,6 +340,7 @@ export class CitasComponent implements OnInit {
     if (!item.fecha) return;
 
     this.fechaSeleccionada = new Date(item.fecha + 'T00:00:00');
+    this.vistaCitas = 'dia';
     this.filtrarCitasPorDia();
     this.generarCalendario();
   }
@@ -346,6 +348,30 @@ export class CitasComponent implements OnInit {
   filtrarCitasPorDia(): void {
     const iso = this.formatearFecha(this.fechaSeleccionada);
     this.citasDelDia = this.citas.filter(c => c.fecha === iso);
+  }
+
+  get citasVisibles(): any[] {
+    return this.vistaCitas === 'todas' ? this.citas : this.citasDelDia;
+  }
+
+  get tituloListado(): string {
+    return this.vistaCitas === 'todas' ? 'Todas las citas' : 'Citas del día';
+  }
+
+  get subtituloListado(): string {
+    return this.vistaCitas === 'todas'
+      ? `${this.citas.length || 0} citas registradas`
+      : this.formatearFecha(this.fechaSeleccionada);
+  }
+
+  get mensajeVacio(): string {
+    return this.vistaCitas === 'todas'
+      ? 'No hay citas registradas en el sistema.'
+      : 'No hay citas registradas para el día seleccionado.';
+  }
+
+  cambiarVista(vista: 'dia' | 'todas'): void {
+    this.vistaCitas = vista;
   }
 
   formatearFecha(fecha: Date): string {
@@ -356,7 +382,7 @@ export class CitasComponent implements OnInit {
   }
 
   contarPorEstado(estado: string): number {
-    return this.citasDelDia.filter(c => c.estado === estado).length;
+    return this.citasVisibles.filter(c => c.estado === estado).length;
   }
 
   cambiarEstado(cita: any, nuevoEstado: string): void {

@@ -214,13 +214,31 @@
 
       <div class="panel-title">
 
-        <h2>Citas del día</h2>
+        <h2>{{ tituloListado }}</h2>
 
         <p>
-          {{ formatearFecha(fechaSeleccionada) }}
+          {{ subtituloListado }}
         </p>
 
+        <div class="view-toggle" role="group" aria-label="Filtro de citas">
+          <button
+            type="button"
+            [class.active]="vistaCitas === 'dia'"
+            (click)="cambiarVista('dia')">
+            Día seleccionado
+          </button>
+
+          <button
+            type="button"
+            [class.active]="vistaCitas === 'todas'"
+            (click)="cambiarVista('todas')">
+            Todas las citas
+          </button>
+        </div>
+
       </div>
+
+      <div class="tabla-citas-wrapper">
 
       <table class="tabla-citas">
 
@@ -240,7 +258,7 @@
 
         <tbody>
 
-          <tr *ngFor="let c of (citasDelDia || [])">
+          <tr *ngFor="let c of (citasVisibles || [])">
 
             <td>{{ c.hora }}</td>
 
@@ -310,10 +328,16 @@
 
           </tr>
 
-          <tr *ngIf="(citasDelDia || []).length === 0">
+          <tr *ngIf="(citasVisibles || []).length === 0">
 
             <td colspan="7" class="empty">
-              No hay citas registradas
+              <div class="empty-state">
+                <div class="empty-icon">+</div>
+                <strong>{{ mensajeVacio }}</strong>
+                <span>
+                  Selecciona otro día del calendario o cambia a "Todas las citas".
+                </span>
+              </div>
             </td>
 
           </tr>
@@ -321,6 +345,8 @@
         </tbody>
 
       </table>
+
+      </div>
 
     </section>
 
@@ -394,7 +420,7 @@
 
         <p>
           <span>Total:</span>
-          <strong>{{ citasDelDia.length || 0 }}</strong>
+          <strong>{{ citasVisibles.length || 0 }}</strong>
         </p>
 
         <p>
