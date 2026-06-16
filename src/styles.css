@@ -1,1 +1,249 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global clinical UI baseline */
+:root {
+  --hce-bg: #f8fafc;
+  --hce-surface: #ffffff;
+  --hce-border: #e5e7eb;
+  --hce-text: #0f172a;
+  --hce-muted: #64748b;
+  --hce-primary: #2563eb;
+  --hce-primary-hover: #1d4ed8;
+  --hce-success: #0f766e;
+  --hce-warning: #f59e0b;
+  --hce-danger: #dc2626;
+  --hce-card-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  --hce-radius: 16px;
+}
+
+html,
+body {
+  background: var(--hce-bg) !important;
+  color: var(--hce-text);
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+}
+
+main,
+.content,
+.page,
+.dashboard-container,
+.citas-page,
+.detalle-page,
+.historial-page,
+.paciente-citas-page,
+.pacientes-page,
+.paciente-detalle-page,
+.paciente-form-page,
+.ml-dashboard,
+.atencion-page,
+.reportes-page,
+.sync-page,
+.sincronizacion-page,
+.trazabilidad-page,
+.usuarios-page {
+  background: var(--hce-bg) !important;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--hce-text);
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+}
+
+p,
+span,
+small,
+td,
+li,
+.recommendation,
+.activity p,
+.summary-card span,
+.panel-title p,
+.page-header p,
+.ml-header p,
+.timeline-content p {
+  font-weight: 400 !important;
+}
+
+label,
+th,
+button,
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-warning,
+.btn-guardar,
+.btn-cancelar,
+.btn-action,
+.export-btn,
+.badge,
+.risk-badge,
+.estado,
+.estado-cita,
+.sync-badge {
+  font-weight: 600 !important;
+}
+
+.route-header {
+  background: var(--hce-bg) !important;
+  padding: 12px 24px !important;
+}
+
+.breadcrumb {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  color: var(--hce-muted) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.breadcrumb a {
+  color: var(--hce-primary) !important;
+  font-weight: 600 !important;
+}
+
+.breadcrumb .current {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+.panel,
+.summary-card,
+.form-card,
+.historial-card,
+.detalle-card,
+.prediccion-card,
+.patient-card,
+.paciente-card,
+.list-card,
+.historia-card,
+.timeline-content,
+.calendar-card,
+.summary-card,
+.indicator-card,
+.updated-card,
+.state-card,
+.info-box,
+.sync-card,
+.trace-card,
+.reporte-card,
+.usuario-card {
+  background: var(--hce-surface) !important;
+  border: 1px solid var(--hce-border) !important;
+  border-radius: var(--hce-radius) !important;
+  box-shadow: var(--hce-card-shadow) !important;
+}
+
+table {
+  border-collapse: separate !important;
+  border-spacing: 0 8px !important;
+}
+
+thead th {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  font-weight: 600 !important;
+  border: 0 !important;
+}
+
+tbody td {
+  color: #334155 !important;
+  font-weight: 400 !important;
+  border-color: var(--hce-border) !important;
+}
+
+tbody tr:hover td {
+  background: #f8fafc !important;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 12px !important;
+  min-height: 42px;
+  color: var(--hce-text);
+  font-weight: 400 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+  outline: none !important;
+}
+
+button,
+a[class*="btn-"],
+.export-btn {
+  border-radius: 12px !important;
+}
+
+.btn-primary,
+.btn-buscar,
+.btn-historial,
+.panel-header button {
+  background: var(--hce-primary) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.btn-primary:hover,
+.btn-buscar:hover,
+.panel-header button:hover {
+  background: var(--hce-primary-hover) !important;
+}
+
+.btn-secondary,
+.btn-cancelar,
+.btn-limpiar,
+.btn-volver {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid var(--hce-border) !important;
+  box-shadow: none !important;
+}
+
+.btn-guardar,
+.btn-action,
+.export-btn,
+.btn-print {
+  background: var(--hce-success) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.btn-warning {
+  background: var(--hce-warning) !important;
+  color: #ffffff !important;
+}
+
+.btn-danger,
+.logout {
+  color: var(--hce-danger) !important;
+}
+
+.alerta,
+.alerta-info,
+.info-box,
+.danger-box {
+  box-shadow: none !important;
+}
+
+@media (max-width: 768px) {
+  .route-header {
+    padding: 10px 18px !important;
+  }
+}
