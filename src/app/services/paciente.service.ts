@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { timeout } from 'rxjs';
 
 import { Paciente } from '../models/paciente.model';
 import { IndexedDbService } from './indexed-db.service';
@@ -19,7 +20,7 @@ export class PacienteService {
 
   listar(): Observable<Paciente[]> {
     return new Observable(observer => {
-      this.http.get<Paciente[]>(this.api).subscribe({
+      this.http.get<Paciente[]>(this.api).pipe(timeout(4000)).subscribe({
         next: async (data) => {
           for (const paciente of data as any[]) {
             paciente.uuidLocal = paciente.uuidLocal || String(paciente.id);
@@ -43,7 +44,7 @@ export class PacienteService {
 
   obtener(id: number | string): Observable<Paciente> {
     return new Observable(observer => {
-      this.http.get<Paciente>(`${this.api}/${id}`).subscribe({
+      this.http.get<Paciente>(`${this.api}/${id}`).pipe(timeout(4000)).subscribe({
         next: async (data: any) => {
           data.uuidLocal = data.uuidLocal || String(data.id);
           data.estadoSync = 'SINCRONIZADO';
@@ -82,7 +83,7 @@ export class PacienteService {
     paciente.fechaCreacionLocal = new Date().toISOString();
 
     return new Observable(observer => {
-      this.http.post<Paciente>(this.api, paciente).subscribe({
+      this.http.post<Paciente>(this.api, paciente).pipe(timeout(4000)).subscribe({
         next: async (data: any) => {
           data.uuidLocal = data.uuidLocal || String(data.id);
           data.estadoSync = 'SINCRONIZADO';
@@ -112,7 +113,7 @@ export class PacienteService {
     paciente.fechaActualizacionLocal = new Date().toISOString();
 
     return new Observable(observer => {
-      this.http.put<Paciente>(`${this.api}/${id}`, paciente).subscribe({
+      this.http.put<Paciente>(`${this.api}/${id}`, paciente).pipe(timeout(4000)).subscribe({
         next: async (data: any) => {
           data.uuidLocal = data.uuidLocal || String(data.id || paciente.uuidLocal);
           data.estadoSync = 'SINCRONIZADO';
@@ -137,7 +138,7 @@ export class PacienteService {
 
   baja(id: number | string): Observable<any> {
     return new Observable(observer => {
-      this.http.patch<Paciente>(`${this.api}/${id}/baja`, {}).subscribe({
+      this.http.patch<Paciente>(`${this.api}/${id}/baja`, {}).pipe(timeout(4000)).subscribe({
         next: async (data: any) => {
           data.uuidLocal = data.uuidLocal || String(data.id || id);
           data.estadoSync = 'SINCRONIZADO';
@@ -180,6 +181,7 @@ export class PacienteService {
   buscar(criterio: string): Observable<Paciente[]> {
     return new Observable(observer => {
       this.http.get<Paciente[]>(`${this.api}/buscar?criterio=${criterio}`)
+        .pipe(timeout(4000))
         .subscribe({
           next: (data) => {
             observer.next(data);

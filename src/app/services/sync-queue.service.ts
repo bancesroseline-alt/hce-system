@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { timeout } from 'rxjs';
 import { IndexedDbService } from './indexed-db.service';
 
 @Injectable({
@@ -41,7 +42,6 @@ export class SyncQueueService {
         }
 
         await this.indexedDb.marcarSincronizado(pendiente.uuidLocal);
-
       } catch (error) {
         console.error('Error sincronizando pendiente:', pendiente, error);
       }
@@ -51,20 +51,30 @@ export class SyncQueueService {
   private sincronizarCita(pendiente: any): Promise<any> {
     const cita = pendiente.data;
 
-    const payload = {
-      uuidLocal: cita.uuidLocal,
-      pacienteId: Number(cita.pacienteId || cita.paciente?.id),
-      medicoId: Number(cita.medicoId || cita.medico?.id),
-      tipoCita: cita.tipoCita,
-      fecha: cita.fecha,
-      hora: cita.hora,
-      especialidad: cita.especialidad,
-      motivoConsulta: cita.motivoConsulta,
-      estado: cita.estado,
-      origenRegistro: 'INDEXEDDB'
-    };
+    if (pendiente.accion === 'ACTUALIZAR_ESTADO' && cita.id) {
+      return this.http
+        .patch(`${this.api}/citas/${cita.id}/estado?estado=${cita.estado}`, {})
+        .pipe(timeout(4000))
+        .toPromise();
+    }
 
-    return this.http.post(`${this.api}/sincronizacion/citas`, payload).toPromise();
+    if (pendiente.accion === 'ACTUALIZAR' && cita.id) {
+      const payload = this.mapearCitaPayload(cita);
+
+      return this.http
+        .put(`${this.api}/citas/${cita.id}`, payload)
+        .pipe(timeout(4000))
+        .toPromise();
+    }
+
+    return this.http
+      .post(`${this.api}/sincronizacion/citas`, {
+        ...this.mapearCitaPayload(cita),
+        uuidLocal: cita.uuidLocal,
+        origenRegistro: 'INDEXEDDB'
+      })
+      .pipe(timeout(4000))
+      .toPromise();
   }
 
   private sincronizarAtencion(pendiente: any): Promise<any> {
@@ -78,33 +88,62 @@ export class SyncQueueService {
       fechaHora: a.fechaHora,
       tipoAtencion: a.tipoAtencion,
       motivoConsulta: a.motivoConsulta,
+      presionArterial: a.presionArterial,
+      temperatura: a.temperatura,
+      saturacion: a.saturacion,
+      talla: a.talla,
+      peso: a.peso,
       diagnostico: a.diagnostico,
       tratamientoIndicado: a.tratamientoIndicado,
       observaciones: a.observaciones,
+      medicamentos: a.medicamentos,
       estado: a.estado || 'COMPLETADA',
       origenRegistro: 'INDEXEDDB'
     };
 
-    return this.http.post(`${this.api}/sincronizacion`, payload).toPromise();
+    return this.http
+      .post(`${this.api}/sincronizacion`, payload)
+      .pipe(timeout(4000))
+      .toPromise();
   }
 
   private sincronizarPaciente(pendiente: any): Promise<any> {
     const paciente = pendiente.data;
 
-    /**
-     * IMPORTANTE:
-     * En backend todavía debes crear:
-     * POST /api/sincronizacion/pacientes
-     */
-    return this.http.post(`${this.api}/sincronizacion/pacientes`, paciente).toPromise();
+    if (pendiente.accion === 'ACTUALIZAR' && paciente.id) {
+      return this.http
+        .put(`${this.api}/pacientes/${paciente.id}`, paciente)
+        .pipe(timeout(4000))
+        .toPromise();
+    }
+
+    if (pendiente.accion === 'BAJA' && paciente.id) {
+      return this.http
+        .patch(`${this.api}/pacientes/${paciente.id}/baja`, {})
+        .pipe(timeout(4000))
+        .toPromise();
+    }
+
+    return this.http
+      .post(`${this.api}/sincronizacion/pacientes`, paciente)
+      .pipe(timeout(4000))
+      .toPromise();
   }
 
   private sincronizarPrediccion(pendiente: any): Promise<any> {
-    /**
-     * IMPORTANTE:
-     * En backend todavía debes crear:
-     * POST /api/sincronizacion/predicciones
-     */
-    return this.http.post(`${this.api}/sincronizacion/predicciones`, pendiente.data).toPromise();
+    return Promise.resolve(pendiente.data);
+  }
+
+  private mapearCitaPayload(cita: any): any {
+    return {
+      pacienteId: Number(cita.pacienteId || cita.paciente?.id),
+      medicoId: Number(cita.medicoId || cita.medico?.id),
+      tipoCita: cita.tipoCita,
+      fecha: cita.fecha,
+      hora: cita.hora,
+      especialidad: cita.especialidad,
+      motivoConsulta: cita.motivoConsulta,
+      estado: cita.estado
+    };
   }
 }

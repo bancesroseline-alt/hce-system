@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { PacienteService } from '../../services/paciente.service';
+import { CitaOfflineService } from '../../services/cita-offline.service';
 
 @Component({
   selector: 'app-paciente-citas',
@@ -12,8 +13,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
   styleUrl: './paciente-citas.component.css'
 })
 export class PacienteCitasComponent implements OnInit {
-
-  api = 'https://hce-backend.onrender.com/api';
 
   pacienteId!: number;
   paciente: any = null;
@@ -33,8 +32,9 @@ export class PacienteCitasComponent implements OnInit {
   modoEditar = false;
 
   constructor(
-    private http: HttpClient,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pacienteService: PacienteService,
+    private citaOfflineService: CitaOfflineService
   ) {}
 
   ngOnInit(): void {
@@ -45,20 +45,8 @@ export class PacienteCitasComponent implements OnInit {
     this.cargarCitasPaciente();
   }
 
-  getHeaders() {
-    const token = localStorage.getItem('token');
-
-    if (!token) return {};
-
-    return {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${token}`
-      })
-    };
-  }
-
   cargarPaciente(): void {
-    this.http.get<any>(`${this.api}/pacientes/${this.pacienteId}`, this.getHeaders())
+    this.pacienteService.obtener(this.pacienteId)
       .subscribe({
         next: data => {
           this.paciente = data;
@@ -73,7 +61,7 @@ export class PacienteCitasComponent implements OnInit {
   cargarCitasPaciente(): void {
     this.cargando = true;
 
-    this.http.get<any[]>(`${this.api}/citas/paciente/${this.pacienteId}`, this.getHeaders())
+    this.citaOfflineService.listarPorPaciente(this.pacienteId)
       .subscribe({
         next: data => {
           this.citas = data || [];
@@ -92,7 +80,7 @@ export class PacienteCitasComponent implements OnInit {
   cargarMedicos(): void {
     const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
 
-    this.http.get<any[]>(`${this.api}/usuarios`, this.getHeaders())
+    this.citaOfflineService.listarMedicos()
       .subscribe({
         next: data => {
           this.medicos = (data || []).filter(u => this.normalizarRol(u.rol) === 'MEDICO');
@@ -205,10 +193,15 @@ export class PacienteCitasComponent implements OnInit {
       estado: this.citaEditando.estado
     };
 
-    this.http.put(`${this.api}/citas/${this.citaEditando.id}`, payload, this.getHeaders())
+    this.citaOfflineService.actualizar({
+      ...this.citaEditando,
+      ...payload
+    })
       .subscribe({
         next: () => {
-          this.mensaje = 'Cita actualizada correctamente';
+          this.mensaje = navigator.onLine
+            ? 'Cita actualizada correctamente'
+            : 'Cita actualizada offline. Se sincronizara cuando vuelva internet';
           this.modoEditar = false;
           this.citaEditando = null;
           this.cargarCitasPaciente();

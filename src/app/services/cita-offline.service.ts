@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 
 import { IndexedDbService } from './indexed-db.service';
 
@@ -18,7 +18,7 @@ export class CitaOfflineService {
 
   listar(): Observable<any[]> {
   return new Observable(observer => {
-    this.http.get<any[]>(`${this.api}/citas`).subscribe({
+    this.http.get<any[]>(`${this.api}/citas`).pipe(timeout(4000)).subscribe({
       next: async (data) => {
         for (const cita of data as any[]) {
           cita.uuidLocal = cita.uuidLocal || String(cita.id);
@@ -51,7 +51,7 @@ export class CitaOfflineService {
 
   listarPorPaciente(pacienteId: number): Observable<any[]> {
     return new Observable(observer => {
-      this.http.get<any[]>(`${this.api}/citas/paciente/${pacienteId}`).subscribe({
+      this.http.get<any[]>(`${this.api}/citas/paciente/${pacienteId}`).pipe(timeout(4000)).subscribe({
         next: async (data) => {
           for (const cita of data as any[]) {
             cita.uuidLocal = cita.uuidLocal || String(cita.id);
@@ -90,7 +90,7 @@ export class CitaOfflineService {
     cita.fechaCreacionLocal = new Date().toISOString();
 
     return new Observable(observer => {
-      this.http.post<any>(`${this.api}/citas`, cita).subscribe({
+      this.http.post<any>(`${this.api}/citas`, cita).pipe(timeout(4000)).subscribe({
         next: async (data: any) => {
           data.uuidLocal = data.uuidLocal || String(data.id);
           data.estadoSync = 'SINCRONIZADO';
@@ -113,6 +113,49 @@ export class CitaOfflineService {
     });
   }
 
+  actualizar(cita: any): Observable<any> {
+    cita.uuidLocal = cita.uuidLocal || String(cita.id || crypto.randomUUID());
+    cita.estadoSync = 'PENDIENTE';
+    cita.fechaActualizacionLocal = new Date().toISOString();
+
+    return new Observable(observer => {
+      if (cita.id) {
+        this.http.put<any>(`${this.api}/citas/${cita.id}`, cita).pipe(timeout(4000)).subscribe({
+          next: async (data: any) => {
+            const citaActualizada = {
+              ...cita,
+              ...data,
+              uuidLocal: cita.uuidLocal,
+              estadoSync: 'SINCRONIZADO'
+            };
+
+            await this.indexedDb.guardar('citas', citaActualizada);
+
+            observer.next(citaActualizada);
+            observer.complete();
+          },
+          error: async (err) => {
+            console.warn('Backend no disponible. Cita actualizada offline...', err);
+
+            await this.indexedDb.guardar('citas', cita);
+            await this.indexedDb.agregarPendiente('CITA', 'ACTUALIZAR', cita);
+
+            observer.next(cita);
+            observer.complete();
+          }
+        });
+      } else {
+        this.indexedDb.guardar('citas', cita)
+          .then(() => this.indexedDb.agregarPendiente('CITA', 'ACTUALIZAR', cita))
+          .then(() => {
+            observer.next(cita);
+            observer.complete();
+          })
+          .catch(err => observer.error(err));
+      }
+    });
+  }
+
   actualizarEstado(cita: any, nuevoEstado: string): Observable<any> {
     cita.estado = nuevoEstado;
     cita.uuidLocal = cita.uuidLocal || String(cita.id || crypto.randomUUID());
@@ -121,7 +164,7 @@ export class CitaOfflineService {
 
     return new Observable(observer => {
       if (cita.id) {
-        this.http.patch<any>(`${this.api}/citas/${cita.id}/estado?estado=${nuevoEstado}`, {}).subscribe({
+        this.http.patch<any>(`${this.api}/citas/${cita.id}/estado?estado=${nuevoEstado}`, {}).pipe(timeout(4000)).subscribe({
           next: async (data: any) => {
             const citaActualizada = {
               ...cita,
@@ -159,7 +202,7 @@ export class CitaOfflineService {
 
   listarMedicos(): Observable<any[]> {
     return new Observable(observer => {
-      this.http.get<any[]>(`${this.api}/usuarios`).subscribe({
+      this.http.get<any[]>(`${this.api}/usuarios`).pipe(timeout(4000)).subscribe({
         next: (data) => {
           const medicos = (data || []).filter(u =>
             String(u.rol || '').toUpperCase().includes('MEDICO')

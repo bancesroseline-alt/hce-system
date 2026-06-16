@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +16,7 @@ export class AuthService {
     return new Observable(observer => {
 
       this.http.post<any>(`${this.apiUrl}/login`, data)
+        .pipe(timeout(4000))
         .subscribe({
 
           next: (response) => {

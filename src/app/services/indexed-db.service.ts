@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class IndexedDbService {
 
   private dbName = 'hce_offline_db';
-  private dbVersion = 1;
+  private dbVersion = 2;
   private db!: IDBDatabase;
   private dbReady!: Promise<IDBDatabase>;
 
@@ -15,6 +15,9 @@ export class IndexedDbService {
     'citas',
     'atenciones',
     'predicciones',
+    'usuarios',
+    'dashboard',
+    'reportes',
     'syncQueue'
   ];
 

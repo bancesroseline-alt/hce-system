@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { timeout } from 'rxjs';
 
 import { IndexedDbService } from './indexed-db.service';
 
@@ -23,7 +24,7 @@ export class AtencionOfflineService {
     atencion.fechaCreacionLocal = new Date().toISOString();
 
     return new Observable(observer => {
-      this.http.post<any>(`${this.api}/atenciones`, atencion).subscribe({
+      this.http.post<any>(`${this.api}/atenciones`, atencion).pipe(timeout(4000)).subscribe({
         next: async (data: any) => {
           data.uuidLocal = data.uuidLocal || String(data.id);
           data.estadoSync = 'SINCRONIZADO';
@@ -48,7 +49,7 @@ export class AtencionOfflineService {
 
   listar(): Observable<any[]> {
     return new Observable(observer => {
-      this.http.get<any[]>(`${this.api}/atenciones`).subscribe({
+      this.http.get<any[]>(`${this.api}/atenciones`).pipe(timeout(4000)).subscribe({
         next: async (data) => {
           for (const atencion of data as any[]) {
             atencion.uuidLocal = atencion.uuidLocal || String(atencion.id);
@@ -74,7 +75,7 @@ export class AtencionOfflineService {
 
   listarPorPaciente(pacienteId: number): Observable<any[]> {
     return new Observable(observer => {
-      this.http.get<any[]>(`${this.api}/historias-clinicas/paciente/${pacienteId}`).subscribe({
+      this.http.get<any[]>(`${this.api}/historias-clinicas/paciente/${pacienteId}`).pipe(timeout(4000)).subscribe({
         next: async (data: any) => {
           const atenciones = data?.atenciones || [];
 

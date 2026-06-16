@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { IndexedDbService } from '../../services/indexed-db.service';
+import { timeout } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -61,7 +62,7 @@ export class DashboardComponent implements OnInit {
 
     this.http.get<any>(
       `https://hce-backend.onrender.com/api/dashboard/medico/${medicoId}`
-    ).subscribe({
+    ).pipe(timeout(4000)).subscribe({
       next: async (data) => {
         this.modoOffline = false;
         this.cargarDatos(data);

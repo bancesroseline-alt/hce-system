@@ -117,56 +117,20 @@ export class PacienteFormPageComponent {
       return;
     }
 
-    // MODO CREAR OFFLINE
-    if (!navigator.onLine) {
-
-      this.pacienteService.registrar(this.paciente)
-        .subscribe({
-          next: () => {
-            this.mensaje = 'Paciente guardado offline correctamente';
-
-            setTimeout(() => {
-              this.router.navigate(['/pacientes']);
-            }, 2000);
-          },
-          error: (err) => {
-            console.error(err);
-            alert('Error al guardar paciente offline');
-          }
-        });
-
-      return;
-    }
-
-    // MODO CREAR ONLINE
-    this.pacienteService.buscar(this.paciente.numeroDocumento)
+    this.pacienteService.registrar(this.paciente)
       .subscribe({
-        next: (data) => {
+        next: () => {
+          this.mensaje = navigator.onLine
+            ? 'Paciente registrado correctamente'
+            : 'Paciente guardado offline correctamente';
 
-          if (data.length > 0) {
-            alert('Ya existe un paciente con ese documento');
-            return;
-          }
-
-          this.pacienteService.registrar(this.paciente)
-            .subscribe({
-              next: () => {
-                this.mensaje = 'Paciente registrado correctamente';
-
-                setTimeout(() => {
-                  this.router.navigate(['/pacientes']);
-                }, 2000);
-              },
-              error: (err) => {
-                console.error(err);
-                alert('Error al registrar paciente');
-              }
-            });
-
+          setTimeout(() => {
+            this.router.navigate(['/pacientes']);
+          }, 2000);
         },
         error: (err) => {
           console.error(err);
-          alert('No se pudo validar el documento con el servidor');
+          alert(err.error?.message || 'Error al registrar paciente');
         }
       });
   }
