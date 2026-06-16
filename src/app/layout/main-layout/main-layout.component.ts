@@ -188,6 +188,14 @@ export class MainLayoutComponent implements OnInit {
     return this.usuario?.nombres || this.usuario?.username || 'Usuario';
   }
 
+  rolUsuarioSidebar(): string {
+    const rol = this.normalizarRol(this.usuario?.rol);
+    if (rol === 'ADMIN') return 'Administrador';
+    if (rol === 'MEDICO') return 'Medico';
+    if (rol === 'ENFERMERO') return 'Enfermero';
+    return this.usuario?.rol || 'Usuario';
+  }
+
   private normalizarRol(rol: any): string {
     const normalizado = (rol || '')
       .toString()

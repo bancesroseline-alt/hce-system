@@ -14,9 +14,9 @@
       </p>
     </div>
 
-    <div class="hero-badge">
+    <div class="hero-badge" [class.offline]="sistemaOffline()">
       <span class="pulse"></span>
-      {{ sistemaOnline ? 'Sistema online' : 'Sistema offline' }}
+      {{ sistemaOffline() ? 'Sistema offline' : 'Sistema online' }}
     </div>
   </section>
 

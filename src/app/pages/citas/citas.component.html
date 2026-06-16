@@ -279,15 +279,6 @@
   <div class="action-group">
 
   <button
-    class="btn-secondary btn-mini"
-    type="button"
-    [routerLink]="['/citas', c.id || c.uuidLocal]">
-
-    Ver detalle
-
-  </button>
-
-  <button
     *ngIf="c.estado === 'PROGRAMADA'"
     class="btn-action"
     type="button"

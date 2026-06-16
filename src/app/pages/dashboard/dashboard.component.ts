@@ -98,6 +98,10 @@ export class DashboardComponent implements OnInit {
     this.sistemaOnline = navigator.onLine;
   }
 
+  sistemaOffline(): boolean {
+    return this.modoOffline || !this.sistemaOnline;
+  }
+
   cargarDatos(data: any): void {
     this.totalPacientes = data.totalPacientes || 0;
     this.citasHoy = data.citasHoy || 0;

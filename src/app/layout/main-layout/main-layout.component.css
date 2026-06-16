@@ -17,7 +17,7 @@
 /* SIDEBAR */
 .sidebar {
   width: 245px;
-  background: #122033;
+  background: linear-gradient(180deg, #071528 0%, #0f2238 58%, #122033 100%);
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -66,13 +66,14 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
 }
 
 .menu a {
   text-decoration: none;
-  color: #e2e8f0;
+  color: #cbd5e1;
   padding: 11px 12px;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 14px;
   font-weight: 700;
   display: flex;
@@ -82,14 +83,14 @@
 }
 
 .menu a:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.09);
   color: #ffffff;
 }
 
 .menu a.active {
-  background: #0ea5e9;
+  background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
   color: #ffffff;
-  box-shadow: 0 10px 22px rgba(14, 165, 233, 0.28);
+  box-shadow: 0 12px 28px rgba(14, 165, 233, 0.30);
 }
 
 /* ICONOS DEL SIDEBAR */
@@ -97,7 +98,7 @@
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -128,7 +129,49 @@
 }
 
 .menu a.active .nav-icon {
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.sidebar-user-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 18px;
+  padding: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-user-avatar {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 900;
+}
+
+.sidebar-user-card strong {
+  display: block;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-user-card small {
+  display: block;
+  margin-top: 3px;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .menu a.active .nav-icon svg,
@@ -486,12 +529,18 @@ main {
   }
 
   .brand-text,
-  .menu a span:last-child {
+  .menu a span:last-child,
+  .sidebar-user-card div {
     display: none;
   }
 
   .menu a {
     justify-content: center;
+  }
+
+  .sidebar-user-card {
+    justify-content: center;
+    padding: 10px;
   }
 
   .user-name {

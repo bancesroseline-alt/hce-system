@@ -1,83 +1,208 @@
-<div class="dashboard">
+<div class="ml-dashboard">
 
-  <div class="cards">
-
-    <div class="card alto">
-      <h3>Alto Riesgo</h3>
-      <p>{{ alertasAltas.length }}</p>
+  <section class="ml-header">
+    <div>
+      <span class="model-tag">Modelo: Random Forest</span>
+      <h1>Predicción de Inasistencia Médica</h1>
+      <p>Sistema de predicción de riesgos basado en aprendizaje automático</p>
     </div>
 
-    <div class="card medio">
-      <h3>Medio Riesgo</h3>
-      <p>{{ alertasMedias.length }}</p>
+    <div class="updated-card">
+      <span>Última actualización</span>
+      <strong>{{ ultimaActualizacion || 'Sin sincronizar' }}</strong>
+    </div>
+  </section>
+
+  <section class="indicator-grid">
+
+    <article class="indicator-card high">
+      <div class="indicator-head">
+        <span class="indicator-icon">!</span>
+        <div>
+          <h3>Alto Riesgo</h3>
+          <strong>{{ alertasAltas.length }}</strong>
+        </div>
+      </div>
+      <p>Pacientes con probabilidad crítica</p>
+      <div class="progress-track">
+        <span [style.width.%]="progresoIndicador(alertasAltas.length)"></span>
+      </div>
+    </article>
+
+    <article class="indicator-card medium">
+      <div class="indicator-head">
+        <span class="indicator-icon">~</span>
+        <div>
+          <h3>Medio Riesgo</h3>
+          <strong>{{ alertasMedias.length }}</strong>
+        </div>
+      </div>
+      <p>Pacientes con seguimiento preventivo</p>
+      <div class="progress-track">
+        <span [style.width.%]="progresoIndicador(alertasMedias.length)"></span>
+      </div>
+    </article>
+
+    <article class="indicator-card low">
+      <div class="indicator-head">
+        <span class="indicator-icon">✓</span>
+        <div>
+          <h3>Bajo Riesgo</h3>
+          <strong>{{ alertasBajas.length }}</strong>
+        </div>
+      </div>
+      <p>Pacientes con riesgo controlado</p>
+      <div class="progress-track">
+        <span [style.width.%]="progresoIndicador(alertasBajas.length)"></span>
+      </div>
+    </article>
+
+    <article class="indicator-card accuracy">
+      <div class="indicator-head">
+        <span class="indicator-icon">%</span>
+        <div>
+          <h3>Precisión del Modelo</h3>
+          <strong>{{ precisionModelo }}%</strong>
+        </div>
+      </div>
+      <p>Rendimiento estimado del modelo ML</p>
+      <div class="progress-track">
+        <span [style.width.%]="precisionModelo"></span>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="analytics-grid">
+
+    <article class="panel risk-panel">
+      <div class="panel-title">
+        <h2>Distribución de Riesgos</h2>
+        <p>Clasificación actual de pacientes evaluados</p>
+      </div>
+
+      <div class="donut-wrap">
+        <div class="donut" [style.background]="donutBackground()">
+          <div>
+            <strong>{{ totalAlertas }}</strong>
+            <span>Pacientes</span>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span><i class="low-dot"></i>Bajo Riesgo: {{ alertasBajas.length }}</span>
+          <span><i class="medium-dot"></i>Medio Riesgo: {{ alertasMedias.length }}</span>
+          <span><i class="high-dot"></i>Alto Riesgo: {{ alertasAltas.length }}</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel model-panel">
+      <div class="panel-title">
+        <h2>Indicadores del Modelo</h2>
+        <p>Resumen operativo de predicciones</p>
+      </div>
+
+      <div class="model-metrics">
+        <div>
+          <span>Pacientes evaluados</span>
+          <strong>{{ totalAlertas }}</strong>
+        </div>
+        <div>
+          <span>Predicciones hoy</span>
+          <strong>{{ prediccionesHoy }}</strong>
+        </div>
+        <div>
+          <span>Precisión del modelo</span>
+          <strong>{{ precisionModelo }}%</strong>
+        </div>
+        <div>
+          <span>Última sincronización</span>
+          <strong>{{ ultimaActualizacion || 'Pendiente' }}</strong>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="panel table-panel">
+    <div class="filters-bar">
+      <div class="search-box">
+        <span>⌕</span>
+        <input
+          type="text"
+          placeholder="Buscar paciente..."
+          [(ngModel)]="filtroBusqueda">
+      </div>
+
+      <select [(ngModel)]="filtroRiesgo">
+        <option value="TODOS">Todos los riesgos</option>
+        <option value="ALTO">Alto riesgo</option>
+        <option value="MEDIO">Medio riesgo</option>
+        <option value="BAJO">Bajo riesgo</option>
+      </select>
+
+      <button type="button" class="export-btn" (click)="exportarExcel()">
+        Exportar Excel
+      </button>
     </div>
 
-    <div class="card bajo">
-      <h3>Bajo Riesgo</h3>
-      <p>{{ alertasBajas.length }}</p>
+    <div class="table-wrap" *ngIf="alertasFiltradas.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>Citas previas</th>
+            <th>Inasistencias</th>
+            <th>Reprogramaciones</th>
+            <th>Riesgo</th>
+            <th>Probabilidad</th>
+            <th>Recomendación</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let alerta of alertasFiltradas">
+            <td>
+              <div class="patient-cell">
+                <span class="patient-avatar">{{ inicialPaciente(alerta) }}</span>
+                <strong>{{ nombrePaciente(alerta) }}</strong>
+              </div>
+            </td>
+
+            <td>{{ alerta.cantidadCitasPrevias || 0 }}</td>
+            <td>{{ alerta.cantidadInasistenciasPrevias || 0 }}</td>
+            <td>{{ alerta.cantidadReprogramaciones || 0 }}</td>
+
+            <td>
+              <span class="risk-badge" [ngClass]="riesgoClase(alerta)">
+                {{ alerta.nivelRiesgo }}
+              </span>
+            </td>
+
+            <td>
+              <div class="probability">
+                <div class="probability-track">
+                  <span [class]="riesgoClase(alerta)" [style.width.%]="porcentajeRiesgo(alerta)"></span>
+                </div>
+                <strong>{{ porcentajeRiesgo(alerta) }}%</strong>
+              </div>
+            </td>
+
+            <td>
+              <span class="recommendation">{{ alerta.recomendacion }}</span>
+              <span class="offline-tag" *ngIf="alerta.modoOffline">Offline</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-  </div>
-
-  <div class="tabla" *ngIf="alertas.length > 0">
-    <table>
-
-      <thead>
-        <tr>
-          <th>Paciente</th>
-          <th>Citas previas</th>
-          <th>Inasistencias</th>
-          <th>Reprogramaciones</th>
-          <th>Riesgo</th>
-          <th>Probabilidad</th>
-          <th>Recomendación</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let alerta of alertas">
-
-          <td>
-            {{ nombrePaciente(alerta) }}
-          </td>
-
-          <td>
-            {{ alerta.cantidadCitasPrevias || 0 }}
-          </td>
-
-          <td>
-            {{ alerta.cantidadInasistenciasPrevias || 0 }}
-          </td>
-
-          <td>
-            {{ alerta.cantidadReprogramaciones || 0 }}
-          </td>
-
-          <td>
-            <span class="riesgo" [ngClass]="alerta.nivelRiesgo.toLowerCase()">
-  {{ alerta.nivelRiesgo }}
-</span>
-          </td>
-
-          <td>
-            {{ alerta.probabilidadInasistencia * 100 | number:'1.0-0' }}%
-          </td>
-
-          <td>
-            {{ alerta.recomendacion }}
-            <span class="offline-tag" *ngIf="alerta.modoOffline">
-              Offline
-            </span>
-          </td>
-
-        </tr>
-      </tbody>
-
-    </table>
-  </div>
-
-  <div *ngIf="totalAlertas === 0" class="empty">
-    Sin pacientes disponibles para prediccion
-  </div>
+    <div *ngIf="alertasFiltradas.length === 0" class="empty">
+      <div class="empty-icon">⌕</div>
+      <strong>Sin pacientes disponibles para predicción</strong>
+      <span>Ajusta los filtros o sincroniza datos para actualizar el tablero.</span>
+    </div>
+  </section>
 
 </div>
