@@ -1,33 +1,46 @@
-/* Global clinical UI baseline */
+/* Global HCE design system */
 :root {
-  --hce-bg: #f8fafc;
+  --hce-bg: #F8FAFC;
   --hce-surface: #ffffff;
-  --hce-border: #e5e7eb;
-  --hce-text: #0f172a;
-  --hce-muted: #64748b;
-  --hce-primary: #2563eb;
+  --hce-surface-soft: #f1f5f9;
+  --hce-border: #E2E8F0;
+  --hce-text: #0F172A;
+  --hce-muted: #64748B;
+  --hce-primary: #2563EB;
   --hce-primary-hover: #1d4ed8;
-  --hce-success: #0f766e;
-  --hce-warning: #f59e0b;
-  --hce-danger: #dc2626;
-  --hce-card-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  --hce-secondary: #3B82F6;
+  --hce-success: #10B981;
+  --hce-warning: #F59E0B;
+  --hce-danger: #EF4444;
+  --hce-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 28px rgba(15, 23, 42, 0.05);
+  --hce-card-shadow-hover: 0 4px 10px rgba(15, 23, 42, 0.06), 0 18px 40px rgba(15, 23, 42, 0.08);
   --hce-radius: 16px;
+  --hce-radius-sm: 12px;
+  --hce-transition: all .25s ease;
 }
 
 html,
 body {
   background: var(--hce-bg) !important;
   color: var(--hce-text);
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
 }
 
 body {
   margin: 0;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 main,
 .content,
 .page,
+.dashboard-container,
 .citas-page,
 .detalle-page,
 .historial-page,
@@ -53,6 +66,21 @@ h3 {
   letter-spacing: 0 !important;
 }
 
+h1 {
+  font-size: clamp(28px, 3vw, 36px) !important;
+  line-height: 1.08 !important;
+}
+
+h2 {
+  font-size: clamp(20px, 2vw, 24px) !important;
+  line-height: 1.2 !important;
+}
+
+h3 {
+  font-size: 16px !important;
+  line-height: 1.35 !important;
+}
+
 p,
 span,
 small,
@@ -66,6 +94,14 @@ li,
 .ml-header p,
 .timeline-content p {
   font-weight: 400 !important;
+}
+
+p,
+small,
+td,
+li {
+  color: inherit;
+  line-height: 1.5;
 }
 
 label,
@@ -87,6 +123,34 @@ button,
   font-weight: 600 !important;
 }
 
+button,
+a,
+input,
+select,
+textarea,
+.panel,
+.summary-card,
+.form-card,
+.historial-card,
+.detalle-card,
+.prediccion-card,
+.patient-card,
+.paciente-card,
+.list-card,
+.historia-card,
+.timeline-content,
+.calendar-card,
+.indicator-card,
+.updated-card,
+.state-card,
+.info-box,
+.sync-card,
+.trace-card,
+.reporte-card,
+.usuario-card {
+  transition: var(--hce-transition);
+}
+
 .route-header {
   background: var(--hce-bg) !important;
   padding: 12px 24px !important;
@@ -105,6 +169,7 @@ button,
 .breadcrumb a {
   color: var(--hce-primary) !important;
   font-weight: 600 !important;
+  text-decoration: none !important;
 }
 
 .breadcrumb .current {
@@ -137,24 +202,55 @@ button,
   border: 1px solid var(--hce-border) !important;
   border-radius: var(--hce-radius) !important;
   box-shadow: var(--hce-card-shadow) !important;
+  padding: 20px;
+}
+
+.panel:hover,
+.summary-card:hover,
+.form-card:hover,
+.historial-card:hover,
+.detalle-card:hover,
+.prediccion-card:hover,
+.patient-card:hover,
+.paciente-card:hover,
+.list-card:hover,
+.historia-card:hover,
+.timeline-content:hover,
+.calendar-card:hover,
+.indicator-card:hover,
+.updated-card:hover,
+.state-card:hover,
+.info-box:hover,
+.sync-card:hover,
+.trace-card:hover,
+.reporte-card:hover,
+.usuario-card:hover {
+  box-shadow: var(--hce-card-shadow-hover) !important;
+  transform: translateY(-1px);
 }
 
 table {
   border-collapse: separate !important;
   border-spacing: 0 8px !important;
+  width: 100%;
 }
 
 thead th {
-  background: #f1f5f9 !important;
+  background: var(--hce-surface-soft) !important;
   color: #334155 !important;
   font-weight: 600 !important;
   border: 0 !important;
+  padding: 14px 16px !important;
+  white-space: nowrap;
 }
 
 tbody td {
   color: #334155 !important;
   font-weight: 400 !important;
   border-color: var(--hce-border) !important;
+  padding: 14px 16px !important;
+  background: #ffffff;
+  vertical-align: middle;
 }
 
 tbody tr:hover td {
@@ -165,10 +261,12 @@ input,
 select,
 textarea {
   border: 1px solid #cbd5e1 !important;
-  border-radius: 12px !important;
-  min-height: 42px;
+  border-radius: var(--hce-radius-sm) !important;
+  min-height: 44px;
   color: var(--hce-text);
   font-weight: 400 !important;
+  background: #ffffff !important;
+  padding: 11px 13px !important;
 }
 
 input::placeholder,
@@ -179,7 +277,7 @@ textarea::placeholder {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #2563eb !important;
+  border-color: var(--hce-primary) !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
   outline: none !important;
 }
@@ -187,7 +285,8 @@ textarea:focus {
 button,
 a[class*="btn-"],
 .export-btn {
-  border-radius: 12px !important;
+  border-radius: var(--hce-radius-sm) !important;
+  min-height: 40px;
 }
 
 .btn-primary,
@@ -196,7 +295,8 @@ a[class*="btn-"],
 .panel-header button {
   background: var(--hce-primary) !important;
   color: #ffffff !important;
-  box-shadow: none !important;
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.16) !important;
+  border: 1px solid transparent !important;
 }
 
 .btn-primary:hover,
@@ -221,7 +321,7 @@ a[class*="btn-"],
 .btn-print {
   background: var(--hce-success) !important;
   color: #ffffff !important;
-  box-shadow: none !important;
+  box-shadow: 0 10px 18px rgba(16, 185, 129, 0.14) !important;
 }
 
 .btn-warning {
@@ -234,11 +334,33 @@ a[class*="btn-"],
   color: var(--hce-danger) !important;
 }
 
+.badge,
+.risk-badge,
+.estado,
+.estado-cita,
+.sync-badge {
+  border-radius: 999px !important;
+  border: 1px solid transparent;
+  letter-spacing: 0 !important;
+}
+
 .alerta,
 .alerta-info,
 .info-box,
 .danger-box {
   box-shadow: none !important;
+}
+
+.page-header,
+.panel-title,
+.panel-header {
+  gap: 16px;
+}
+
+.page-header p,
+.panel-title p,
+.panel-header p {
+  color: var(--hce-muted) !important;
 }
 
 @media (max-width: 768px) {
