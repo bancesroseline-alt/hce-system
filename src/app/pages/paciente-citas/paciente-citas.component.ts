@@ -310,6 +310,7 @@ export class PacienteCitasComponent implements OnInit {
 
     return {
       ...this.citaEditando,
+      pacienteId: this.citaEditando.pacienteId || this.pacienteId,
       edad: this.paciente?.edad || 0,
       sexo: this.paciente?.sexo || '',
       diaSemana: this.obtenerDiaSemana(this.citaEditando.fecha),

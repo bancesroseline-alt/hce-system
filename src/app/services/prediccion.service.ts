@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 export class PrediccionService {
 
   private apiCitas = `${environment.apiBaseUrl}/citas`;
-  private apiML = environment.mlApiUrl;
+  private apiPredicciones = `${environment.apiBaseUrl}/predicciones`;
 
   constructor(
     private http: HttpClient,
@@ -30,19 +30,20 @@ export class PrediccionService {
 
   predecir(cita: any): Observable<any> {
     const payload = {
+      pacienteId: cita.pacienteId || cita.paciente?.id,
       edad: cita.edad || 0,
-      sexo: cita.sexo || '',
-      tipo_cita: cita.tipoCita,
+      cantidadCitasPrevias: cita.cantidadCitasPrevias || 0,
+      cantidadInasistenciasPrevias: cita.antecedentesInasistencias || 0,
+      tipoCita: cita.tipoCita,
       especialidad: cita.especialidad,
-      dia_semana: cita.diaSemana || '',
-      hora: Number(`${cita.hora || '10'}`.split(':')[0]),
-      antecedentes_inasistencias: cita.antecedentesInasistencias || 0,
-      cantidad_citas_previas: cita.cantidadCitasPrevias || 0
+      citaId: cita.id || null,
+      diaSemana: cita.diaSemana || '',
+      hora: Number(`${cita.hora || '10'}`.split(':')[0])
     };
 
-    return this.http.post<any>(this.apiML, payload).pipe(
-      timeout(4000),
-      map(res => this.mapearRespuesta(cita, res.probabilidad, false)),
+    return this.http.post<any>(`${this.apiPredicciones}/inasistencia`, payload).pipe(
+      timeout(30000),
+      map(res => this.mapearRespuesta(cita, Number(res.probabilidadInasistencia), false)),
       catchError(() => of(this.predecirOffline(cita))),
       switchMap(prediccion =>
         from(this.indexedDb.guardar('predicciones', {
@@ -57,23 +58,24 @@ export class PrediccionService {
 
   predecirConModelo(cita: any): Observable<any> {
     const payload = {
+      pacienteId: cita.pacienteId,
       edad: cita.edad || 0,
-      sexo: cita.sexo || '',
-      tipo_cita: cita.tipoCita,
+      cantidadCitasPrevias: cita.cantidadCitasPrevias || 0,
+      cantidadInasistenciasPrevias: cita.antecedentesInasistencias || 0,
+      tipoCita: cita.tipoCita,
       especialidad: cita.especialidad,
-      dia_semana: cita.diaSemana || '',
-      hora: Number(`${cita.hora || '10'}`.split(':')[0]),
-      antecedentes_inasistencias: cita.antecedentesInasistencias || 0,
-      cantidad_citas_previas: cita.cantidadCitasPrevias || 0
+      citaId: cita.id || null,
+      diaSemana: cita.diaSemana || 'MONDAY',
+      hora: Number(`${cita.hora || '10'}`.split(':')[0])
     };
 
-    return this.http.post<any>(this.apiML, payload).pipe(
+    return this.http.post<any>(`${this.apiPredicciones}/inasistencia`, payload).pipe(
       timeout(30000),
       map(res => {
-        const probabilidad = Number(res?.probabilidad);
+        const probabilidad = Number(res?.probabilidadInasistencia);
 
         if (Number.isNaN(probabilidad)) {
-          throw new Error('La API ML no devolvio una probabilidad valida');
+          throw new Error('El backend no devolvio una probabilidad valida');
         }
 
         return this.mapearRespuesta(cita, probabilidad, false);
