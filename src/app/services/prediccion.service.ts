@@ -44,15 +44,10 @@ export class PrediccionService {
     return this.http.post<any>(`${this.apiPredicciones}/inasistencia`, payload).pipe(
       timeout(30000),
       map(res => this.mapearRespuesta(cita, Number(res.probabilidadInasistencia), false)),
-      catchError(() => of(this.predecirOffline(cita))),
       switchMap(prediccion =>
-        from(this.indexedDb.guardar('predicciones', {
-          ...prediccion,
-          uuidLocal: prediccion.uuidLocal || crypto.randomUUID(),
-          citaId: cita.id || cita.uuidLocal || null,
-          fechaPrediccionLocal: new Date().toISOString()
-        })).pipe(map(() => prediccion))
-      )
+        from(this.guardarPrediccionCita(cita, prediccion)).pipe(map(() => prediccion))
+      ),
+      catchError(() => from(this.obtenerUltimaPrediccionCita(cita)))
     );
   }
 
@@ -79,7 +74,11 @@ export class PrediccionService {
         }
 
         return this.mapearRespuesta(cita, probabilidad, false);
-      })
+      }),
+      switchMap(prediccion =>
+        from(this.guardarPrediccionCita(cita, prediccion)).pipe(map(() => prediccion))
+      ),
+      catchError(() => from(this.obtenerUltimaPrediccionCita(cita)))
     );
   }
 
@@ -96,7 +95,13 @@ export class PrediccionService {
   }
 
   obtenerPrediccionesPacientes(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiPredicciones}/pacientes`).pipe(timeout(30000));
+    return this.http.get<any[]>(`${this.apiPredicciones}/pacientes`).pipe(
+      timeout(30000),
+      switchMap(predicciones =>
+        from(this.guardarPrediccionesPacientes(predicciones || [])).pipe(map(() => predicciones || []))
+      ),
+      catchError(() => from(this.obtenerPrediccionesPacientesOffline()))
+    );
   }
 
   private async cachearCitas(citas: any[]): Promise<void> {
@@ -128,6 +133,71 @@ export class PrediccionService {
     probabilidad = Math.max(0.05, Math.min(probabilidad, 0.95));
 
     return this.mapearRespuesta(cita, probabilidad, true);
+  }
+
+  private async guardarPrediccionCita(cita: any, prediccion: any): Promise<any> {
+    const citaId = cita.id || cita.uuidLocal || null;
+    const pacienteId = cita.pacienteId || cita.paciente?.id || null;
+
+    return this.indexedDb.guardar('predicciones', {
+      ...prediccion,
+      uuidLocal: `PREDICCION-CITA-${citaId || pacienteId || crypto.randomUUID()}`,
+      tipoPrediccion: 'CITA',
+      citaId,
+      pacienteId,
+      fechaPrediccionLocal: new Date().toISOString(),
+      modoOffline: false
+    });
+  }
+
+  private async obtenerUltimaPrediccionCita(cita: any): Promise<any> {
+    const citaId = cita.id || cita.uuidLocal || null;
+    const pacienteId = cita.pacienteId || cita.paciente?.id || null;
+    const predicciones = await this.indexedDb.obtenerTodos('predicciones');
+
+    const ultima = predicciones
+      .filter((p: any) =>
+        (citaId && String(p.citaId) === String(citaId)) ||
+        (pacienteId && String(p.pacienteId) === String(pacienteId))
+      )
+      .sort((a: any, b: any) =>
+        `${b.fechaPrediccionLocal || ''}`.localeCompare(`${a.fechaPrediccionLocal || ''}`)
+      )[0];
+
+    if (!ultima) {
+      throw new Error('No hay una prediccion previa guardada para trabajar offline');
+    }
+
+    return {
+      ...ultima,
+      modoOffline: true,
+      recomendacion: `${ultima.recomendacion || 'Ultimo resultado guardado'} (ultimo resultado guardado)`
+    };
+  }
+
+  private async guardarPrediccionesPacientes(predicciones: any[]): Promise<void> {
+    for (const prediccion of predicciones) {
+      await this.indexedDb.guardar('predicciones', {
+        ...prediccion,
+        uuidLocal: `PREDICCION-PACIENTE-${prediccion.pacienteId}`,
+        tipoPrediccion: 'PACIENTE',
+        fechaPrediccionLocal: new Date().toISOString(),
+        modoOffline: false
+      });
+    }
+  }
+
+  private async obtenerPrediccionesPacientesOffline(): Promise<any[]> {
+    const predicciones = await this.indexedDb.obtenerTodos('predicciones');
+
+    return predicciones
+      .filter((p: any) => p.tipoPrediccion === 'PACIENTE')
+      .map((p: any) => ({
+        ...p,
+        modoOffline: true,
+        recomendacion: `${p.recomendacion || 'Ultimo resultado guardado'} (ultimo resultado guardado)`
+      }))
+      .sort((a: any, b: any) => `${a.nombres || ''}`.localeCompare(`${b.nombres || ''}`));
   }
 
   private mapearRespuesta(cita: any, probabilidad: number, modoOffline: boolean): any {

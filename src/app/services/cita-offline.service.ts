@@ -22,6 +22,7 @@ export class CitaOfflineService {
     this.http.get<any[]>(`${this.api}/citas`).pipe(timeout(4000)).subscribe({
       next: async (data) => {
         for (const cita of data as any[]) {
+          this.normalizarCita(cita);
           cita.uuidLocal = cita.uuidLocal || String(cita.id);
           cita.estadoSync = 'SINCRONIZADO';
 
@@ -35,6 +36,8 @@ export class CitaOfflineService {
 
           await this.indexedDb.guardar('citas', cita);
         }
+
+        await this.reconciliarCitasLocales(data || []);
 
         observer.next(data);
         observer.complete();
@@ -55,6 +58,7 @@ export class CitaOfflineService {
       this.http.get<any[]>(`${this.api}/citas/paciente/${pacienteId}`).pipe(timeout(4000)).subscribe({
         next: async (data) => {
           for (const cita of data as any[]) {
+            this.normalizarCita(cita);
             cita.uuidLocal = cita.uuidLocal || String(cita.id);
             cita.estadoSync = 'SINCRONIZADO';
             cita.pacienteId = cita.pacienteId || pacienteId;
@@ -65,6 +69,8 @@ export class CitaOfflineService {
 
             await this.indexedDb.guardar('citas', cita);
           }
+
+          await this.reconciliarCitasLocales(data || [], pacienteId);
 
           observer.next(data);
           observer.complete();
@@ -86,6 +92,7 @@ export class CitaOfflineService {
   }
 
   registrar(cita: any): Observable<any> {
+    this.normalizarCita(cita);
     cita.uuidLocal = cita.uuidLocal || crypto.randomUUID();
     cita.estadoSync = 'PENDIENTE';
     cita.fechaCreacionLocal = new Date().toISOString();
@@ -93,6 +100,7 @@ export class CitaOfflineService {
     return new Observable(observer => {
       this.http.post<any>(`${this.api}/citas`, cita).pipe(timeout(4000)).subscribe({
         next: async (data: any) => {
+          this.normalizarCita(data);
           data.uuidLocal = data.uuidLocal || String(data.id);
           data.estadoSync = 'SINCRONIZADO';
 
@@ -115,6 +123,7 @@ export class CitaOfflineService {
   }
 
   actualizar(cita: any): Observable<any> {
+    this.normalizarCita(cita);
     cita.uuidLocal = cita.uuidLocal || String(cita.id || crypto.randomUUID());
     cita.estadoSync = 'PENDIENTE';
     cita.fechaActualizacionLocal = new Date().toISOString();
@@ -123,6 +132,7 @@ export class CitaOfflineService {
       if (cita.id) {
         this.http.put<any>(`${this.api}/citas/${cita.id}`, cita).pipe(timeout(4000)).subscribe({
           next: async (data: any) => {
+            this.normalizarCita(data);
             const citaActualizada = {
               ...cita,
               ...data,
@@ -158,6 +168,7 @@ export class CitaOfflineService {
   }
 
   actualizarEstado(cita: any, nuevoEstado: string): Observable<any> {
+    this.normalizarCita(cita);
     cita.estado = nuevoEstado;
     cita.uuidLocal = cita.uuidLocal || String(cita.id || crypto.randomUUID());
     cita.estadoSync = 'PENDIENTE';
@@ -167,6 +178,7 @@ export class CitaOfflineService {
       if (cita.id) {
         this.http.patch<any>(`${this.api}/citas/${cita.id}/estado?estado=${nuevoEstado}`, {}).pipe(timeout(4000)).subscribe({
           next: async (data: any) => {
+            this.normalizarCita(data);
             const citaActualizada = {
               ...cita,
               ...data,
@@ -230,5 +242,44 @@ export class CitaOfflineService {
         }
       });
     });
+  }
+
+  private normalizarCita(cita: any): void {
+    if (!cita) return;
+    cita.especialidad = this.normalizarEspecialidad(cita.especialidad);
+  }
+
+  private normalizarEspecialidad(valor: any): string {
+    const texto = String(valor || '').trim().replace(/\s+/g, ' ');
+
+    if (!texto) return '';
+
+    return texto
+      .toLocaleLowerCase('es-PE')
+      .split(' ')
+      .map(palabra => palabra.charAt(0).toLocaleUpperCase('es-PE') + palabra.slice(1))
+      .join(' ');
+  }
+
+  private async reconciliarCitasLocales(remotas: any[], pacienteId?: number): Promise<void> {
+    const locales = await this.indexedDb.obtenerTodos('citas');
+
+    for (const local of locales) {
+      const estaPendiente = local.estadoSync === 'PENDIENTE' || local.estadoSync === 'ERROR_SYNC';
+      const pertenecePaciente = !pacienteId ||
+        Number(local.pacienteId) === Number(pacienteId) ||
+        Number(local.paciente?.id) === Number(pacienteId);
+
+      if (estaPendiente || !pertenecePaciente) continue;
+
+      const existePorId = remotas.some(cita => local.id && String(cita.id) === String(local.id));
+      const existePorUuid = remotas.some(cita =>
+        local.uuidLocal && String(cita.uuidLocal || cita.id) === String(local.uuidLocal)
+      );
+
+      if (!existePorId && !existePorUuid && local.uuidLocal) {
+        await this.indexedDb.eliminar('citas', local.uuidLocal);
+      }
+    }
   }
 }

@@ -229,9 +229,21 @@ export class SyncQueueService {
       tipoCita: cita.tipoCita,
       fecha: cita.fecha,
       hora: cita.hora,
-      especialidad: cita.especialidad,
+      especialidad: this.normalizarEspecialidad(cita.especialidad),
       motivoConsulta: cita.motivoConsulta,
       estado: cita.estado
     };
+  }
+
+  private normalizarEspecialidad(valor: any): string {
+    const texto = String(valor || '').trim().replace(/\s+/g, ' ');
+
+    if (!texto) return '';
+
+    return texto
+      .toLocaleLowerCase('es-PE')
+      .split(' ')
+      .map(palabra => palabra.charAt(0).toLocaleUpperCase('es-PE') + palabra.slice(1))
+      .join(' ');
   }
 }

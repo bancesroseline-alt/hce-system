@@ -27,6 +27,7 @@
           <th>Paciente</th>
           <th>Citas previas</th>
           <th>Inasistencias</th>
+          <th>Reprogramaciones</th>
           <th>Riesgo</th>
           <th>Probabilidad</th>
           <th>Recomendación</th>
@@ -49,6 +50,10 @@
           </td>
 
           <td>
+            {{ alerta.cantidadReprogramaciones || 0 }}
+          </td>
+
+          <td>
             <span class="riesgo" [ngClass]="alerta.nivelRiesgo.toLowerCase()">
   {{ alerta.nivelRiesgo }}
 </span>
@@ -60,6 +65,9 @@
 
           <td>
             {{ alerta.recomendacion }}
+            <span class="offline-tag" *ngIf="alerta.modoOffline">
+              Offline
+            </span>
           </td>
 
         </tr>

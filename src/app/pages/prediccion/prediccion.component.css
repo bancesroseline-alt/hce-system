@@ -83,3 +83,14 @@ td {
   padding: 30px;
   color: #64748b;
 }
+
+.offline-tag {
+  background: #e0f2fe;
+  border-radius: 999px;
+  color: #075985;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  margin-left: 8px;
+  padding: 3px 8px;
+}

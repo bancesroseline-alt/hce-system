@@ -17,6 +17,8 @@ interface Alerta {
   recomendacion: string;
   cantidadCitasPrevias?: number;
   cantidadInasistenciasPrevias?: number;
+  cantidadReprogramaciones?: number;
+  modoOffline?: boolean;
 }
 
 @Component({

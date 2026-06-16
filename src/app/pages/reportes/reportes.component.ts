@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { IndexedDbService } from '../../services/indexed-db.service';
+import { CitaOfflineService } from '../../services/cita-offline.service';
+import { PacienteService } from '../../services/paciente.service';
 
 @Component({
   selector: 'app-reportes',
@@ -29,7 +32,11 @@ export class ReportesComponent implements OnInit {
   prediccionesPorRiesgo: Array<{ riesgo: string; total: number }> = [];
   actividadReciente: Array<{ tipo: string; descripcion: string; fecha: string }> = [];
 
-  constructor(private indexedDb: IndexedDbService) {}
+  constructor(
+    private indexedDb: IndexedDbService,
+    private citaOfflineService: CitaOfflineService,
+    private pacienteService: PacienteService
+  ) {}
 
   ngOnInit(): void {
     this.generarReporteLocal();
@@ -37,6 +44,7 @@ export class ReportesComponent implements OnInit {
 
   async generarReporteLocal(): Promise<void> {
     this.cargando = true;
+    await this.sincronizarBaseLocal();
 
     const [
       pacientes,
@@ -55,24 +63,42 @@ export class ReportesComponent implements OnInit {
     ]);
 
     const hoy = new Date().toISOString().split('T')[0];
+    const pacientesActualesIds = new Set(
+      pacientes
+        .map((p: any) => p.id || p.pacienteId)
+        .filter(Boolean)
+        .map((id: any) => String(id))
+    );
+    const citasVigentes = citas.filter((c: any) => {
+      const pacienteId = c.pacienteId || c.paciente?.id;
+      return pacienteId && pacientesActualesIds.has(String(pacienteId));
+    });
+    const atencionesVigentes = atenciones.filter((a: any) => {
+      const pacienteId = a.pacienteId || a.paciente?.id;
+      return !pacienteId || pacientesActualesIds.has(String(pacienteId));
+    });
+    const prediccionesVigentes = predicciones.filter((p: any) => {
+      const pacienteId = p.pacienteId || p.paciente?.id;
+      return !pacienteId || pacientesActualesIds.has(String(pacienteId));
+    });
 
     this.resumen = {
       pacientes: pacientes.length,
       pacientesActivos: pacientes.filter((p: any) => p.estado !== false).length,
-      citas: citas.length,
-      citasHoy: citas.filter((c: any) => c.fecha === hoy).length,
-      atenciones: atenciones.length,
-      inasistencias: citas.filter((c: any) => c.estado === 'NO_ASISTIO').length,
+      citas: citasVigentes.length,
+      citasHoy: citasVigentes.filter((c: any) => c.fecha === hoy).length,
+      atenciones: atencionesVigentes.length,
+      inasistencias: citasVigentes.filter((c: any) => c.estado === 'NO_ASISTIO').length,
       pendientes: pendientes.filter((p: any) => p.estado === 'PENDIENTE').length,
       errores: errores.length
     };
 
-    this.citasPorEstado = this.agruparConPorcentaje(citas, 'estado');
-    this.citasPorEspecialidad = this.agrupar(citas, 'especialidad')
+    this.citasPorEstado = this.agruparConPorcentaje(citasVigentes, 'estado');
+    this.citasPorEspecialidad = this.agrupar(citasVigentes, 'especialidad')
       .sort((a, b) => b.total - a.total)
       .slice(0, 6);
-    this.prediccionesPorRiesgo = this.agruparRiesgo(predicciones);
-    this.actividadReciente = this.obtenerActividadReciente(pacientes, citas, atenciones);
+    this.prediccionesPorRiesgo = this.agruparRiesgo(prediccionesVigentes);
+    this.actividadReciente = this.obtenerActividadReciente(pacientes, citasVigentes, atencionesVigentes);
 
     await this.indexedDb.guardar('reportes', {
       uuidLocal: 'reporte-local-general',
@@ -96,7 +122,9 @@ export class ReportesComponent implements OnInit {
     const mapa = new Map<string, number>();
 
     items.forEach(item => {
-      const clave = item[campo] || 'SIN_DATO';
+      const clave = campo === 'especialidad'
+        ? this.normalizarEspecialidad(item[campo]) || 'SIN_DATO'
+        : item[campo] || 'SIN_DATO';
       mapa.set(clave, (mapa.get(clave) || 0) + 1);
     });
 
@@ -138,7 +166,7 @@ export class ReportesComponent implements OnInit {
       })),
       ...citas.map((c: any) => ({
         tipo: 'Cita',
-        descripcion: `${c.especialidad || 'Sin especialidad'} - ${c.estado || 'SIN_ESTADO'}`,
+        descripcion: `${this.normalizarEspecialidad(c.especialidad) || 'Sin especialidad'} - ${c.estado || 'SIN_ESTADO'}`,
         fecha: c.fechaActualizacionLocal || c.fechaCreacionLocal || c.fecha || ''
       })),
       ...atenciones.map((a: any) => ({
@@ -150,5 +178,30 @@ export class ReportesComponent implements OnInit {
       .filter(item => item.fecha)
       .sort((a, b) => `${b.fecha}`.localeCompare(`${a.fecha}`))
       .slice(0, 8);
+  }
+
+  private async sincronizarBaseLocal(): Promise<void> {
+    if (!navigator.onLine) return;
+
+    try {
+      await Promise.all([
+        firstValueFrom(this.pacienteService.listar()),
+        firstValueFrom(this.citaOfflineService.listar())
+      ]);
+    } catch (error) {
+      console.warn('No se pudo refrescar IndexedDB antes de generar reportes.', error);
+    }
+  }
+
+  private normalizarEspecialidad(valor: any): string {
+    const texto = String(valor || '').trim().replace(/\s+/g, ' ');
+
+    if (!texto) return '';
+
+    return texto
+      .toLocaleLowerCase('es-PE')
+      .split(' ')
+      .map(palabra => palabra.charAt(0).toLocaleUpperCase('es-PE') + palabra.slice(1))
+      .join(' ');
   }
 }
