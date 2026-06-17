@@ -13,7 +13,10 @@
     <section class="list-card">
 
       <div class="table-header">
-        <input placeholder="Buscar paciente por nombre o DNI ..." />
+        <input
+          type="text"
+          placeholder="Buscar paciente por nombre o DNI ..."
+          [(ngModel)]="busquedaPaciente" />
 
         <button class="btn-secondary" type="button">
           Filtros
@@ -33,7 +36,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let p of pacientes">
+          <tr *ngFor="let p of pacientesFiltrados">
             <td>{{ p.nombres }} {{ p.apellidos }}</td>
             <td>{{ p.numeroDocumento }}</td>
             <td>{{ p.edad }}</td>
@@ -55,9 +58,9 @@
             </td>
           </tr>
 
-          <tr *ngIf="pacientes.length === 0">
+          <tr *ngIf="pacientesFiltrados.length === 0">
             <td colspan="6" class="empty">
-              No hay pacientes registrados.
+              {{ busquedaPaciente ? 'No se encontraron pacientes con esa busqueda.' : 'No hay pacientes registrados.' }}
             </td>
           </tr>
         </tbody>

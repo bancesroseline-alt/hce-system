@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { PacienteService } from '../../services/paciente.service';
@@ -9,7 +10,7 @@ import { AtencionOfflineService } from '../../services/atencion-offline.service'
 @Component({
   selector: 'app-historia',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './historia.component.html',
   styleUrl: './historia.component.css'
 })
@@ -18,6 +19,7 @@ export class HistoriaComponent implements OnInit {
   modoListado = true;
 
   pacientes: any[] = [];
+  busquedaPaciente = '';
   paciente: any = null;
   atenciones: any[] = [];
   citasProgramadas: any[] = [];
@@ -56,6 +58,24 @@ export class HistoriaComponent implements OnInit {
       }
     });
 }
+
+  get pacientesFiltrados(): any[] {
+    const termino = this.busquedaPaciente.trim().toLowerCase();
+
+    if (!termino) {
+      return this.pacientes;
+    }
+
+    return this.pacientes.filter(paciente => {
+      const nombreCompleto = `${paciente.nombres || ''} ${paciente.apellidos || ''}`.toLowerCase();
+      const documento = `${paciente.numeroDocumento || ''}`.toLowerCase();
+      const id = `${paciente.id || ''}`.toLowerCase();
+
+      return nombreCompleto.includes(termino)
+        || documento.includes(termino)
+        || id.includes(termino);
+    });
+  }
 
   cargarDetallePaciente(pacienteId: number): void {
 
