@@ -92,10 +92,10 @@ export class PacienteCitasComponent implements OnInit {
     this.citaOfflineService.listarMedicos()
       .subscribe({
         next: data => {
-          this.medicos = (data || []).filter(u => this.normalizarRol(u.rol) === 'MEDICO');
+          this.medicos = (data || []).filter(u => this.esProfesionalCita(u.rol));
 
           if (
-            this.normalizarRol(usuario.rol) === 'MEDICO' &&
+            this.esProfesionalCita(usuario.rol) &&
             usuario.id &&
             !this.medicos.some(m => Number(m.id) === Number(usuario.id))
           ) {
@@ -105,7 +105,7 @@ export class PacienteCitasComponent implements OnInit {
         error: err => {
           console.error('Error al cargar médicos', err);
 
-          if (this.normalizarRol(usuario.rol) === 'MEDICO' && usuario.id) {
+          if (this.esProfesionalCita(usuario.rol) && usuario.id) {
             this.medicos = [usuario];
           }
         }
@@ -119,6 +119,10 @@ export class PacienteCitasComponent implements OnInit {
       .replace(/[\u0300-\u036f]/g, '')
       .replace('ROLE_', '')
       .toUpperCase();
+  }
+
+  esProfesionalCita(rol: any): boolean {
+    return ['MEDICO', 'ENFERMERO'].includes(this.normalizarRol(rol));
   }
 
   aplicarFiltros(): void {
@@ -187,7 +191,7 @@ export class PacienteCitasComponent implements OnInit {
     }
 
     if (!this.citaEditando.medicoId) {
-      this.mensaje = 'El médico es obligatorio';
+      this.mensaje = 'El profesional es obligatorio';
       return;
     }
 
@@ -224,7 +228,7 @@ export class PacienteCitasComponent implements OnInit {
 
   obtenerNombreMedico(id: number): string {
     const medico = this.medicos.find(m => Number(m.id) === Number(id));
-    if (!medico) return 'Sin médico';
+    if (!medico) return 'Sin profesional';
 
     return `${medico.nombres || ''} ${medico.apellidos || ''}`.trim() || medico.username;
   }

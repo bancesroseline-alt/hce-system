@@ -116,17 +116,17 @@ export class CitasComponent implements OnInit {
 
     this.citaOfflineService.listarMedicos().subscribe({
       next: data => {
-        this.medicos = (data || []).filter(u => this.normalizarRol(u.rol) === 'MEDICO');
+        this.medicos = (data || []).filter(u => this.esProfesionalCita(u.rol));
 
         if (
-          this.normalizarRol(usuario.rol) === 'MEDICO' &&
+          this.esProfesionalCita(usuario.rol) &&
           usuario.id &&
           !this.medicos.some(m => Number(m.id) === Number(usuario.id))
         ) {
           this.medicos.push(usuario);
         }
 
-        if (usuario.id && this.normalizarRol(usuario.rol) === 'MEDICO') {
+        if (usuario.id && this.esProfesionalCita(usuario.rol)) {
           this.cita.medico.id = usuario.id;
           this.busquedaMedico = this.obtenerNombreUsuario(usuario);
         }
@@ -150,12 +150,16 @@ export class CitasComponent implements OnInit {
       .toUpperCase();
   }
 
+  esProfesionalCita(rol: any): boolean {
+    return ['MEDICO', 'ENFERMERO'].includes(this.normalizarRol(rol));
+  }
+
   obtenerNombreUsuario(usuario: any): string {
     const nombres = usuario.nombres || usuario.nombre || '';
     const apellidos = usuario.apellidos || '';
     const username = usuario.username || '';
 
-    return `${nombres} ${apellidos}`.trim() || username || 'Médico';
+    return `${nombres} ${apellidos}`.trim() || username || 'Profesional';
   }
 
   pacientesFiltrados(): any[] {
@@ -209,7 +213,7 @@ export class CitasComponent implements OnInit {
     this.tipoMensaje = '';
 
     if (!this.cita.paciente.id || !this.cita.medico.id) {
-      this.mensaje = 'Paciente y médico son obligatorios';
+      this.mensaje = 'Paciente y profesional son obligatorios';
       this.tipoMensaje = 'error';
       return;
     }

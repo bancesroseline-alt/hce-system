@@ -205,9 +205,10 @@ export class CitaOfflineService {
     return new Observable(observer => {
       this.http.get<any[]>(`${this.api}/usuarios`).pipe(timeout(4000)).subscribe({
         next: (data) => {
-          const medicos = (data || []).filter(u =>
-            String(u.rol || '').toUpperCase().includes('MEDICO')
-          );
+          const medicos = (data || []).filter(u => {
+            const rol = String(u.rol || '').replace('ROLE_', '').toUpperCase();
+            return rol === 'MEDICO' || rol === 'ENFERMERO';
+          });
 
           localStorage.setItem('medicos_cache', JSON.stringify(medicos));
 

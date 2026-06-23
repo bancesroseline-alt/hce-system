@@ -198,11 +198,11 @@
         </div>
 
         <div class="form-group">
-          <label>Médico *</label>
+          <label>Medico / enfermero *</label>
           <select
             [(ngModel)]="citaEditando.medicoId"
             [disabled]="citaEditando.estado === 'ATENDIDA'">
-            <option [ngValue]="null">Seleccione médico</option>
+            <option [ngValue]="null">Seleccione profesional</option>
             <option *ngFor="let m of medicos" [ngValue]="m.id">
               {{ m.nombres }} {{ m.apellidos }} - {{ m.username }}
             </option>
