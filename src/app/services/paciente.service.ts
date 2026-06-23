@@ -29,6 +29,8 @@ export class PacienteService {
             await this.indexedDb.guardar('pacientes', paciente);
           }
 
+          await this.reconciliarPacientesLocales(data || []);
+
           observer.next(data);
           observer.complete();
         },
@@ -205,5 +207,32 @@ export class PacienteService {
           }
         });
     });
+  }
+
+  private async reconciliarPacientesLocales(remotos: any[]): Promise<void> {
+    const locales = await this.indexedDb.obtenerTodos('pacientes');
+
+    for (const local of locales) {
+      const estaPendiente = local.estadoSync === 'PENDIENTE' || local.estadoSync === 'ERROR_SYNC';
+
+      if (estaPendiente || !local.uuidLocal) {
+        continue;
+      }
+
+      const remotoPorId = remotos.find(p => local.id && String(p.id) === String(local.id));
+      const remotoPorUuid = remotos.find(p =>
+        String(p.uuidLocal || p.id) === String(local.uuidLocal)
+      );
+      const remotoPorDocumento = remotos.find(p =>
+        p.numeroDocumento && String(p.numeroDocumento) === String(local.numeroDocumento || '')
+      );
+
+      const esCopiaRemotaActual = !!remotoPorId || !!remotoPorUuid;
+      const esDuplicadoPorDocumento = !!remotoPorDocumento && !esCopiaRemotaActual;
+
+      if (esDuplicadoPorDocumento || (!remotoPorDocumento && !esCopiaRemotaActual)) {
+        await this.indexedDb.eliminar('pacientes', local.uuidLocal);
+      }
+    }
   }
 }

@@ -26,23 +26,25 @@ export class SyncQueueService {
 
     for (const pendiente of pendientes) {
       try {
+        let respuestaRemota: any = null;
+
         if (pendiente.entidad === 'CITA') {
-          await this.sincronizarCita(pendiente);
+          respuestaRemota = await this.sincronizarCita(pendiente);
         }
 
         if (pendiente.entidad === 'ATENCION') {
-          await this.sincronizarAtencion(pendiente);
+          respuestaRemota = await this.sincronizarAtencion(pendiente);
         }
 
         if (pendiente.entidad === 'PACIENTE') {
-          await this.sincronizarPaciente(pendiente);
+          respuestaRemota = await this.sincronizarPaciente(pendiente);
         }
 
         if (pendiente.entidad === 'PREDICCION') {
-          await this.sincronizarPrediccion(pendiente);
+          respuestaRemota = await this.sincronizarPrediccion(pendiente);
         }
 
-        await this.marcarEntidadSincronizada(pendiente);
+        await this.marcarEntidadSincronizada(pendiente, respuestaRemota);
         await this.indexedDb.marcarSincronizado(pendiente.uuidLocal);
       } catch (error) {
         await this.marcarEntidadConError(pendiente, error);
@@ -152,16 +154,24 @@ export class SyncQueueService {
     }
   }
 
-  private async marcarEntidadSincronizada(pendiente: any): Promise<void> {
+  private async marcarEntidadSincronizada(pendiente: any, remoto: any): Promise<void> {
     const store = this.obtenerStoreEntidad(pendiente.entidad);
 
     if (!store || !pendiente.data?.uuidLocal) return;
 
-    await this.indexedDb.guardar(store, {
+    const sincronizado = {
       ...pendiente.data,
+      ...(remoto || {}),
+      uuidLocal: remoto?.uuidLocal || pendiente.data.uuidLocal,
       estadoSync: 'SINCRONIZADO',
       fechaSincronizacion: new Date().toISOString()
-    });
+    };
+
+    if (sincronizado.uuidLocal !== pendiente.data.uuidLocal) {
+      await this.indexedDb.eliminar(store, pendiente.data.uuidLocal);
+    }
+
+    await this.indexedDb.guardar(store, sincronizado);
   }
 
   private async marcarEntidadConError(pendiente: any, error: any): Promise<void> {
