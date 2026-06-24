@@ -22,7 +22,7 @@ export class DashboardComponent implements OnInit {
   porcentajeInasistencia = 0;
 
   nombreUsuario = 'Usuario';
-  rolUsuario = 'Médico';
+  rolUsuario = 'Medico';
 
   citasDelDia: any[] = [];
   actividades: any[] = [];
@@ -36,7 +36,6 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-
     this.actualizarEstadoConexion();
 
     window.addEventListener('online', () => {
@@ -57,7 +56,7 @@ export class DashboardComponent implements OnInit {
 
     this.rolUsuario =
       usuario.rol ||
-      'Médico';
+      'Medico';
 
     const medicoId = usuario.id || 2;
 
@@ -67,6 +66,7 @@ export class DashboardComponent implements OnInit {
       next: async (data) => {
         this.modoOffline = false;
         this.cargarDatos(data);
+        await this.cargarActividadRecienteDesdeIndexedDb();
 
         localStorage.setItem(
           'dashboard_cache',
@@ -85,6 +85,7 @@ export class DashboardComponent implements OnInit {
 
         if (cache) {
           this.cargarDatos(JSON.parse(cache));
+          await this.cargarActividadRecienteDesdeIndexedDb();
           return;
         }
 
@@ -135,23 +136,43 @@ export class DashboardComponent implements OnInit {
       : 0;
 
     this.citasDelDia = citasHoy;
+    this.actividades = this.obtenerActividadReciente(pacientes, citas, atenciones);
+  }
 
-    this.actividades = [
-      ...pacientes.slice(-3).map((p: any) => ({
-        titulo: 'Paciente registrado',
-        detalle: `${p.nombres || ''} ${p.apellidos || ''}`,
-        tiempo: p.fechaCreacionLocal || 'Registro local'
+  async cargarActividadRecienteDesdeIndexedDb(): Promise<void> {
+    const [pacientes, citas, atenciones] = await Promise.all([
+      this.indexedDb.obtenerTodos('pacientes'),
+      this.indexedDb.obtenerTodos('citas'),
+      this.indexedDb.obtenerTodos('atenciones')
+    ]);
+
+    const actividadLocal = this.obtenerActividadReciente(pacientes, citas, atenciones);
+
+    if (actividadLocal.length > 0) {
+      this.actividades = actividadLocal;
+    }
+  }
+
+  private obtenerActividadReciente(pacientes: any[], citas: any[], atenciones: any[]): any[] {
+    return [
+      ...pacientes.map((p: any) => ({
+        titulo: 'PACIENTE',
+        detalle: `${p.nombres || ''} ${p.apellidos || ''}`.trim() || p.numeroDocumento || 'Paciente',
+        tiempo: p.fechaActualizacionLocal || p.fechaCreacionLocal || p.fechaRegistro || ''
       })),
-      ...citas.slice(-3).map((c: any) => ({
-        titulo: 'Cita registrada',
-        detalle: c.motivoConsulta || c.motivo || 'Cita médica',
-        tiempo: c.fechaCreacionLocal || 'Registro local'
+      ...citas.map((c: any) => ({
+        titulo: 'CITA',
+        detalle: `${c.especialidad || 'Sin especialidad'} - ${c.estado || 'SIN_ESTADO'}`,
+        tiempo: c.fechaActualizacionLocal || c.fechaCreacionLocal || c.fecha || ''
       })),
-      ...atenciones.slice(-3).map((a: any) => ({
-        titulo: 'Atención registrada',
-        detalle: a.diagnostico || a.motivoConsulta || 'Atención médica',
-        tiempo: a.fechaCreacionLocal || 'Registro local'
+      ...atenciones.map((a: any) => ({
+        titulo: 'ATENCION',
+        detalle: a.diagnostico || a.motivoConsulta || 'Atencion medica',
+        tiempo: a.fechaCreacionLocal || a.fechaHora || ''
       }))
-    ].slice(-5).reverse();
+    ]
+      .filter(item => item.tiempo)
+      .sort((a, b) => `${b.tiempo}`.localeCompare(`${a.tiempo}`))
+      .slice(0, 8);
   }
 }
