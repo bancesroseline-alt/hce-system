@@ -3,22 +3,31 @@
   <section class="page-header">
     <div>
       <h1>Trazabilidad</h1>
-      <p>Validacion de integridad de atenciones medicas mediante hashes.</p>
+      <p>Validacion de integridad de registros clinicos mediante hashes y metadatos blockchain.</p>
     </div>
   </section>
 
   <section class="query-panel">
     <label>
-      ID de atencion medica
-      <input type="number" [(ngModel)]="atencionId" placeholder="Ej. 15">
+      Entidad
+      <select [(ngModel)]="entityType">
+        <option *ngFor="let tipo of tiposEntidad" [value]="tipo.value">
+          {{ tipo.label }}
+        </option>
+      </select>
+    </label>
+
+    <label>
+      ID del registro
+      <input type="number" [(ngModel)]="entityId" placeholder="Ej. 15">
     </label>
 
     <div class="actions">
       <button type="button" (click)="consultar()" [disabled]="cargando">
         {{ cargando ? 'Consultando...' : 'Consultar historial' }}
       </button>
-      <button type="button" class="secondary" (click)="validar()">
-        Validar integridad
+      <button type="button" class="secondary" (click)="validar()" [disabled]="verificando">
+        {{ verificando ? 'Verificando...' : 'Verificar integridad' }}
       </button>
     </div>
   </section>
@@ -27,8 +36,9 @@
     {{ mensaje }}
   </div>
 
-  <div *ngIf="resultadoValidacion" class="alert success">
-    {{ resultadoValidacion }}
+  <div *ngIf="resultadoValidacion" class="alert" [class.success]="resultadoValidacion.integro" [class.error]="!resultadoValidacion.integro">
+    <strong>{{ resultadoValidacion.estado }}</strong>
+    <span>{{ resultadoValidacion.mensaje }}</span>
   </div>
 
   <section class="history-panel">
@@ -41,25 +51,33 @@
       <thead>
         <tr>
           <th>Operacion</th>
+          <th>Entidad</th>
+          <th>ID registro</th>
           <th>Usuario</th>
           <th>Hash</th>
-          <th>Hash anterior</th>
           <th>Fecha</th>
           <th>Integridad</th>
+          <th>Accion</th>
         </tr>
       </thead>
 
       <tbody>
         <tr *ngFor="let item of historial">
-          <td>{{ item.tipoOperacion }}</td>
-          <td>{{ item.usuarioId }}</td>
+          <td>{{ item.action || item.tipoOperacion }}</td>
+          <td>{{ item.entityType || 'ATENCION' }}</td>
+          <td>{{ item.entityId || item.atencionId }}</td>
+          <td>{{ item.userId || item.usuarioId || '-' }}</td>
           <td class="hash">{{ item.hashRegistro }}</td>
-          <td class="hash">{{ item.hashAnterior || '-' }}</td>
           <td>{{ item.fechaRegistro }}</td>
           <td>
             <span class="status" [class.invalid]="item.integridadValida === false">
-              {{ item.integridadValida === false ? 'Invalida' : 'Valida' }}
+              {{ item.status || (item.integridadValida === false ? 'Alterado' : 'Verificado') }}
             </span>
+          </td>
+          <td>
+            <button type="button" class="table-action" (click)="entityType = item.entityType || 'ATENCION'; entityId = +(item.entityId || item.atencionId); validar()">
+              Verificar
+            </button>
           </td>
         </tr>
       </tbody>

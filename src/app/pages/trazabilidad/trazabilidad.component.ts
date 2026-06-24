@@ -12,26 +12,36 @@ import { TrazabilidadService } from '../../services/trazabilidad.service';
 })
 export class TrazabilidadComponent {
 
+  entityType = 'ATENCION';
+  entityId: number | null = null;
   atencionId: number | null = null;
   historial: any[] = [];
-  resultadoValidacion = '';
+  resultadoValidacion: any = null;
   mensaje = '';
   cargando = false;
+  verificando = false;
+
+  tiposEntidad = [
+    { value: 'ATENCION', label: 'Atencion medica' },
+    { value: 'CITA', label: 'Cita' },
+    { value: 'PACIENTE', label: 'Paciente' },
+    { value: 'HISTORIA_CLINICA', label: 'Historia clinica' }
+  ];
 
   constructor(private trazabilidadService: TrazabilidadService) {}
 
   consultar(): void {
     this.mensaje = '';
-    this.resultadoValidacion = '';
+    this.resultadoValidacion = null;
 
-    if (!this.atencionId) {
-      this.mensaje = 'Ingrese el ID de una atencion medica';
+    if (!this.entityId) {
+      this.mensaje = 'Ingrese el ID del registro';
       return;
     }
 
     this.cargando = true;
 
-    this.trazabilidadService.historialPorAtencion(this.atencionId).subscribe({
+    this.trazabilidadService.historialPorEntidad(this.entityType, this.entityId).subscribe({
       next: data => {
         this.historial = data || [];
         this.cargando = false;
@@ -46,17 +56,25 @@ export class TrazabilidadComponent {
 
   validar(): void {
     this.mensaje = '';
+    this.resultadoValidacion = null;
 
-    if (!this.atencionId) {
-      this.mensaje = 'Ingrese el ID de una atencion medica';
+    if (!this.entityId) {
+      this.mensaje = 'Ingrese el ID del registro';
       return;
     }
 
-    this.trazabilidadService.validarIntegridad(this.atencionId).subscribe({
-      next: data => this.resultadoValidacion = data,
+    this.verificando = true;
+
+    this.trazabilidadService.verificarIntegridad(this.entityType, this.entityId).subscribe({
+      next: data => {
+        this.resultadoValidacion = data;
+        this.verificando = false;
+        this.consultar();
+      },
       error: err => {
         console.error('Error validando integridad', err);
         this.mensaje = 'No se pudo validar la integridad';
+        this.verificando = false;
       }
     });
   }

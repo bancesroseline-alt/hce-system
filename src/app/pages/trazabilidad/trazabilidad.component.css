@@ -31,7 +31,7 @@
   align-items: end;
   display: grid;
   gap: 14px;
-  grid-template-columns: minmax(220px, 320px) 1fr;
+  grid-template-columns: minmax(180px, 240px) minmax(180px, 260px) 1fr;
   padding: 18px;
 }
 
@@ -43,11 +43,14 @@ label {
   gap: 6px;
 }
 
-input {
+input,
+select {
   border: 1px solid #cbd5e1;
   border-radius: 7px;
+  box-sizing: border-box;
   min-height: 40px;
   padding: 9px 10px;
+  width: 100%;
 }
 
 .actions {
@@ -70,12 +73,21 @@ button.secondary {
   background: #2563eb;
 }
 
+button.table-action {
+  background: #e0f2fe;
+  color: #075985;
+  min-height: 34px;
+  padding: 0 10px;
+}
+
 button:disabled {
   background: #94a3b8;
   cursor: not-allowed;
 }
 
 .alert {
+  display: grid;
+  gap: 4px;
   border-radius: 8px;
   padding: 12px 14px;
 }

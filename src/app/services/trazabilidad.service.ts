@@ -12,6 +12,18 @@ export class TrazabilidadService {
 
   constructor(private http: HttpClient) {}
 
+  listar(): Observable<any[]> {
+    return this.http.get<any[]>(this.api).pipe(timeout(4000));
+  }
+
+  historialPorEntidad(entityType: string, entityId: string | number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/${entityType}/${entityId}`).pipe(timeout(4000));
+  }
+
+  verificarIntegridad(entityType: string, entityId: string | number): Observable<any> {
+    return this.http.post<any>(`${this.api}/verificar`, { entityType, entityId: String(entityId) }).pipe(timeout(4000));
+  }
+
   historialPorAtencion(atencionId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/atencion/${atencionId}`).pipe(timeout(4000));
   }
