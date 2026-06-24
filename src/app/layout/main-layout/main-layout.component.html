@@ -35,32 +35,62 @@
 
       <div class="header-actions">
 
-        <button class="notification-btn" title="Notificaciones">
-          <span>!</span>
-          <span class="notification-badge">3</span>
-        </button>
+        <div class="notification-menu">
+          <button class="notification-btn" title="Notificaciones" (click)="toggleNotificaciones()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 22a2.8 2.8 0 0 0 2.65-1.9h-5.3A2.8 2.8 0 0 0 12 22Zm7-6.2V11a7 7 0 0 0-5-6.7V3a2 2 0 1 0-4 0v1.3A7 7 0 0 0 5 11v4.8L3.3 18v1h17.4v-1L19 15.8ZM7 17l.9-1.2V11a4.1 4.1 0 0 1 8.2 0v4.8L17 17H7Z"></path>
+            </svg>
+            <span class="notification-badge" *ngIf="totalNotificaciones > 0">{{ totalNotificaciones }}</span>
+          </button>
+
+          <div class="notifications-panel" *ngIf="mostrarNotificaciones">
+            <div class="notifications-head">
+              <strong>Notificaciones</strong>
+              <small>{{ totalNotificaciones > 0 ? totalNotificaciones + ' aviso(s) activo(s)' : 'Sin avisos pendientes' }}</small>
+            </div>
+
+            <button
+              type="button"
+              class="notification-item"
+              *ngFor="let notificacion of notificaciones"
+              [class.warning]="notificacion.severity === 'warning'"
+              [class.danger]="notificacion.severity === 'danger'"
+              (click)="irANotificacion(notificacion.route)">
+              <span class="notification-dot"></span>
+              <span>
+                <strong>{{ notificacion.titulo }}</strong>
+                <small>{{ notificacion.detalle }}</small>
+              </span>
+            </button>
+
+            <div class="notifications-empty" *ngIf="notificaciones.length === 0">
+              <strong>Todo al día</strong>
+              <small>No hay registros pendientes, errores ni conflictos.</small>
+            </div>
+          </div>
+        </div>
 
         <div class="user-menu">
 
           <button class="user-menu-btn" (click)="toggleUserMenu()">
             <span class="user-avatar">
-              {{ (usuario?.nombres || usuario?.username || 'U').charAt(0) }}
+              {{ inicialUsuario() }}
             </span>
 
             <span class="user-name">
-              {{ usuario?.nombres || usuario?.username || 'Usuario' }}
+              {{ nombreUsuario() }}
             </span>
 
-            <span class="chevron">v</span>
+            <span class="chevron">⌄</span>
           </button>
 
           <div class="dropdown" *ngIf="mostrarMenuUsuario">
             <div class="dropdown-user">
-              <strong>{{ usuario?.nombres || usuario?.username || 'Usuario' }}</strong>
+              <span class="dropdown-avatar">{{ inicialUsuario() }}</span>
+              <strong>{{ nombreUsuario() }}</strong>
               <small>{{ usuario?.rol || 'Usuario' }}</small>
             </div>
 
-            <button routerLink="/dashboard">Dashboard</button>
             <button class="logout" (click)="logout()">Cerrar sesion</button>
           </div>
 
@@ -71,6 +101,16 @@
     </header>
 
     <main>
+      <section class="route-header">
+        <h1>{{ tituloPagina }}</h1>
+        <nav class="breadcrumb" aria-label="Ruta actual">
+          <ng-container *ngFor="let item of breadcrumbs; let last = last">
+            <a *ngIf="item.route && !last" [routerLink]="item.route">{{ item.label }}</a>
+            <span *ngIf="!item.route || last" [class.current]="last">{{ item.label }}</span>
+            <span class="separator" *ngIf="!last">›</span>
+          </ng-container>
+        </nav>
+      </section>
       <router-outlet></router-outlet>
     </main>
 

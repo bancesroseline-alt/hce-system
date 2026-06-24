@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
+import { IndexedDbService } from '../../services/indexed-db.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -13,7 +15,12 @@ export class MainLayoutComponent implements OnInit {
 
   usuario: any;
   mostrarMenuUsuario = false;
+  mostrarNotificaciones = false;
   menuItems: any[] = [];
+  tituloPagina = 'Dashboard';
+  breadcrumbs: Array<{ label: string; route?: string }> = [];
+  notificaciones: Array<{ tipo: string; titulo: string; detalle: string; route: string; severity: 'info' | 'warning' | 'danger' }> = [];
+  totalNotificaciones = 0;
 
   private readonly items = [
     {
@@ -72,21 +79,113 @@ export class MainLayoutComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private indexedDb: IndexedDbService
+  ) {}
 
   ngOnInit(): void {
     this.usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
     const rol = this.normalizarRol(this.usuario?.rol);
     this.menuItems = this.items.filter(item => item.roles.includes(rol));
+    this.actualizarBreadcrumb(this.router.url);
+    this.cargarNotificaciones();
+
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.actualizarBreadcrumb(event.urlAfterRedirects || event.url);
+        this.mostrarMenuUsuario = false;
+        this.mostrarNotificaciones = false;
+        this.cargarNotificaciones();
+      });
+
+    window.addEventListener('online', () => this.cargarNotificaciones());
+    window.addEventListener('focus', () => this.cargarNotificaciones());
   }
 
   toggleUserMenu(): void {
     this.mostrarMenuUsuario = !this.mostrarMenuUsuario;
+    this.mostrarNotificaciones = false;
+  }
+
+  toggleNotificaciones(): void {
+    this.mostrarNotificaciones = !this.mostrarNotificaciones;
+    this.mostrarMenuUsuario = false;
+    this.cargarNotificaciones();
   }
 
   logout(): void {
     localStorage.clear();
     this.router.navigate(['/login']);
+  }
+
+  async cargarNotificaciones(): Promise<void> {
+    try {
+      const [pendientes, errores, conflictos] = await Promise.all([
+        this.indexedDb.obtenerPendientes(),
+        this.indexedDb.obtenerTodos('syncErrors'),
+        this.indexedDb.obtenerTodos('conflicts')
+      ]);
+
+      this.notificaciones = [];
+
+      if (pendientes.length > 0) {
+        this.notificaciones.push({
+          tipo: 'Pendientes',
+          titulo: `${pendientes.length} registro${pendientes.length === 1 ? '' : 's'} por sincronizar`,
+          detalle: 'Hay cambios locales esperando conexión o sincronización manual.',
+          route: '/sincronizacion',
+          severity: 'warning'
+        });
+      }
+
+      if (errores.length > 0) {
+        this.notificaciones.push({
+          tipo: 'Errores',
+          titulo: `${errores.length} error${errores.length === 1 ? '' : 'es'} de sincronización`,
+          detalle: 'Revisa los registros fallidos para reintentarlos o ver el detalle.',
+          route: '/sincronizacion',
+          severity: 'danger'
+        });
+      }
+
+      const conflictosActivos = conflictos.filter((c: any) => c.estado !== 'RESUELTO_LOCAL' && c.estado !== 'RESUELTO_REMOTO');
+
+      if (conflictosActivos.length > 0) {
+        this.notificaciones.push({
+          tipo: 'Conflictos',
+          titulo: `${conflictosActivos.length} conflicto${conflictosActivos.length === 1 ? '' : 's'} detectado${conflictosActivos.length === 1 ? '' : 's'}`,
+          detalle: 'Necesitan revisión para decidir si conservar dato local o remoto.',
+          route: '/sincronizacion',
+          severity: 'danger'
+        });
+      }
+
+      this.totalNotificaciones = pendientes.length + errores.length + conflictosActivos.length;
+    } catch (error) {
+      this.notificaciones = [{
+        tipo: 'Sistema',
+        titulo: 'No se pudieron revisar las notificaciones',
+        detalle: 'IndexedDB no respondió correctamente en este navegador.',
+        route: '/sincronizacion',
+        severity: 'info'
+      }];
+      this.totalNotificaciones = 1;
+    }
+  }
+
+  irANotificacion(route: string): void {
+    this.mostrarNotificaciones = false;
+    this.router.navigate([route]);
+  }
+
+  inicialUsuario(): string {
+    return (this.usuario?.nombres || this.usuario?.username || 'U').charAt(0).toUpperCase();
+  }
+
+  nombreUsuario(): string {
+    return this.usuario?.nombres || this.usuario?.username || 'Usuario';
   }
 
   private normalizarRol(rol: any): string {
@@ -98,5 +197,66 @@ export class MainLayoutComponent implements OnInit {
       .toUpperCase();
 
     return normalizado === 'ADMINISTRADOR' ? 'ADMIN' : normalizado;
+  }
+
+  private actualizarBreadcrumb(url: string): void {
+    const cleanUrl = url.split('?')[0].split('#')[0];
+    const segmentos = cleanUrl.replace(/^\/+/, '').split('/').filter(Boolean);
+    const principal = segmentos[0] || 'dashboard';
+
+    const mapa: Record<string, string> = {
+      dashboard: 'Dashboard',
+      usuarios: 'Gestión de usuarios',
+      pacientes: 'Pacientes',
+      citas: 'Citas',
+      'historias-clinicas': 'Historias clínicas',
+      atenciones: 'Registro de atención médica',
+      prediccion: 'Predicción ML',
+      sincronizacion: 'Sincronización',
+      trazabilidad: 'Trazabilidad',
+      reportes: 'Reportes locales'
+    };
+
+    this.tituloPagina = mapa[principal] || 'Sistema HCE';
+    this.breadcrumbs = [{ label: 'Inicio', route: '/dashboard' }];
+
+    if (principal === 'dashboard') {
+      this.breadcrumbs = [{ label: 'Dashboard' }];
+      return;
+    }
+
+    if (principal === 'pacientes') {
+      this.breadcrumbs.push({ label: 'Pacientes', route: '/pacientes' });
+
+      if (segmentos[1] === 'nuevo') this.breadcrumbs.push({ label: 'Nuevo paciente' });
+      if (segmentos[1] === 'editar') this.breadcrumbs.push({ label: `Editar paciente ${segmentos[2] || ''}`.trim() });
+      if (segmentos[1] && !['nuevo', 'editar'].includes(segmentos[1])) {
+        this.breadcrumbs.push({ label: `Paciente ${segmentos[1]}`, route: `/pacientes/${segmentos[1]}` });
+      }
+      if (segmentos[2] === 'citas') this.breadcrumbs.push({ label: 'Citas' });
+      return;
+    }
+
+    if (principal === 'citas') {
+      this.breadcrumbs.push({ label: 'Citas', route: '/citas' });
+      if (segmentos[1] === 'paciente') this.breadcrumbs.push({ label: `Paciente ${segmentos[2] || ''}`.trim() });
+      if (segmentos[1] === 'nueva') this.breadcrumbs.push({ label: 'Nueva cita' });
+      return;
+    }
+
+    if (principal === 'historias-clinicas') {
+      this.breadcrumbs.push({ label: 'Historias clínicas', route: '/historias-clinicas' });
+      if (segmentos[1]) this.breadcrumbs.push({ label: `Paciente ${segmentos[1]}` });
+      return;
+    }
+
+    if (principal === 'atenciones') {
+      this.breadcrumbs.push({ label: 'Historias clínicas', route: '/historias-clinicas' });
+      if (segmentos[2]) this.breadcrumbs.push({ label: `Paciente ${segmentos[2]}`, route: `/historias-clinicas/${segmentos[2]}` });
+      this.breadcrumbs.push({ label: 'Nueva atención' });
+      return;
+    }
+
+    this.breadcrumbs.push({ label: mapa[principal] || principal });
   }
 }
