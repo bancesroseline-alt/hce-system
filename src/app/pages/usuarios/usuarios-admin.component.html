@@ -2,8 +2,8 @@
 
   <section class="usuarios-header">
     <div>
-      <h1>Usuarios nuevos</h1>
-      <p>Inicio &gt; Usuarios</p>
+      <h1>Gestion de usuarios</h1>
+      <p>Inicio &gt; Gestion de usuarios</p>
     </div>
 
     <div class="system-status">
@@ -22,147 +22,129 @@
 
   <section class="form-shell">
     <div class="form-column">
-      <h2>Datos personales</h2>
+      <h2>{{ modoEdicion ? 'Editar usuario' : 'Registrar usuario' }}</h2>
 
       <label>
-        Nombre completo
+        Nombre *
         <input
           type="text"
           [(ngModel)]="usuario.nombres"
-          (blur)="autocompletarUsername()"
-          placeholder="Nombres">
+          placeholder="Nombre">
       </label>
 
       <label>
-        Apellidos
+        Apellido *
         <input
           type="text"
           [(ngModel)]="usuario.apellidos"
-          (blur)="autocompletarUsername()"
-          placeholder="Apellidos">
+          placeholder="Apellido">
       </label>
 
       <label>
-        DNI/NIF *
+        Username *
         <input
           type="text"
-          [(ngModel)]="datosApoyo.documento"
-          placeholder="Documento de identidad">
-      </label>
-
-      <label>
-        Telefono
-        <input
-          type="text"
-          [(ngModel)]="datosApoyo.telefono"
-          placeholder="+51 999 999 999">
-      </label>
-
-      <label>
-        Correo electronico personal
-        <input
-          type="email"
-          [(ngModel)]="datosApoyo.correoPersonal"
-          (blur)="autocompletarUsername()"
-          placeholder="correo@dominio.com">
+          [(ngModel)]="usuario.username"
+          placeholder="usuario o correo">
       </label>
     </div>
 
     <div class="form-column">
-      <h2>Credenciales y roles</h2>
+      <h2>Acceso</h2>
 
       <label>
-        Correo de usuario
-        <input
-          type="text"
-          [(ngModel)]="usuario.username"
-          placeholder="usuario o correo institucional">
-      </label>
-
-      <label>
-        Contrasena
+        Contrasena {{ modoEdicion ? '' : '*' }}
         <input
           type="password"
           [(ngModel)]="usuario.password"
-          placeholder="Contrasena">
-      </label>
-
-      <div class="strength">
-        <span [class.active]="fortalezaPassword() >= 1"></span>
-        <span [class.active]="fortalezaPassword() >= 2"></span>
-        <span [class.active]="fortalezaPassword() >= 3"></span>
-        <span [class.active]="fortalezaPassword() >= 4"></span>
-      </div>
-
-      <label>
-        Confirmar contrasena
-        <input
-          type="password"
-          [(ngModel)]="confirmarPassword"
-          placeholder="Confirmar contrasena">
+          [placeholder]="modoEdicion ? 'Dejar vacia para mantener actual' : 'Contrasena'">
       </label>
 
       <label>
-        Rol de acceso
+        Rol *
         <select [(ngModel)]="usuario.rol">
-          <option value="ADMIN">Administrador</option>
-          <option value="MEDICO">Medico</option>
-          <option value="ENFERMERO">Enfermero</option>
+          <option value="ADMIN">ADMINISTRADOR</option>
+          <option value="MEDICO">MEDICO</option>
+          <option value="ENFERMERO">ENFERMERO</option>
         </select>
       </label>
 
-      <label class="toggle-row">
-        <input type="checkbox" [(ngModel)]="usuario.estado">
-        Usuario activo
+      <label>
+        Estado *
+        <select [(ngModel)]="usuario.estado">
+          <option [ngValue]="true">ACTIVO</option>
+          <option [ngValue]="false">INACTIVO</option>
+        </select>
       </label>
     </div>
   </section>
 
   <div class="actions">
-    <button type="button" class="secondary" (click)="cargarUsuarios()">Cancelar</button>
+    <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
+    <button type="button" class="secondary" (click)="limpiarFormulario()">Limpiar formulario</button>
     <button type="button" class="primary" (click)="guardar()" [disabled]="guardando">
-      {{ guardando ? 'Guardando...' : 'Guardar' }}
+      {{ guardando ? 'Guardando...' : 'Guardar usuario' }}
     </button>
   </div>
 
   <section class="list-panel">
     <div class="panel-title">
-      <h2>Usuarios registrados</h2>
-      <span>{{ usuarios.length }} registros</span>
+      <div>
+        <h2>Usuarios registrados</h2>
+        <span>{{ usuariosFiltrados().length }} registros</span>
+      </div>
+
+      <input
+        class="search-input"
+        type="search"
+        [(ngModel)]="busqueda"
+        placeholder="Buscar por nombre o username">
     </div>
 
-    <table *ngIf="usuarios.length > 0">
-      <thead>
-        <tr>
-          <th>Usuario</th>
-          <th>Username</th>
-          <th>Rol</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
+    <div class="table-wrap">
+      <table *ngIf="usuariosFiltrados().length > 0">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Username</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr *ngFor="let u of usuarios">
-          <td>{{ u.nombres }} {{ u.apellidos }}</td>
-          <td>{{ u.username }}</td>
-          <td>
-            <select [ngModel]="u.rol" (ngModelChange)="cambiarRol(u, $event)">
-              <option value="ADMIN">ADMIN</option>
-              <option value="MEDICO">MEDICO</option>
-              <option value="ENFERMERO">ENFERMERO</option>
-            </select>
-          </td>
-          <td>
-            <span class="status" [class.inactive]="u.estado === false">
-              {{ u.estado === false ? 'Inactivo' : 'Activo' }}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        <tbody>
+          <tr *ngFor="let u of usuariosFiltrados()">
+            <td>{{ u.nombres }}</td>
+            <td>{{ u.apellidos }}</td>
+            <td>{{ u.username }}</td>
+            <td>{{ etiquetaRol(u.rol) }}</td>
+            <td>
+              <span class="status" [class.inactive]="u.estado === false">
+                {{ u.estado === false ? 'INACTIVO' : 'ACTIVO' }}
+              </span>
+            </td>
+            <td>
+              <div class="row-actions">
+                <button type="button" class="table-btn" (click)="editar(u)">Editar</button>
+                <button type="button" class="table-btn" (click)="cambiarEstado(u)">
+                  {{ u.estado === false ? 'Activar' : 'Desactivar' }}
+                </button>
+                <button type="button" class="table-btn danger" (click)="eliminar(u)">Eliminar</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <p class="empty" *ngIf="!cargando && usuarios.length === 0">
+    <p class="empty" *ngIf="!cargando && usuariosFiltrados().length === 0">
       No hay usuarios registrados.
+    </p>
+
+    <p class="empty" *ngIf="cargando">
+      Cargando usuarios...
     </p>
   </section>
 

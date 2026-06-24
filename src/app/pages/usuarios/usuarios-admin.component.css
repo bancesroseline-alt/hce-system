@@ -171,6 +171,7 @@ select:focus {
   align-items: center;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
+  gap: 14px;
   justify-content: space-between;
   padding: 14px 18px;
 }
@@ -178,6 +179,20 @@ select:focus {
 .panel-title span {
   color: #64748b;
   font-weight: 700;
+}
+
+.panel-title > div {
+  display: grid;
+  gap: 4px;
+}
+
+.search-input {
+  max-width: 320px;
+  width: 100%;
+}
+
+.table-wrap {
+  overflow-x: auto;
 }
 
 table {
@@ -200,6 +215,37 @@ th {
 
 td select {
   min-height: 34px;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  color: #0f172a;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 10px;
+}
+
+.table-btn:hover {
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+.table-btn.danger {
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.table-btn.danger:hover {
+  background: #fee2e2;
 }
 
 .status {
@@ -225,9 +271,14 @@ td select {
 
 @media (max-width: 900px) {
   .usuarios-header,
-  .actions {
+  .actions,
+  .panel-title {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .search-input {
+    max-width: none;
   }
 
   .form-shell {

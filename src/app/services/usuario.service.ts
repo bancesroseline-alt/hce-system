@@ -21,7 +21,19 @@ export class UsuarioService {
     return this.http.post<Usuario>(this.api, usuario).pipe(timeout(4000));
   }
 
+  actualizar(id: number, usuario: Usuario): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.api}/${id}`, usuario).pipe(timeout(4000));
+  }
+
   actualizarRol(id: number, rol: string): Observable<Usuario> {
     return this.http.put<Usuario>(`${this.api}/${id}/rol?rol=${rol}`, {}).pipe(timeout(4000));
+  }
+
+  cambiarEstado(id: number, estado: boolean): Observable<Usuario> {
+    return this.http.patch<Usuario>(`${this.api}/${id}/estado?estado=${estado}`, {}).pipe(timeout(4000));
+  }
+
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/${id}`).pipe(timeout(4000));
   }
 }

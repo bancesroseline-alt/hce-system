@@ -16,10 +16,12 @@ export const roleGuard: CanActivateFn = (route) => {
 };
 
 function normalizarRol(rol: any): string {
-  return (rol || '')
+  const normalizado = (rol || '')
     .toString()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace('ROLE_', '')
     .toUpperCase();
+
+  return normalizado === 'ADMINISTRADOR' ? 'ADMIN' : normalizado;
 }

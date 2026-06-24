@@ -23,7 +23,7 @@ export class MainLayoutComponent implements OnInit {
       icon: 'M3 13h8V3H3v10Zm0 8h8v-6H3v6Zm10 0h8V11h-8v10Zm0-18v6h8V3h-8Z'
     },
     {
-      label: 'Usuarios',
+      label: 'Gestion de usuarios',
       route: '/usuarios',
       roles: ['ADMIN'],
       icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Zm7-2v-2h-2V8h2V6h2v2h2v2h-2v2h-2Z'
@@ -37,7 +37,7 @@ export class MainLayoutComponent implements OnInit {
     {
       label: 'Citas',
       route: '/citas',
-      roles: ['MEDICO', 'ENFERMERO'],
+      roles: ['ADMIN', 'MEDICO', 'ENFERMERO'],
       icon: 'M7 2h2v2h6V2h2v2h3c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h3V2Zm13 8H4v10h16V10ZM4 8h16V6H4v2Zm3 4h4v4H7v-4Z'
     },
     {
@@ -49,7 +49,7 @@ export class MainLayoutComponent implements OnInit {
     {
       label: 'Prediccion (ML)',
       route: '/prediccion',
-      roles: ['ADMIN', 'MEDICO'],
+      roles: ['ADMIN', 'MEDICO', 'ENFERMERO'],
       icon: 'M12 2c1.1 0 2 .9 2 2v1h2c1.1 0 2 .9 2 2v2h1c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2h-1v2c0 1.1-.9 2-2 2h-2v1c0 1.1-.9 2-2 2s-2-.9-2-2v-1H8c-1.1 0-2-.9-2-2v-2H5c-1.1 0-2-.9-2-2v-2c0-1.1.9-2 2-2h1V7c0-1.1.9-2 2-2h2V4c0-1.1.9-2 2-2Zm-4 5v10h8V7H8Zm2 3h4v2h-4v-2Zm0 4h4v2h-4v-2Z'
     },
     {
@@ -61,13 +61,13 @@ export class MainLayoutComponent implements OnInit {
     {
       label: 'Trazabilidad',
       route: '/trazabilidad',
-      roles: ['ADMIN', 'MEDICO'],
+      roles: ['ADMIN', 'MEDICO', 'ENFERMERO'],
       icon: 'M12 2 3 7v6c0 5 3.8 8.7 9 9 5.2-.3 9-4 9-9V7l-9-5Zm0 3.2 6 3.3V13c0 3.4-2.3 5.8-6 6-3.7-.2-6-2.6-6-6V8.5l6-3.3Zm-1 4.8h2v5h-2v-5Zm0 6h2v2h-2v-2Z'
     },
     {
       label: 'Reportes',
       route: '/reportes',
-      roles: ['ADMIN', 'MEDICO'],
+      roles: ['ADMIN', 'MEDICO', 'ENFERMERO'],
       icon: 'M4 19h16v2H4v-2Zm2-8h3v6H6v-6Zm5-6h3v12h-3V5Zm5 3h3v9h-3V8Z'
     }
   ];
@@ -90,11 +90,13 @@ export class MainLayoutComponent implements OnInit {
   }
 
   private normalizarRol(rol: any): string {
-    return (rol || '')
+    const normalizado = (rol || '')
       .toString()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace('ROLE_', '')
       .toUpperCase();
+
+    return normalizado === 'ADMINISTRADOR' ? 'ADMIN' : normalizado;
   }
 }

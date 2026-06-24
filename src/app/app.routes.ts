@@ -102,7 +102,7 @@ export const routes: Routes = [
       {
         path: 'citas',
         canActivate: [roleGuard],
-        data: { roles: ['MEDICO', 'ENFERMERO'] },
+        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
         loadComponent: () =>
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
@@ -111,7 +111,7 @@ export const routes: Routes = [
       {
         path: 'citas/paciente/:id',
         canActivate: [roleGuard],
-        data: { roles: ['MEDICO', 'ENFERMERO'] },
+        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
         loadComponent: () =>
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
@@ -120,7 +120,7 @@ export const routes: Routes = [
       {
         path: 'citas/nueva/:id',
         canActivate: [roleGuard],
-        data: { roles: ['MEDICO', 'ENFERMERO'] },
+        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
         loadComponent: () =>
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
@@ -146,7 +146,7 @@ export const routes: Routes = [
       {
         path: 'prediccion',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'MEDICO'] },
+        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
         loadComponent: () =>
           import('./pages/prediccion/prediccion.component')
             .then(m => m.PrediccionComponent)
@@ -162,7 +162,7 @@ export const routes: Routes = [
       {
         path: 'trazabilidad',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'MEDICO'] },
+        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
         loadComponent: () =>
           import('./pages/trazabilidad/trazabilidad.component')
             .then(m => m.TrazabilidadComponent)
@@ -171,7 +171,7 @@ export const routes: Routes = [
       {
         path: 'reportes',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'MEDICO'] },
+        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
         loadComponent: () =>
           import('./pages/reportes/reportes.component')
             .then(m => m.ReportesComponent)

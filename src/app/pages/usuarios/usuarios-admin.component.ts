@@ -14,26 +14,15 @@ import { UsuarioService } from '../../services/usuario.service';
 export class UsuariosAdminComponent implements OnInit {
 
   usuarios: Usuario[] = [];
+  busqueda = '';
   mensaje = '';
   tipoMensaje: 'success' | 'error' | '' = '';
   cargando = false;
   guardando = false;
+  modoEdicion = false;
+  usuarioEditandoId: number | null = null;
 
-  confirmarPassword = '';
-  datosApoyo = {
-    documento: '',
-    telefono: '',
-    correoPersonal: ''
-  };
-
-  usuario: Usuario = {
-    nombres: '',
-    apellidos: '',
-    username: '',
-    password: '',
-    rol: 'MEDICO',
-    estado: true
-  };
+  usuario: Usuario = this.crearFormularioVacio();
 
   constructor(private usuarioService: UsuarioService) {}
 
@@ -51,104 +40,168 @@ export class UsuariosAdminComponent implements OnInit {
       },
       error: err => {
         console.error('Error cargando usuarios', err);
-        this.mensaje = 'No se pudieron cargar los usuarios';
-        this.tipoMensaje = 'error';
+        this.mostrarError('No se pudieron cargar los usuarios');
         this.cargando = false;
       }
     });
   }
 
-  autocompletarUsername(): void {
-    if (this.usuario.username?.trim()) return;
+  usuariosFiltrados(): Usuario[] {
+    const q = this.busqueda.trim().toLowerCase();
 
-    const base = this.datosApoyo.correoPersonal?.trim();
-    if (base) {
-      this.usuario.username = base;
-      return;
-    }
+    if (!q) return this.usuarios;
 
-    const nombres = this.usuario.nombres.trim().toLowerCase().replace(/\s+/g, '.');
-    const apellidos = this.usuario.apellidos.trim().toLowerCase().replace(/\s+/g, '.');
-
-    if (nombres && apellidos) {
-      this.usuario.username = `${nombres}.${apellidos}`;
-    }
+    return this.usuarios.filter(u =>
+      `${u.nombres || ''}`.toLowerCase().includes(q) ||
+      `${u.apellidos || ''}`.toLowerCase().includes(q) ||
+      `${u.username || ''}`.toLowerCase().includes(q)
+    );
   }
 
   guardar(): void {
     this.mensaje = '';
     this.tipoMensaje = '';
-    this.autocompletarUsername();
 
-    if (!this.usuario.nombres.trim() || !this.usuario.apellidos.trim()) {
-      this.mostrarError('Nombre y apellidos son obligatorios');
-      return;
-    }
+    if (!this.validarFormulario()) return;
 
-    if (!this.datosApoyo.documento.trim()) {
-      this.mostrarError('DNI/NIF es obligatorio para registrar el usuario');
-      return;
-    }
+    const usernameDuplicado = this.usuarios.some(u =>
+      u.username.trim().toLowerCase() === this.usuario.username.trim().toLowerCase() &&
+      u.id !== this.usuarioEditandoId
+    );
 
-    if (!this.usuario.username.trim()) {
-      this.mostrarError('Correo o nombre de usuario es obligatorio');
-      return;
-    }
-
-    if (!this.usuario.password || this.usuario.password.length < 6) {
-      this.mostrarError('La contrasena debe tener al menos 6 caracteres');
-      return;
-    }
-
-    if (this.usuario.password !== this.confirmarPassword) {
-      this.mostrarError('Las contrasenas no coinciden');
+    if (usernameDuplicado) {
+      this.mostrarError('Ya existe un usuario con ese username');
       return;
     }
 
     this.guardando = true;
 
-    this.usuarioService.crear(this.usuario).subscribe({
+    const request = this.modoEdicion && this.usuarioEditandoId
+      ? this.usuarioService.actualizar(this.usuarioEditandoId, this.usuario)
+      : this.usuarioService.crear(this.usuario);
+
+    request.subscribe({
       next: () => {
-        this.mensaje = 'Usuario creado correctamente';
+        this.mensaje = this.modoEdicion
+          ? 'Usuario actualizado correctamente'
+          : 'Usuario creado correctamente';
         this.tipoMensaje = 'success';
         this.guardando = false;
         this.limpiarFormulario();
         this.cargarUsuarios();
       },
       error: err => {
-        console.error('Error creando usuario', err);
-        this.mostrarError(err.error?.message || 'No se pudo crear el usuario');
+        console.error('Error guardando usuario', err);
+        this.mostrarError(err.error?.message || 'No se pudo guardar el usuario');
         this.guardando = false;
       }
     });
   }
 
-  cambiarRol(usuario: Usuario, rol: string): void {
+  editar(usuario: Usuario): void {
+    this.modoEdicion = true;
+    this.usuarioEditandoId = usuario.id || null;
+    this.mensaje = '';
+    this.tipoMensaje = '';
+
+    this.usuario = {
+      id: usuario.id,
+      nombres: usuario.nombres || '',
+      apellidos: usuario.apellidos || '',
+      username: usuario.username || '',
+      password: '',
+      rol: usuario.rol,
+      estado: usuario.estado !== false
+    };
+  }
+
+  cambiarEstado(usuario: Usuario): void {
     if (!usuario.id) return;
 
-    this.usuarioService.actualizarRol(usuario.id, rol).subscribe({
+    const nuevoEstado = usuario.estado === false;
+
+    this.usuarioService.cambiarEstado(usuario.id, nuevoEstado).subscribe({
       next: actualizado => {
-        usuario.rol = actualizado.rol;
-        this.mensaje = 'Rol actualizado correctamente';
+        usuario.estado = actualizado.estado;
+        this.mensaje = actualizado.estado ? 'Usuario activado correctamente' : 'Usuario desactivado correctamente';
         this.tipoMensaje = 'success';
       },
       error: err => {
-        console.error('Error actualizando rol', err);
-        this.mostrarError('No se pudo actualizar el rol');
+        console.error('Error actualizando estado', err);
+        this.mostrarError('No se pudo actualizar el estado del usuario');
       }
     });
   }
 
-  fortalezaPassword(): number {
-    const password = this.usuario.password || '';
-    let score = 0;
+  eliminar(usuario: Usuario): void {
+    if (!usuario.id) return;
 
-    if (password.length >= 6) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
+    const confirmado = window.confirm(`Seguro que deseas eliminar el usuario ${usuario.username}?`);
 
-    return score;
+    if (!confirmado) return;
+
+    this.usuarioService.eliminar(usuario.id).subscribe({
+      next: () => {
+        this.mensaje = 'Usuario eliminado correctamente';
+        this.tipoMensaje = 'success';
+        this.cargarUsuarios();
+      },
+      error: err => {
+        console.error('Error eliminando usuario', err);
+        this.mostrarError(err.error?.message || 'No se pudo eliminar el usuario');
+      }
+    });
+  }
+
+  limpiarFormulario(): void {
+    this.usuario = this.crearFormularioVacio();
+    this.modoEdicion = false;
+    this.usuarioEditandoId = null;
+  }
+
+  cancelar(): void {
+    this.limpiarFormulario();
+    this.mensaje = '';
+    this.tipoMensaje = '';
+  }
+
+  etiquetaRol(rol: string): string {
+    if (rol === 'ADMIN') return 'ADMINISTRADOR';
+    return rol;
+  }
+
+  private validarFormulario(): boolean {
+    if (!this.usuario.nombres.trim()) {
+      this.mostrarError('Nombre obligatorio');
+      return false;
+    }
+
+    if (!this.usuario.apellidos.trim()) {
+      this.mostrarError('Apellido obligatorio');
+      return false;
+    }
+
+    if (!this.usuario.username.trim()) {
+      this.mostrarError('Username obligatorio');
+      return false;
+    }
+
+    if (!this.modoEdicion && !this.usuario.password?.trim()) {
+      this.mostrarError('Contrasena obligatoria');
+      return false;
+    }
+
+    if (!this.usuario.rol) {
+      this.mostrarError('Rol obligatorio');
+      return false;
+    }
+
+    if (this.usuario.estado === null || this.usuario.estado === undefined) {
+      this.mostrarError('Estado obligatorio');
+      return false;
+    }
+
+    return true;
   }
 
   private mostrarError(texto: string): void {
@@ -156,21 +209,14 @@ export class UsuariosAdminComponent implements OnInit {
     this.tipoMensaje = 'error';
   }
 
-  private limpiarFormulario(): void {
-    this.usuario = {
+  private crearFormularioVacio(): Usuario {
+    return {
       nombres: '',
       apellidos: '',
       username: '',
       password: '',
       rol: 'MEDICO',
       estado: true
-    };
-
-    this.confirmarPassword = '';
-    this.datosApoyo = {
-      documento: '',
-      telefono: '',
-      correoPersonal: ''
     };
   }
 }
