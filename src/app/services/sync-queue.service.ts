@@ -55,6 +55,34 @@ export class SyncQueueService {
     }
   }
 
+  async reintentarPendiente(pendiente: any): Promise<void> {
+    if (!navigator.onLine) {
+      throw new Error('Sin internet. No se puede sincronizar.');
+    }
+
+    let respuestaRemota: any = null;
+
+    if (pendiente.entidad === 'CITA') {
+      respuestaRemota = await this.sincronizarCita(pendiente);
+    }
+
+    if (pendiente.entidad === 'ATENCION') {
+      respuestaRemota = await this.sincronizarAtencion(pendiente);
+    }
+
+    if (pendiente.entidad === 'PACIENTE') {
+      respuestaRemota = await this.sincronizarPaciente(pendiente);
+    }
+
+    if (pendiente.entidad === 'PREDICCION') {
+      respuestaRemota = await this.sincronizarPrediccion(pendiente);
+    }
+
+    await this.marcarEntidadSincronizada(pendiente, respuestaRemota);
+    await this.indexedDb.marcarSincronizado(pendiente.uuidLocal);
+    await this.indexedDb.eliminarErrorSync(pendiente.uuidLocal);
+  }
+
   private sincronizarCita(pendiente: any): Promise<any> {
     const cita = pendiente.data;
 

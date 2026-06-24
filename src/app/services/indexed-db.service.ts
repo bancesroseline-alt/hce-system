@@ -102,6 +102,10 @@ export class IndexedDbService {
     });
   }
 
+  async eliminarErrorSync(uuidLocal: string): Promise<void> {
+    return this.eliminar('syncErrors', uuidLocal);
+  }
+
   async agregarPendiente(entidad: string, accion: string, data: any): Promise<any> {
     const pendiente = {
       uuidLocal: crypto.randomUUID(),

@@ -11,30 +11,43 @@
         {{ online ? 'Con conexion' : 'Modo offline' }}
       </span>
 
-      <button type="button" (click)="sincronizar()" [disabled]="sincronizando || !online">
+      <button type="button" class="primary-action" (click)="sincronizar()" [disabled]="sincronizando || !online">
         {{ sincronizando ? 'Sincronizando...' : 'Sincronizar pendientes' }}
       </button>
     </div>
   </section>
 
-  <div *ngIf="mensaje" class="message">
-    {{ mensaje }}
+  <div *ngIf="mensaje" class="message" [ngClass]="tipoMensaje">
+    <span class="message-icon">{{ tipoMensaje === 'success' ? '✓' : '↻' }}</span>
+    <span>{{ mensaje }}</span>
   </div>
 
   <section class="summary-grid">
     <article>
-      <span>Pendientes</span>
-      <strong>{{ pendientes.length }}</strong>
+      <div class="summary-icon pending">↻</div>
+      <div>
+        <span>Pendientes</span>
+        <strong>{{ pendientes.length }}</strong>
+        <p>Registros listos para enviar al servidor.</p>
+      </div>
     </article>
 
     <article>
-      <span>Errores</span>
-      <strong>{{ errores.length }}</strong>
+      <div class="summary-icon error">!</div>
+      <div>
+        <span>Errores</span>
+        <strong>{{ errores.length }}</strong>
+        <p>Registros que requieren reintento o revision.</p>
+      </div>
     </article>
 
     <article>
-      <span>Conflictos</span>
-      <strong>{{ conflictos.length }}</strong>
+      <div class="summary-icon conflict">≠</div>
+      <div>
+        <span>Conflictos</span>
+        <strong>{{ conflictos.length }}</strong>
+        <p>Diferencias entre informacion local y remota.</p>
+      </div>
     </article>
   </section>
 
@@ -45,39 +58,43 @@
         <h2>Pendientes</h2>
       </div>
 
-      <table *ngIf="pendientes.length > 0">
-        <thead>
-          <tr>
-            <th>Entidad</th>
-            <th>Accion</th>
-            <th>Estado</th>
-            <th>Fecha</th>
-            <th>Detalle</th>
-          </tr>
-        </thead>
+      <div class="table-wrap" *ngIf="pendientes.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Entidad</th>
+              <th>Accion</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Detalle</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          <tr *ngFor="let p of pendientes">
-            <td>{{ p.entidad }}</td>
-            <td>{{ p.accion }}</td>
-            <td>
-              <span class="sync-badge" [ngClass]="claseSync(p.estado)">
-                {{ etiquetaSync(p.estado) }}
-              </span>
-            </td>
-            <td>{{ p.fechaCreacionLocal || '-' }}</td>
-            <td>
-              <button type="button" class="link-btn" (click)="verDetalle(p)">
-                Ver
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          <tbody>
+            <tr *ngFor="let p of pendientes">
+              <td>{{ p.entidad }}</td>
+              <td>{{ p.accion }}</td>
+              <td>
+                <span class="sync-badge" [ngClass]="claseSync(p.estado)">
+                  {{ etiquetaSync(p.estado) }}
+                </span>
+              </td>
+              <td>{{ p.fechaCreacionLocal || '-' }}</td>
+              <td>
+                <button type="button" class="link-btn" (click)="verDetalle(p)">
+                  Ver detalle
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <p class="empty" *ngIf="pendientes.length === 0">
-        No hay registros pendientes por sincronizar.
-      </p>
+      <div class="empty-state" *ngIf="pendientes.length === 0">
+        <div class="empty-icon">✓</div>
+        <strong>No hay registros pendientes por sincronizar.</strong>
+        <span>Todo lo local se encuentra al dia.</span>
+      </div>
     </div>
 
     <div class="panel">
@@ -85,33 +102,49 @@
         <h2>Errores de sincronizacion</h2>
       </div>
 
-      <table *ngIf="errores.length > 0">
-        <thead>
-          <tr>
-            <th>Entidad</th>
-            <th>Accion</th>
-            <th>Error</th>
-            <th>Detalle</th>
-          </tr>
-        </thead>
+      <div class="table-wrap" *ngIf="errores.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Entidad</th>
+              <th>Accion</th>
+              <th>Error</th>
+              <th>Fecha / hora</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          <tr *ngFor="let e of errores">
-            <td>{{ e.entidad }}</td>
-            <td>{{ e.accion }}</td>
-            <td>{{ e.error }}</td>
-            <td>
-              <button type="button" class="link-btn" (click)="verDetalle(e)">
-                Ver
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          <tbody>
+            <tr *ngFor="let e of errores">
+              <td>{{ e.entidad }}</td>
+              <td>{{ e.accion }}</td>
+              <td class="error-cell">{{ e.error }}</td>
+              <td>{{ e.fechaError || '-' }}</td>
+              <td>
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="retry-btn"
+                    (click)="retrySyncError(e)"
+                    [disabled]="reintentandoUuid === e.uuidLocal || !online">
+                    {{ reintentandoUuid === e.uuidLocal ? 'Reintentando...' : 'Reintentar' }}
+                  </button>
 
-      <p class="empty" *ngIf="errores.length === 0">
-        No hay errores registrados.
-      </p>
+                  <button type="button" class="link-btn" (click)="verDetalle(e)">
+                    Ver detalle
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" *ngIf="errores.length === 0">
+        <div class="empty-icon">✓</div>
+        <strong>No hay errores registrados.</strong>
+        <span>La sincronizacion no presenta fallos.</span>
+      </div>
     </div>
 
     <div class="panel full">
@@ -119,43 +152,49 @@
         <h2>Conflictos</h2>
       </div>
 
-      <table *ngIf="conflictos.length > 0">
-        <thead>
-          <tr>
-            <th>Entidad</th>
-            <th>Motivo</th>
-            <th>Estado</th>
-            <th>Detalle</th>
-          </tr>
-        </thead>
+      <div class="table-wrap" *ngIf="conflictos.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Entidad</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+              <th>Detalle</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          <tr *ngFor="let c of conflictos">
-            <td>{{ c.entidad }}</td>
-            <td>{{ c.motivo }}</td>
-            <td>
-              <span class="sync-badge sync-pendiente">
-                {{ c.estado }}
-              </span>
-            </td>
-            <td>
-              <button type="button" class="link-btn" (click)="verDetalle(c)">
-                Comparar
-              </button>
-              <button type="button" class="link-btn" (click)="resolverConLocal(c)" *ngIf="c.estado === 'PENDIENTE'">
-                Usar local
-              </button>
-              <button type="button" class="link-btn" (click)="resolverConRemoto(c)" *ngIf="c.estado === 'PENDIENTE'">
-                Usar remoto
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          <tbody>
+            <tr *ngFor="let c of conflictos">
+              <td>{{ c.entidad }}</td>
+              <td>{{ c.motivo }}</td>
+              <td>
+                <span class="sync-badge sync-pendiente">
+                  {{ c.estado }}
+                </span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" class="link-btn" (click)="verDetalle(c)">
+                    Comparar
+                  </button>
+                  <button type="button" class="link-btn" (click)="resolverConLocal(c)" *ngIf="c.estado === 'PENDIENTE'">
+                    Usar local
+                  </button>
+                  <button type="button" class="link-btn" (click)="resolverConRemoto(c)" *ngIf="c.estado === 'PENDIENTE'">
+                    Usar remoto
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <p class="empty" *ngIf="conflictos.length === 0">
-        No hay conflictos detectados.
-      </p>
+      <div class="empty-state" *ngIf="conflictos.length === 0">
+        <div class="empty-icon">✓</div>
+        <strong>No hay conflictos detectados.</strong>
+        <span>Los datos locales y remotos no presentan diferencias.</span>
+      </div>
     </div>
 
   </section>
