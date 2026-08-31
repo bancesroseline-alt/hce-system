@@ -18,6 +18,20 @@
     </div>
   </section>
 
+  <section class="report-card report-filters">
+    <div class="card-title"><div><h2>Reporte detallado de citas</h2><p>Filtra y exporta exactamente los registros requeridos.</p></div></div>
+    <div class="filters-row">
+      <label>Desde<input type="date" [(ngModel)]="filtroDesde"></label>
+      <label>Hasta<input type="date" [(ngModel)]="filtroHasta"></label>
+      <label>Estado<select [(ngModel)]="filtroEstado"><option>TODOS</option><option>PROGRAMADA</option><option>ATENDIDA</option><option>CANCELADA</option><option>NO_ASISTIO</option><option>REPROGRAMADA</option></select></label>
+      <label>Especialidad<input [(ngModel)]="filtroEspecialidad" placeholder="Buscar..."></label>
+      <label>Profesional<input [(ngModel)]="filtroProfesional" placeholder="Buscar..."></label>
+      <button type="button" (click)="limpiarFiltros()">Limpiar</button>
+      <button type="button" (click)="exportarCitas()">Exportar CSV</button>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Hora</th><th>Especialidad</th><th>Tipo</th><th>Estado</th></tr></thead><tbody><tr *ngFor="let c of citasFiltradas()"><td>{{c.fecha}}</td><td>{{c.hora}}</td><td>{{c.especialidad}}</td><td>{{c.tipoCita}}</td><td>{{c.estado}}</td></tr></tbody></table><p class="empty" *ngIf="citasFiltradas().length === 0">No hay citas para los filtros seleccionados.</p></div>
+  </section>
+
   <section class="kpi-grid">
     <article class="kpi-card accent-blue">
       <div class="kpi-icon">P</div>

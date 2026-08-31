@@ -117,8 +117,8 @@ export class SyncQueueService {
 
     const payload = {
       uuidLocal: a.uuidLocal,
-      pacienteId: Number(a.pacienteId),
-      usuarioId: Number(a.usuarioId),
+      pacienteId: Number(a.pacienteId || a.paciente?.id),
+      usuarioId: Number(a.usuarioId || a.usuario?.id),
       citaId: a.citaId ? Number(a.citaId) : null,
       fechaHora: a.fechaHora,
       tipoAtencion: a.tipoAtencion,
@@ -135,6 +135,13 @@ export class SyncQueueService {
       estado: a.estado || 'COMPLETADA',
       origenRegistro: 'INDEXEDDB'
     };
+
+    if (pendiente.accion === 'ACTUALIZAR' && a.id) {
+      return this.http
+        .put(`${this.api}/atenciones/${a.id}`, payload)
+        .pipe(timeout(4000))
+        .toPromise();
+    }
 
     return this.http
       .post(`${this.api}/sincronizacion`, payload)

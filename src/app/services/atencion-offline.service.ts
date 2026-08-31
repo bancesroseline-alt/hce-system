@@ -107,4 +107,38 @@ export class AtencionOfflineService {
       });
     });
   }
+
+  actualizar(atencion: any): Observable<any> {
+    const local = {
+      ...atencion,
+      uuidLocal: atencion.uuidLocal || String(atencion.id || crypto.randomUUID()),
+      estadoSync: 'PENDIENTE',
+      fechaActualizacionLocal: new Date().toISOString()
+    };
+
+    return new Observable(observer => {
+      if (!atencion.id) {
+        this.guardarActualizacionOffline(local, observer);
+        return;
+      }
+
+      this.http.put<any>(`${this.api}/atenciones/${atencion.id}`, local).pipe(timeout(4000)).subscribe({
+        next: async data => {
+          data.uuidLocal = data.uuidLocal || local.uuidLocal;
+          data.estadoSync = 'SINCRONIZADO';
+          await this.indexedDb.guardar('atenciones', data);
+          observer.next(data);
+          observer.complete();
+        },
+        error: () => this.guardarActualizacionOffline(local, observer)
+      });
+    });
+  }
+
+  private async guardarActualizacionOffline(local: any, observer: any): Promise<void> {
+    await this.indexedDb.guardar('atenciones', local);
+    await this.indexedDb.agregarPendiente('ATENCION', 'ACTUALIZAR', local);
+    observer.next(local);
+    observer.complete();
+  }
 }

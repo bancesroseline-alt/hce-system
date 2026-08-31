@@ -568,3 +568,4 @@
     grid-template-columns: 1fr;
   }
 }
+.report-filters{margin:20px 0}.filters-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;align-items:end}.filters-row label{display:grid;gap:5px;color:#475569}.filters-row input,.filters-row select,.filters-row button{padding:9px;border:1px solid #cbd5e1;border-radius:7px}.table-wrap{overflow:auto;margin-top:16px}.table-wrap table{width:100%;border-collapse:collapse}.table-wrap th,.table-wrap td{padding:9px;text-align:left;border-bottom:1px solid #e2e8f0}

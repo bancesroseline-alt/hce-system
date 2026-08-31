@@ -16,6 +16,7 @@
     </div>
 
     <div class="header-actions">
+      <button type="button" class="btn-primary" *ngIf="!editando" (click)="iniciarEdicion()">Editar atencion</button>
       <span class="modo-badge cita" *ngIf="citaId()">Atención desde cita</span>
       <span class="modo-badge emergencia" *ngIf="!citaId() && atencion?.tipoAtencion === 'EMERGENCIA'">Emergencia</span>
     </div>
@@ -57,7 +58,7 @@
       Esta atención fue registrada desde una cita programada: {{ cita.especialidad || cita.tipoCita }} del {{ cita.fecha }} {{ cita.hora }}.
     </div>
 
-    <form class="form-grid readonly-form">
+    <form class="form-grid" (ngSubmit)="guardarCambios()">
 
       <section class="form-section">
         <h2>Información de la atención</h2>
@@ -74,7 +75,7 @@
 
         <div class="form-group">
           <label>Motivo de consulta</label>
-          <input type="text" [value]="atencion.motivoConsulta || '-'" readonly>
+          <input type="text" name="motivoConsulta" [(ngModel)]="atencion.motivoConsulta" [readonly]="!editando" required>
         </div>
 
         <div class="form-group">
@@ -88,27 +89,27 @@
 
         <div class="form-group">
           <label>Presión arterial</label>
-          <input type="text" [value]="atencion.presionArterial || '-'" readonly>
+          <input type="text" name="presionArterial" [(ngModel)]="atencion.presionArterial" [readonly]="!editando">
         </div>
 
         <div class="form-group">
           <label>Temperatura</label>
-          <input type="text" [value]="atencion.temperatura ?? '-'" readonly>
+          <input type="number" step="0.1" name="temperatura" [(ngModel)]="atencion.temperatura" [readonly]="!editando">
         </div>
 
         <div class="form-group">
           <label>Saturación</label>
-          <input type="text" [value]="atencion.saturacion ?? '-'" readonly>
+          <input type="number" name="saturacion" [(ngModel)]="atencion.saturacion" [readonly]="!editando">
         </div>
 
         <div class="form-group">
           <label>Talla</label>
-          <input type="text" [value]="atencion.talla ?? '-'" readonly>
+          <input type="number" step="0.01" name="talla" [(ngModel)]="atencion.talla" [readonly]="!editando">
         </div>
 
         <div class="form-group">
           <label>Peso</label>
-          <input type="text" [value]="atencion.peso ?? '-'" readonly>
+          <input type="number" step="0.1" name="peso" [(ngModel)]="atencion.peso" [readonly]="!editando">
         </div>
       </section>
 
@@ -117,12 +118,12 @@
 
         <div class="form-group">
           <label>Diagnóstico</label>
-          <input type="text" [value]="atencion.diagnostico || '-'" readonly>
+          <input type="text" name="diagnostico" [(ngModel)]="atencion.diagnostico" [readonly]="!editando" required>
         </div>
 
         <div class="form-group">
           <label>Observaciones</label>
-          <textarea readonly [value]="atencion.observaciones || '-'"></textarea>
+          <textarea name="observaciones" [(ngModel)]="atencion.observaciones" [readonly]="!editando"></textarea>
         </div>
       </section>
 
@@ -131,16 +132,20 @@
 
         <div class="form-group">
           <label>Tratamiento indicado</label>
-          <textarea readonly [value]="atencion.tratamientoIndicado || '-'"></textarea>
+          <textarea name="tratamientoIndicado" [(ngModel)]="atencion.tratamientoIndicado" [readonly]="!editando"></textarea>
         </div>
 
         <div class="form-group">
           <label>Medicamentos</label>
-          <textarea readonly [value]="atencion.medicamentos || '-'"></textarea>
+          <textarea name="medicamentos" [(ngModel)]="atencion.medicamentos" [readonly]="!editando"></textarea>
         </div>
       </section>
 
       <div class="form-actions">
+        <button type="button" class="btn-secondary" *ngIf="editando" (click)="cancelarEdicion()">Cancelar edicion</button>
+        <button type="submit" class="btn-primary" *ngIf="editando" [disabled]="guardando">
+          {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
         <a
           class="btn-secondary"
           *ngIf="pacienteId()"

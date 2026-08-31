@@ -76,6 +76,14 @@ export class MainLayoutComponent implements OnInit {
       route: '/reportes',
       roles: ['ADMIN', 'MEDICO', 'ENFERMERO'],
       icon: 'M4 19h16v2H4v-2Zm2-8h3v6H6v-6Zm5-6h3v12h-3V5Zm5 3h3v9h-3V8Z'
+    },
+    {
+      label: 'Monitoreo', route: '/monitoreo', roles: ['ADMIN'],
+      icon: 'M3 3h18v2H3V3Zm2 4h14v14H5V7Zm3 9h2v2H8v-2Zm3-4h2v6h-2v-6Zm3-3h2v9h-2V9Z'
+    },
+    {
+      label: 'Soporte', route: '/soporte', roles: ['ADMIN', 'MEDICO', 'ENFERMERO'],
+      icon: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 17h-2v-2h2v2Zm2.1-7.75-.9.92c-.72.73-1.2 1.33-1.2 2.83h-2v-.5c0-1 .48-1.96 1.2-2.68l1.24-1.26A2 2 0 1 0 10 9H8a4 4 0 1 1 7.1 2.25Z'
     }
   ];
 
@@ -222,7 +230,9 @@ export class MainLayoutComponent implements OnInit {
       prediccion: 'Predicción ML',
       sincronizacion: 'Sincronización',
       trazabilidad: 'Trazabilidad',
-      reportes: 'Reportes locales'
+      reportes: 'Reportes locales',
+      soporte: 'Soporte y retroalimentacion',
+      monitoreo: 'Monitoreo y desempeño'
     };
 
     this.tituloPagina = mapa[principal] || 'Sistema HCE';

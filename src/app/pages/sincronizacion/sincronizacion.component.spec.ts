@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { SincronizacionComponent } from './sincronizacion.component';
 
@@ -8,7 +9,8 @@ describe('SincronizacionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SincronizacionComponent]
+      imports: [SincronizacionComponent],
+      providers: [provideHttpClient()]
     })
     .compileComponents();
 

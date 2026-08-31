@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { IndexedDbService } from '../../services/indexed-db.service';
 import { CitaOfflineService } from '../../services/cita-offline.service';
@@ -8,7 +9,7 @@ import { PacienteService } from '../../services/paciente.service';
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './reportes.component.html',
   styleUrl: './reportes.component.css'
 })
@@ -31,6 +32,12 @@ export class ReportesComponent implements OnInit {
   citasPorEspecialidad: Array<{ especialidad: string; total: number }> = [];
   prediccionesPorRiesgo: Array<{ riesgo: string; total: number }> = [];
   actividadReciente: Array<{ tipo: string; descripcion: string; fecha: string }> = [];
+  citasReporte: any[] = [];
+  filtroDesde = '';
+  filtroHasta = '';
+  filtroEstado = 'TODOS';
+  filtroEspecialidad = '';
+  filtroProfesional = '';
 
   constructor(
     private indexedDb: IndexedDbService,
@@ -73,6 +80,7 @@ export class ReportesComponent implements OnInit {
       const pacienteId = c.pacienteId || c.paciente?.id;
       return pacienteId && pacientesActualesIds.has(String(pacienteId));
     });
+    this.citasReporte = citasVigentes;
     const atencionesVigentes = atenciones.filter((a: any) => {
       const pacienteId = a.pacienteId || a.paciente?.id;
       return !pacienteId || pacientesActualesIds.has(String(pacienteId));
@@ -116,6 +124,36 @@ export class ReportesComponent implements OnInit {
     return this.resumen.citas > 0
       ? Math.round((this.resumen.inasistencias / this.resumen.citas) * 100)
       : 0;
+  }
+
+  citasFiltradas(): any[] {
+    const especialidad = this.filtroEspecialidad.trim().toLowerCase();
+    const profesional = this.filtroProfesional.trim().toLowerCase();
+    return this.citasReporte.filter(c => {
+      const fecha = String(c.fecha || '');
+      const nombreProfesional = `${c.medico?.nombres || ''} ${c.medico?.apellidos || ''} ${c.medicoNombre || ''}`.toLowerCase();
+      return (!this.filtroDesde || fecha >= this.filtroDesde) &&
+        (!this.filtroHasta || fecha <= this.filtroHasta) &&
+        (this.filtroEstado === 'TODOS' || c.estado === this.filtroEstado) &&
+        (!especialidad || String(c.especialidad || '').toLowerCase().includes(especialidad)) &&
+        (!profesional || nombreProfesional.includes(profesional));
+    });
+  }
+
+  limpiarFiltros(): void {
+    this.filtroDesde = ''; this.filtroHasta = ''; this.filtroEstado = 'TODOS';
+    this.filtroEspecialidad = ''; this.filtroProfesional = '';
+  }
+
+  exportarCitas(): void {
+    const encabezado = ['Fecha','Hora','Paciente','Profesional','Especialidad','Tipo','Estado'];
+    const filas = this.citasFiltradas().map(c => [c.fecha,c.hora,
+      `${c.paciente?.nombres || ''} ${c.paciente?.apellidos || ''}`.trim() || c.pacienteId,
+      `${c.medico?.nombres || ''} ${c.medico?.apellidos || ''}`.trim() || c.medicoNombre || c.medicoId,
+      c.especialidad,c.tipoCita,c.estado]);
+    const csv = [encabezado,...filas].map(f => f.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const url = URL.createObjectURL(new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'}));
+    const link = document.createElement('a'); link.href=url; link.download=`reporte-citas-${new Date().toISOString().slice(0,10)}.csv`; link.click(); URL.revokeObjectURL(url);
   }
 
   estadosPrincipales(): Array<{ estado: string; total: number; porcentaje: number }> {

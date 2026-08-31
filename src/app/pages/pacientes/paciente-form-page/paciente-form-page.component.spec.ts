@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
 import { PacienteFormPageComponent } from './paciente-form-page.component';
 
@@ -8,7 +10,8 @@ describe('PacienteFormPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PacienteFormPageComponent]
+      imports: [PacienteFormPageComponent],
+      providers: [provideHttpClient(), provideRouter([])]
     })
     .compileComponents();
 

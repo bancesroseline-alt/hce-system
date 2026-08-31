@@ -95,6 +95,11 @@ export class PacienteFormPageComponent {
       return;
     }
 
+    if (this.paciente.tipoDocumento === 'DNI' && !/^\d{8}$/.test(this.paciente.numeroDocumento)) {
+      alert('El DNI debe contener exactamente 8 digitos numericos');
+      return;
+    }
+
     if (this.modoEdicion) {
 
       this.pacienteService.actualizar(this.idPaciente!, this.paciente)

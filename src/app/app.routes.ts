@@ -191,6 +191,16 @@ export const routes: Routes = [
           import('./pages/reportes/reportes.component')
             .then(m => m.ReportesComponent)
       },
+      {
+        path: 'soporte',
+        loadComponent: () => import('./pages/soporte/soporte.component').then(m => m.SoporteComponent)
+      },
+      {
+        path: 'monitoreo',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () => import('./pages/monitoreo/monitoreo.component').then(m => m.MonitoreoComponent)
+      },
 
       // REDIRECCIÓN
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }

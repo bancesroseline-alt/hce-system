@@ -49,6 +49,10 @@
             type="text"
             [(ngModel)]="paciente.numeroDocumento"
             [disabled]="modoEdicion"
+            [attr.maxlength]="paciente.tipoDocumento === 'DNI' ? 8 : 20"
+            [attr.pattern]="paciente.tipoDocumento === 'DNI' ? '[0-9]{8}' : null"
+            inputmode="numeric"
+            required
           >
         </div>
 

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 
 import { AtencionOfflineService } from '../../../services/atencion-offline.service';
@@ -11,7 +12,7 @@ import { claseEstadoSync, etiquetaEstadoSync } from '../../../utils/sync-status.
 @Component({
   selector: 'app-atencion-detalle',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './atencion-detalle.component.html',
   styleUrl: './atencion-detalle.component.css'
 })
@@ -23,6 +24,9 @@ export class AtencionDetalleComponent implements OnInit {
   cita: any = null;
   cargando = true;
   mensaje = '';
+  editando = false;
+  guardando = false;
+  copiaOriginal: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -93,6 +97,43 @@ export class AtencionDetalleComponent implements OnInit {
 
   claseSync(valor: any): string {
     return claseEstadoSync(valor);
+  }
+
+  iniciarEdicion(): void {
+    this.copiaOriginal = JSON.parse(JSON.stringify(this.atencion));
+    this.editando = true;
+    this.mensaje = '';
+  }
+
+  cancelarEdicion(): void {
+    this.atencion = this.copiaOriginal;
+    this.copiaOriginal = null;
+    this.editando = false;
+  }
+
+  guardarCambios(): void {
+    if (!String(this.atencion?.motivoConsulta || '').trim() ||
+        !String(this.atencion?.diagnostico || '').trim()) {
+      this.mensaje = 'Motivo de consulta y diagnostico son obligatorios.';
+      return;
+    }
+
+    this.guardando = true;
+    this.atencionOfflineService.actualizar(this.atencion).subscribe({
+      next: actualizada => {
+        this.atencion = actualizada;
+        this.editando = false;
+        this.guardando = false;
+        this.copiaOriginal = null;
+        this.mensaje = navigator.onLine
+          ? 'Atencion medica actualizada correctamente.'
+          : 'Cambio guardado offline. Se sincronizara al recuperar conexion.';
+      },
+      error: () => {
+        this.guardando = false;
+        this.mensaje = 'No se pudo actualizar la atencion medica.';
+      }
+    });
   }
 
   private async cargarPaciente(): Promise<void> {
