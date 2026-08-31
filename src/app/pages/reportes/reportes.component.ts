@@ -38,6 +38,8 @@ export class ReportesComponent implements OnInit {
   filtroEstado = 'TODOS';
   filtroEspecialidad = '';
   filtroProfesional = '';
+  tamanoPagina: 5 | 10 | 'TODOS' = 5;
+  paginaActual = 1;
 
   constructor(
     private indexedDb: IndexedDbService,
@@ -81,6 +83,7 @@ export class ReportesComponent implements OnInit {
       return pacienteId && pacientesActualesIds.has(String(pacienteId));
     });
     this.citasReporte = citasVigentes;
+    this.reiniciarPagina();
     const atencionesVigentes = atenciones.filter((a: any) => {
       const pacienteId = a.pacienteId || a.paciente?.id;
       return !pacienteId || pacientesActualesIds.has(String(pacienteId));
@@ -143,6 +146,47 @@ export class ReportesComponent implements OnInit {
   limpiarFiltros(): void {
     this.filtroDesde = ''; this.filtroHasta = ''; this.filtroEstado = 'TODOS';
     this.filtroEspecialidad = ''; this.filtroProfesional = '';
+    this.reiniciarPagina();
+  }
+
+  citasPaginadas(): any[] {
+    const citas = this.citasFiltradas();
+    if (this.tamanoPagina === 'TODOS') return citas;
+
+    const inicio = (this.paginaActual - 1) * this.tamanoPagina;
+    return citas.slice(inicio, inicio + this.tamanoPagina);
+  }
+
+  totalPaginas(): number {
+    if (this.tamanoPagina === 'TODOS') return 1;
+    return Math.max(1, Math.ceil(this.citasFiltradas().length / this.tamanoPagina));
+  }
+
+  reiniciarPagina(): void {
+    this.paginaActual = 1;
+  }
+
+  cambiarTamanoPagina(): void {
+    this.reiniciarPagina();
+  }
+
+  paginaAnterior(): void {
+    if (this.paginaActual > 1) this.paginaActual--;
+  }
+
+  paginaSiguiente(): void {
+    if (this.paginaActual < this.totalPaginas()) this.paginaActual++;
+  }
+
+  registroInicial(): number {
+    if (this.citasFiltradas().length === 0) return 0;
+    return this.tamanoPagina === 'TODOS' ? 1 : (this.paginaActual - 1) * this.tamanoPagina + 1;
+  }
+
+  registroFinal(): number {
+    const total = this.citasFiltradas().length;
+    if (this.tamanoPagina === 'TODOS') return total;
+    return Math.min(this.paginaActual * this.tamanoPagina, total);
   }
 
   exportarCitas(): void {

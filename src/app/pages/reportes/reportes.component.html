@@ -18,20 +18,6 @@
     </div>
   </section>
 
-  <section class="report-card report-filters">
-    <div class="card-title"><div><h2>Reporte detallado de citas</h2><p>Filtra y exporta exactamente los registros requeridos.</p></div></div>
-    <div class="filters-row">
-      <label>Desde<input type="date" [(ngModel)]="filtroDesde"></label>
-      <label>Hasta<input type="date" [(ngModel)]="filtroHasta"></label>
-      <label>Estado<select [(ngModel)]="filtroEstado"><option>TODOS</option><option>PROGRAMADA</option><option>ATENDIDA</option><option>CANCELADA</option><option>NO_ASISTIO</option><option>REPROGRAMADA</option></select></label>
-      <label>Especialidad<input [(ngModel)]="filtroEspecialidad" placeholder="Buscar..."></label>
-      <label>Profesional<input [(ngModel)]="filtroProfesional" placeholder="Buscar..."></label>
-      <button type="button" (click)="limpiarFiltros()">Limpiar</button>
-      <button type="button" (click)="exportarCitas()">Exportar CSV</button>
-    </div>
-    <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Hora</th><th>Especialidad</th><th>Tipo</th><th>Estado</th></tr></thead><tbody><tr *ngFor="let c of citasFiltradas()"><td>{{c.fecha}}</td><td>{{c.hora}}</td><td>{{c.especialidad}}</td><td>{{c.tipoCita}}</td><td>{{c.estado}}</td></tr></tbody></table><p class="empty" *ngIf="citasFiltradas().length === 0">No hay citas para los filtros seleccionados.</p></div>
-  </section>
-
   <section class="kpi-grid">
     <article class="kpi-card accent-blue">
       <div class="kpi-icon">P</div>
@@ -219,6 +205,52 @@
       </p>
     </article>
 
+  </section>
+
+  <section class="report-card report-filters">
+    <div class="card-title">
+      <div>
+        <h2>Reporte detallado de citas</h2>
+        <p>Filtra y exporta exactamente los registros requeridos.</p>
+      </div>
+    </div>
+
+    <div class="filters-row">
+      <label>Desde<input type="date" [(ngModel)]="filtroDesde" (ngModelChange)="reiniciarPagina()"></label>
+      <label>Hasta<input type="date" [(ngModel)]="filtroHasta" (ngModelChange)="reiniciarPagina()"></label>
+      <label>Estado<select [(ngModel)]="filtroEstado" (ngModelChange)="reiniciarPagina()"><option>TODOS</option><option>PROGRAMADA</option><option>ATENDIDA</option><option>CANCELADA</option><option>NO_ASISTIO</option><option>REPROGRAMADA</option></select></label>
+      <label>Especialidad<input [(ngModel)]="filtroEspecialidad" (ngModelChange)="reiniciarPagina()" placeholder="Buscar..."></label>
+      <label>Profesional<input [(ngModel)]="filtroProfesional" (ngModelChange)="reiniciarPagina()" placeholder="Buscar..."></label>
+      <button type="button" (click)="limpiarFiltros()">Limpiar</button>
+      <button type="button" (click)="exportarCitas()">Exportar CSV</button>
+    </div>
+
+    <div class="table-wrap">
+      <table *ngIf="citasFiltradas().length > 0">
+        <thead><tr><th>Fecha</th><th>Hora</th><th>Especialidad</th><th>Tipo</th><th>Estado</th></tr></thead>
+        <tbody><tr *ngFor="let c of citasPaginadas()"><td>{{c.fecha}}</td><td>{{c.hora}}</td><td>{{c.especialidad}}</td><td>{{c.tipoCita}}</td><td>{{c.estado}}</td></tr></tbody>
+      </table>
+      <p class="empty table-empty" *ngIf="citasFiltradas().length === 0">No hay citas para los filtros seleccionados.</p>
+    </div>
+
+    <div class="pagination-bar" *ngIf="citasFiltradas().length > 0">
+      <div class="page-size">
+        <label for="tamanoPagina">Mostrar</label>
+        <select id="tamanoPagina" [(ngModel)]="tamanoPagina" (ngModelChange)="cambiarTamanoPagina()">
+          <option [ngValue]="5">5 por página</option>
+          <option [ngValue]="10">10 por página</option>
+          <option [ngValue]="'TODOS'">Todos</option>
+        </select>
+      </div>
+
+      <span>Mostrando {{ registroInicial() }}–{{ registroFinal() }} de {{ citasFiltradas().length }}</span>
+
+      <div class="page-navigation" *ngIf="tamanoPagina !== 'TODOS'">
+        <button type="button" (click)="paginaAnterior()" [disabled]="paginaActual === 1">Anterior</button>
+        <strong>Página {{ paginaActual }} de {{ totalPaginas() }}</strong>
+        <button type="button" (click)="paginaSiguiente()" [disabled]="paginaActual >= totalPaginas()">Siguiente</button>
+      </div>
+    </div>
   </section>
 
 </div>

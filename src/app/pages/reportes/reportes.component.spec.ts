@@ -32,4 +32,17 @@ describe('ReportesComponent', () => {
     component.filtroEspecialidad='pedia';
     expect(component.citasFiltradas().length).toBe(1);
   });
+
+  it('pagina las citas en grupos de 5, 10 o todos', () => {
+    component.citasReporte = Array.from({length: 12}, (_, index) => ({fecha: `2026-08-${String(index + 1).padStart(2, '0')}`}));
+    expect(component.citasPaginadas().length).toBe(5);
+    expect(component.totalPaginas()).toBe(3);
+    component.paginaSiguiente();
+    expect(component.registroInicial()).toBe(6);
+    component.tamanoPagina = 10;
+    component.cambiarTamanoPagina();
+    expect(component.citasPaginadas().length).toBe(10);
+    component.tamanoPagina = 'TODOS';
+    expect(component.citasPaginadas().length).toBe(12);
+  });
 });
