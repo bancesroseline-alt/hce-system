@@ -189,15 +189,46 @@ export class ReportesComponent implements OnInit {
     return Math.min(this.paginaActual * this.tamanoPagina, total);
   }
 
-  exportarCitas(): void {
-    const encabezado = ['Fecha','Hora','Paciente','Profesional','Especialidad','Tipo','Estado'];
-    const filas = this.citasFiltradas().map(c => [c.fecha,c.hora,
-      `${c.paciente?.nombres || ''} ${c.paciente?.apellidos || ''}`.trim() || c.pacienteId,
-      `${c.medico?.nombres || ''} ${c.medico?.apellidos || ''}`.trim() || c.medicoNombre || c.medicoId,
-      c.especialidad,c.tipoCita,c.estado]);
-    const csv = [encabezado,...filas].map(f => f.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(',')).join('\n');
-    const url = URL.createObjectURL(new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'}));
-    const link = document.createElement('a'); link.href=url; link.download=`reporte-citas-${new Date().toISOString().slice(0,10)}.csv`; link.click(); URL.revokeObjectURL(url);
+  async exportarCitasXlsx(): Promise<void> {
+    const { Workbook } = await import('exceljs');
+    const workbook = new Workbook();
+    const hoja = workbook.addWorksheet('Citas');
+
+    hoja.columns = [
+      { header: 'Fecha', key: 'fecha', width: 14 },
+      { header: 'Hora', key: 'hora', width: 12 },
+      { header: 'Paciente', key: 'paciente', width: 30 },
+      { header: 'Profesional', key: 'profesional', width: 30 },
+      { header: 'Especialidad', key: 'especialidad', width: 24 },
+      { header: 'Tipo', key: 'tipo', width: 18 },
+      { header: 'Estado', key: 'estado', width: 18 }
+    ];
+
+    this.citasFiltradas().forEach(c => hoja.addRow({
+      fecha: c.fecha,
+      hora: c.hora,
+      paciente: `${c.paciente?.nombres || ''} ${c.paciente?.apellidos || ''}`.trim() || c.pacienteNombre || c.pacienteId,
+      profesional: `${c.medico?.nombres || ''} ${c.medico?.apellidos || ''}`.trim() || c.medicoNombre || c.medicoId,
+      especialidad: c.especialidad,
+      tipo: c.tipoCita,
+      estado: c.estado
+    }));
+
+    const encabezado = hoja.getRow(1);
+    encabezado.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    encabezado.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2563EB' } };
+    encabezado.alignment = { vertical: 'middle' };
+    hoja.autoFilter = { from: 'A1', to: 'G1' };
+    hoja.views = [{ state: 'frozen', ySplit: 1 }];
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `reporte-citas-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   estadosPrincipales(): Array<{ estado: string; total: number; porcentaje: number }> {
