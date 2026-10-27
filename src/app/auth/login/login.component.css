@@ -3,12 +3,40 @@
 }
 
 .login-page {
+  position: relative;
+  isolation: isolate;
   display: flex;
   height: 100vh;
-  background: #f8fafc;
+  overflow: hidden;
+  background: #0e3a6b;
 }
 
-/* ---------- Panel izquierdo: imagen y color ---------- */
+/* Foto a pantalla completa (espejada: el estetoscopio queda a la izquierda, la laptop se pierde en el azul) */
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: url('/img/login-bg.jpg') center / cover no-repeat, url('/img/login-art.svg') center / cover no-repeat, #0e3a6b;
+  transform: scaleX(-1);
+}
+
+/* Difuminado: de la foto a un azul sólido, sin línea de separación */
+.login-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 44, 112, 0.58) 0%,
+    rgba(12, 52, 128, 0.66) 32%,
+    rgba(18, 64, 154, 0.9) 62%,
+    #1646a6 100%
+  );
+}
+
+/* ---------- Lado izquierdo: nombre del sistema sobre la foto ---------- */
 .login-left {
   flex: 1.15;
   display: flex;
@@ -17,11 +45,6 @@
   padding: 48px;
   text-align: center;
   color: #ffffff;
-  background:
-    linear-gradient(160deg, rgba(7, 21, 40, 0.82), rgba(25, 100, 190, 0.72)),
-    url('/img/login-bg.jpg') center / cover no-repeat,
-    url('/img/login-art.svg') center / cover no-repeat,
-    #0e3a6b;
 }
 
 .brand h1 {
