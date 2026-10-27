@@ -18,7 +18,8 @@
   text-align: center;
   color: #ffffff;
   background:
-    linear-gradient(160deg, rgba(7, 21, 40, 0.25), rgba(25, 118, 210, 0.12)),
+    linear-gradient(160deg, rgba(7, 21, 40, 0.82), rgba(25, 100, 190, 0.72)),
+    url('/img/login-bg.jpg') center / cover no-repeat,
     url('/img/login-art.svg') center / cover no-repeat,
     #0e3a6b;
 }
