@@ -4,6 +4,10 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
 
+// Personal de salud: modulos clinicos. ADMIN solo gestiona y monitorea el sistema.
+const SALUD = ['MEDICO', 'ENFERMERO'];
+const ADMIN = ['ADMIN'];
+
 export const routes: Routes = [
 
   // =====================
@@ -33,6 +37,8 @@ export const routes: Routes = [
       // =====================
       {
         path: 'pacientes',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/pacientes/pacientes.component')
             .then(m => m.PacientesComponent)
@@ -41,7 +47,7 @@ export const routes: Routes = [
       {
         path: 'usuarios',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN'] },
+        data: { roles: ADMIN },
         loadComponent: () =>
           import('./pages/usuarios/usuarios-admin.component')
             .then(m => m.UsuariosAdminComponent)
@@ -49,6 +55,8 @@ export const routes: Routes = [
 
       {
         path: 'pacientes/nuevo',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/pacientes/paciente-form-page/paciente-form-page.component')
             .then(m => m.PacienteFormPageComponent)
@@ -56,6 +64,8 @@ export const routes: Routes = [
 
       {
         path: 'pacientes/editar/:id',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/pacientes/paciente-form-page/paciente-form-page.component')
             .then(m => m.PacienteFormPageComponent)
@@ -63,6 +73,8 @@ export const routes: Routes = [
 
       {
         path: 'pacientes/:id',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/pacientes/paciente-detalle/paciente-detalle.component')
             .then(m => m.PacienteDetalleComponent)
@@ -73,30 +85,40 @@ export const routes: Routes = [
       // =====================
            {
         path: 'historias-clinicas',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/historia/historia.component')
             .then(m => m.HistoriaComponent)
       },
       {
         path: 'historias-clinicas/:id',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/historia/historia.component')
             .then(m => m.HistoriaComponent)
       },
       {
         path: 'atenciones/nueva/:pacienteId',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/registro-atencion/registro-atencion.component')
             .then(m => m.RegistroAtencionComponent)
       },
       {
         path: 'atenciones/nueva/:pacienteId/cita/:citaId',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/registro-atencion/registro-atencion.component')
             .then(m => m.RegistroAtencionComponent)
       },
       {
         path: 'atenciones/:id',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/registro-atencion/atencion-detalle/atencion-detalle.component')
             .then(m => m.AtencionDetalleComponent)
@@ -108,7 +130,7 @@ export const routes: Routes = [
       {
         path: 'citas',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
@@ -117,7 +139,7 @@ export const routes: Routes = [
       {
         path: 'citas/paciente/:id',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
@@ -126,7 +148,7 @@ export const routes: Routes = [
       {
         path: 'citas/nueva/:id',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/citas/citas.component')
             .then(m => m.CitasComponent)
@@ -135,7 +157,7 @@ export const routes: Routes = [
       {
         path: 'citas/:id',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/citas/cita-detalle/cita-detalle.component')
             .then(m => m.CitaDetalleComponent)
@@ -143,6 +165,8 @@ export const routes: Routes = [
 
               {
           path: 'pacientes/:id/citas',
+          canActivate: [roleGuard],
+          data: { roles: SALUD },
           loadComponent: () =>
             import('./pages/paciente-citas/paciente-citas.component')
               .then(m => m.PacienteCitasComponent)
@@ -150,6 +174,8 @@ export const routes: Routes = [
 
         {
           path: 'atenciones/emergencia/:pacienteId',
+          canActivate: [roleGuard],
+          data: { roles: SALUD },
           loadComponent: () =>
             import('./pages/registro-atencion/registro-atencion.component')
               .then(m => m.RegistroAtencionComponent)
@@ -161,7 +187,7 @@ export const routes: Routes = [
       {
         path: 'prediccion',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/prediccion/prediccion.component')
             .then(m => m.PrediccionComponent)
@@ -169,6 +195,8 @@ export const routes: Routes = [
 
       {
         path: 'sincronizacion',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () =>
           import('./pages/sincronizacion/sincronizacion.component')
             .then(m => m.SincronizacionComponent)
@@ -186,19 +214,21 @@ export const routes: Routes = [
       {
         path: 'reportes',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'MEDICO', 'ENFERMERO'] },
+        data: { roles: ADMIN },
         loadComponent: () =>
           import('./pages/reportes/reportes.component')
             .then(m => m.ReportesComponent)
       },
       {
         path: 'soporte',
+        canActivate: [roleGuard],
+        data: { roles: SALUD },
         loadComponent: () => import('./pages/soporte/soporte.component').then(m => m.SoporteComponent)
       },
       {
         path: 'monitoreo',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN'] },
+        data: { roles: ADMIN },
         loadComponent: () => import('./pages/monitoreo/monitoreo.component').then(m => m.MonitoreoComponent)
       },
 

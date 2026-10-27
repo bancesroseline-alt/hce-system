@@ -67,7 +67,7 @@
           <p>Pacientes programados para la fecha actual</p>
         </div>
 
-        <button routerLink="/citas">
+        <button routerLink="/citas" *ngIf="!esAdmin">
           Ver todas
         </button>
       </div>
@@ -155,7 +155,7 @@
 
       </div>
 
-      <a class="link" routerLink="/citas">
+      <a class="link" routerLink="/citas" *ngIf="!esAdmin">
         Ver más citas →
       </a>
 

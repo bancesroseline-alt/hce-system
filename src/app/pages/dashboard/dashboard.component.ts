@@ -29,6 +29,7 @@ export class DashboardComponent implements OnInit {
 
   modoOffline = false;
   sistemaOnline = navigator.onLine;
+  esAdmin = false;
 
   constructor(
     private http: HttpClient,
@@ -57,6 +58,8 @@ export class DashboardComponent implements OnInit {
     this.rolUsuario =
       usuario.rol ||
       'Medico';
+
+    this.esAdmin = ['ADMIN', 'ADMINISTRADOR'].includes(String(usuario.rol || '').replace('ROLE_', '').toUpperCase());
 
     const medicoId = usuario.id || 2;
 
