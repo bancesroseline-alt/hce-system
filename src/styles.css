@@ -241,8 +241,106 @@ a[class*="btn-"],
   box-shadow: none !important;
 }
 
+/* ---- Page layout alignment (single scale for every page) ---- */
+:root {
+  --hce-page-padding: 28px;
+  --hce-page-max-width: 1400px;
+  --hce-page-gap: 22px;
+  --hce-title-size: 28px;
+  --hce-subtitle-size: 14px;
+}
+
+.citas-page,
+.detalle-page,
+.historial-page,
+.paciente-citas-page,
+.pacientes-page,
+.page,
+.ml-dashboard,
+.atencion-page,
+.reportes-page,
+.sync-page,
+.trazabilidad-page,
+.usuarios-page,
+.dashboard-container,
+.support-page,
+.monitor {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: var(--hce-page-max-width) !important;
+  margin: 0 auto !important;
+  padding: var(--hce-page-padding) !important;
+  background: var(--hce-bg) !important;
+  font-family: inherit;
+}
+
+.pacientes-page,
+.reportes-page,
+.sync-page,
+.trazabilidad-page,
+.usuarios-page {
+  gap: var(--hce-page-gap) !important;
+}
+
+/* Titles and subtitles */
+.page-header h1,
+.ml-header h1,
+.report-hero h1,
+.sync-header h1,
+.dashboard-hero h1,
+.usuarios-header h1,
+.support-page > header h1,
+.monitor > header h1 {
+  margin: 0 !important;
+  font-size: var(--hce-title-size) !important;
+  line-height: 1.2 !important;
+}
+
+.page-header p,
+.ml-header p,
+.report-hero p,
+.sync-header p,
+.dashboard-hero p,
+.usuarios-header p,
+.support-page > header p,
+.monitor > header p {
+  margin: 6px 0 0 !important;
+  font-size: var(--hce-subtitle-size) !important;
+  color: var(--hce-muted) !important;
+}
+
+/* Header row: same layout and spacing everywhere */
+div.page-header,
+header.page-header,
+.ml-header,
+.support-page > header,
+.monitor > header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 24px !important;
+  margin: 0 0 24px !important;
+}
+
+.support-page .tabs,
+.support-page .card,
+.support-page .message {
+  max-width: 850px;
+}
+
 @media (max-width: 768px) {
+  :root {
+    --hce-page-padding: 16px;
+    --hce-title-size: 24px;
+  }
+
   .route-header {
     padding: 10px 18px !important;
+  }
+
+  div.page-header,
+  header.page-header,
+  .ml-header {
+    flex-direction: column;
   }
 }

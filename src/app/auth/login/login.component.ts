@@ -19,6 +19,7 @@ export class LoginComponent implements OnInit {
 
   error = '';
   loading = false;
+  estado = '';
 
   constructor(
     private authService: AuthService,
@@ -28,6 +29,11 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    if (navigator.onLine) {
+      this.authService.precalentarServidor();
     }
   }
 
@@ -41,11 +47,12 @@ export class LoginComponent implements OnInit {
     }
 
     this.loading = true;
+    this.estado = '';
 
     this.authService.login({
       username: this.username,
       password: this.password
-    }).subscribe({
+    }, mensaje => this.estado = mensaje).subscribe({
 
       next: (res) => {
 
@@ -62,14 +69,8 @@ export class LoginComponent implements OnInit {
 
         console.error(err);
         this.loading = false;
-
-        if (err?.mensaje) {
-          this.error = err.mensaje;
-        } else if (err?.status === 401) {
-          this.error = 'Usuario o contraseña incorrectos';
-        } else {
-          this.error = 'No se pudo iniciar sesión. Si estás offline, primero debes iniciar sesión una vez con internet.';
-        }
+        this.estado = '';
+        this.error = err?.mensaje || 'No se pudo iniciar sesión. Intenta nuevamente.';
       }
 
     });

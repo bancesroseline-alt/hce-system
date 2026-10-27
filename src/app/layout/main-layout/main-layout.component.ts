@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { IndexedDbService } from '../../services/indexed-db.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -89,7 +90,8 @@ export class MainLayoutComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private indexedDb: IndexedDbService
+    private indexedDb: IndexedDbService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -124,7 +126,7 @@ export class MainLayoutComponent implements OnInit {
   }
 
   logout(): void {
-    localStorage.clear();
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 

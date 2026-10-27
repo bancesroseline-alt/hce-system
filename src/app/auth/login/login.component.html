@@ -65,6 +65,10 @@
         </div>
 
         <!-- ERROR -->
+        <div class="info" *ngIf="loading && estado">
+          {{ estado }}
+        </div>
+
         <div class="error" *ngIf="error">
           {{ error }}
         </div>
