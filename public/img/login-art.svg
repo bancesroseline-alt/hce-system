@@ -35,7 +35,7 @@
     <rect x="-118" y="-28" width="236" height="56" rx="16"/>
   </g>
 
-  <g fill="none" stroke="#7dd3fc" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="none" stroke="#7dd3fc" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 270)">
     <polyline stroke-opacity="0.18" stroke-width="10" points="0,470 260,470 320,470 350,400 385,540 420,330 455,500 480,470 700,470 760,470 800,430 830,500 860,470 1200,470"/>
     <polyline stroke-opacity="0.6" stroke-width="3" points="0,470 260,470 320,470 350,400 385,540 420,330 455,500 480,470 700,470 760,470 800,430 830,500 860,470 1200,470"/>
   </g>
