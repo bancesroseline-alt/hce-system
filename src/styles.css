@@ -344,3 +344,70 @@ header.page-header,
     flex-direction: column;
   }
 }
+
+/* ---- Search bars: one border, icon, focus ring ---- */
+.search-box,
+.search-wrapper {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px !important;
+  padding: 0 14px !important;
+  background: var(--hce-surface) !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 12px !important;
+  color: #94a3b8;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-box:focus-within,
+.search-wrapper:focus-within {
+  border-color: var(--hce-primary) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  color: var(--hce-primary);
+}
+
+.search-box .search-icon {
+  flex: none;
+}
+
+.search-box input,
+.search-wrapper input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  font-size: 14px;
+  font-weight: 400 !important;
+}
+
+/* Stand-alone search inputs get the same look */
+.table-header > input,
+input.search-input {
+  box-sizing: border-box;
+  width: min(420px, 100%) !important;
+  max-width: 100%;
+  height: 44px;
+  padding: 0 14px 0 42px !important;
+  border-radius: 12px !important;
+  background: var(--hce-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 14px center / 18px !important;
+}
+
+/* ---- Support page ---- */
+.support-page {
+  max-width: 760px !important;
+}
+
+.support-page > header {
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center;
+  margin-bottom: 20px !important;
+}

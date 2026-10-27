@@ -1,27 +1,46 @@
 <div class="support-page">
-  <header><h1>Soporte y retroalimentacion</h1><p>Reporta una falla o ayudanos a mejorar el sistema.</p></header>
+  <header>
+    <h1>Soporte y retroalimentacion</h1>
+    <p>Reporta una falla o ayudanos a mejorar el sistema.</p>
+  </header>
+
   <nav class="tabs">
     <button type="button" [class.active]="tipo === 'ERROR'" (click)="tipo = 'ERROR'; mensaje = ''">Reportar error</button>
     <button type="button" [class.active]="tipo === 'FEEDBACK'" (click)="tipo = 'FEEDBACK'; mensaje = ''">Enviar feedback</button>
   </nav>
+
   <p class="message" [class.error]="esError" *ngIf="mensaje">{{ mensaje }}</p>
 
   <form *ngIf="tipo === 'ERROR'" (ngSubmit)="enviarError()" class="card">
-    <label>Modulo afectado</label>
-    <select name="modulo" [(ngModel)]="modulo" required>
-      <option value="">Selecciona...</option><option>Pacientes</option><option>Citas</option>
-      <option>Historia clinica</option><option>Prediccion</option><option>Sincronizacion</option><option>Otro</option>
-    </select>
-    <label>Descripcion del error</label>
-    <textarea name="descripcion" [(ngModel)]="descripcion" minlength="10" required></textarea>
-    <button [disabled]="enviando">{{ enviando ? 'Enviando...' : 'Enviar reporte' }}</button>
+    <div class="field">
+      <label for="modulo">Modulo afectado</label>
+      <select id="modulo" name="modulo" [(ngModel)]="modulo" required>
+        <option value="">Selecciona...</option><option>Pacientes</option><option>Citas</option>
+        <option>Historia clinica</option><option>Prediccion</option><option>Sincronizacion</option><option>Otro</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="descripcion">Descripcion del error</label>
+      <textarea id="descripcion" name="descripcion" [(ngModel)]="descripcion" minlength="10" required
+        placeholder="Describe que estabas haciendo y que ocurrio..."></textarea>
+      <small>Minimo 10 caracteres.</small>
+    </div>
+    <button class="submit btn-primary" [disabled]="enviando">{{ enviando ? 'Enviando...' : 'Enviar reporte' }}</button>
   </form>
 
   <form *ngIf="tipo === 'FEEDBACK'" (ngSubmit)="enviarFeedback()" class="card">
-    <label>Calificacion</label>
-    <select name="calificacion" [(ngModel)]="calificacion"><option *ngFor="let n of [1,2,3,4,5]" [ngValue]="n">{{ n }} / 5</option></select>
-    <label>Comentario</label>
-    <textarea name="comentario" [(ngModel)]="comentario" minlength="5" required></textarea>
-    <button [disabled]="enviando">{{ enviando ? 'Enviando...' : 'Enviar feedback' }}</button>
+    <div class="field">
+      <label for="calificacion">Calificacion</label>
+      <select id="calificacion" name="calificacion" [(ngModel)]="calificacion">
+        <option *ngFor="let n of [1,2,3,4,5]" [ngValue]="n">{{ n }} / 5</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="comentario">Comentario</label>
+      <textarea id="comentario" name="comentario" [(ngModel)]="comentario" minlength="5" required
+        placeholder="Cuentanos que te gusto y que podemos mejorar..."></textarea>
+      <small>Minimo 5 caracteres.</small>
+    </div>
+    <button class="submit btn-primary" [disabled]="enviando">{{ enviando ? 'Enviando...' : 'Enviar feedback' }}</button>
   </form>
 </div>
