@@ -6,7 +6,6 @@ import { IndexedDbService } from '../../services/indexed-db.service';
 import { AuthService } from '../../services/auth.service';
 import { SyncQueueService } from '../../services/sync-queue.service';
 import { ConnectionService } from '../../services/connection.service';
-import { UiScaleService } from '../../services/ui-scale.service';
 
 const INTERVALO_SYNC_AUTO_MS = 60000;
 
@@ -101,8 +100,7 @@ export class MainLayoutComponent implements OnInit {
     private indexedDb: IndexedDbService,
     private authService: AuthService,
     private syncQueue: SyncQueueService,
-    private conexion: ConnectionService,
-    public escala: UiScaleService
+    private conexion: ConnectionService
   ) {}
 
   ngOnInit(): void {
