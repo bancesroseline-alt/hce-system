@@ -7,18 +7,7 @@
     </div>
   </section>
 
-  <section class="net-panel" *ngIf="estadoLedger">
-    <div class="net-head">
-      <strong>Red de evidencias</strong>
-      <span class="chip warn" *ngIf="modoSimulado"
-            title="El ledger funciona en modo simulado: bloques encadenados con hash y endoso de Healthcare y Audit, sin una red Hyperledger Fabric real.">
-        Ledger simulado
-      </span>
-      <span class="chip" [class.ok]="estadoLedger.cadenaIntegra" [class.bad]="!estadoLedger.cadenaIntegra">
-        {{ estadoLedger.cadenaIntegra ? 'Cadena íntegra' : 'Cadena inconsistente' }}
-      </span>
-    </div>
-
+  <section class="net-panel" *ngIf="estadoLedger?.canal">
     <div class="net-grid">
       <div><span>Canal</span><strong>{{ estadoLedger.canal }}</strong></div>
       <div><span>Contrato</span><strong>{{ estadoLedger.contrato }}</strong></div>

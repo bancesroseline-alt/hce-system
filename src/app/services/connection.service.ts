@@ -75,7 +75,7 @@ export class ConnectionService {
 
     try {
       // no-cors: basta con que el servidor responda; no depende de la politica CORS.
-      await fetch(`${environment.apiBaseUrl}/auth/login?ngsw-bypass=true&t=${Date.now()}`, {
+      await fetch(`${environment.apiBaseUrl}/auth/ping?ngsw-bypass=true&t=${Date.now()}`, {
         method: 'GET',
         mode: 'no-cors',
         cache: 'no-store',

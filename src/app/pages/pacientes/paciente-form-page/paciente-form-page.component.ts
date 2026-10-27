@@ -5,11 +5,12 @@ import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
 import { PacienteService } from '../../../services/paciente.service';
 import { Paciente } from '../../../models/paciente.model';
+import { ConnectionBadgeComponent } from '../../../shared/connection-badge/connection-badge.component';
 
 @Component({
   selector: 'app-paciente-form-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ConnectionBadgeComponent],
   templateUrl: './paciente-form-page.component.html',
   styleUrls: ['./paciente-form-page.component.css']
 })

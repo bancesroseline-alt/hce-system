@@ -45,25 +45,13 @@
 
 /* Network strip */
 .net-panel {
-  padding: 14px 18px;
-}
-
-.net-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.net-head strong {
-  margin-right: auto;
-  font-size: 15px;
+  padding: 10px 16px;
 }
 
 .net-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
 .net-grid span {
@@ -74,8 +62,8 @@
 
 .net-grid strong {
   display: block;
-  margin-top: 2px;
-  font-size: 14px;
+  margin-top: 1px;
+  font-size: 13px;
   color: #0f172a;
   overflow-wrap: anywhere;
 }

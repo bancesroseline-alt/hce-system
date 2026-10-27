@@ -171,7 +171,7 @@
       </div>
 
       <div class="activity-list" *ngIf="actividades.length > 0">
-        <div class="activity" *ngFor="let act of actividades">
+        <div class="activity" *ngFor="let act of actividades | slice:0:5">
           <div class="activity-dot"></div>
 
           <div>

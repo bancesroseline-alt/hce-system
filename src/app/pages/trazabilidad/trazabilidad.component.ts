@@ -164,8 +164,4 @@ export class TrazabilidadComponent implements OnInit {
     if (estado === 'SIN_REGISTRO') return 'warn';
     return 'bad';
   }
-
-  get modoSimulado(): boolean {
-    return this.estadoLedger?.modo === 'SIMULADO';
-  }
 }
