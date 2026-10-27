@@ -8,119 +8,13 @@
   background: #f8fafc;
 }
 
-/* ---------- Panel izquierdo ---------- */
+/* ---------- Panel izquierdo: imagen y color ---------- */
 .login-left {
-  position: relative;
   flex: 1.15;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 48px 56px;
-  overflow: hidden;
-  color: #ffffff;
-  background: linear-gradient(155deg, #071528 0%, #0d2540 55%, #123b63 100%);
-}
-
-.glow {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.glow-a {
-  top: -160px;
-  left: -140px;
-  width: 460px;
-  height: 460px;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.35), transparent 68%);
-}
-
-.glow-b {
-  right: -180px;
-  bottom: -200px;
-  width: 520px;
-  height: 520px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.35), transparent 68%);
-}
-
-.brand {
-  position: relative;
-  max-width: 460px;
-}
-
-.brand-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 36px;
-}
-
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
-  background: #0ea5e9;
-  color: #ffffff;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.brand-name {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-.brand h1 {
-  margin: 0 0 12px;
-  color: #ffffff !important;
-  font-size: 32px;
-  font-weight: 700 !important;
-  line-height: 1.2;
-}
-
-.lead {
-  margin: 0 0 28px;
-  color: #bfdbfe;
-  font-size: 15px;
-  line-height: 1.55;
-}
-
-.features {
-  display: grid;
-  gap: 14px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.features li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  color: #e2e8f0;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.features svg {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  padding: 4px;
-  border-radius: 50%;
-  background: rgba(14, 165, 233, 0.22);
-  fill: #7dd3fc;
-}
-
-.left-footer {
-  position: absolute;
-  left: 56px;
-  bottom: 24px;
-  color: #64748b;
-  font-size: 12px;
+  background:
+    linear-gradient(160deg, rgba(7, 21, 40, 0.25), rgba(25, 118, 210, 0.12)),
+    url('/img/login-art.svg') center / cover no-repeat,
+    #0e3a6b;
 }
 
 /* ---------- Panel derecho ---------- */
@@ -337,4 +231,13 @@
     height: 32px;
     font-size: 16px;
   }
+}
+
+.mobile-brand .brand-mark {
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #0ea5e9;
+  color: #ffffff;
+  font-weight: 700;
 }
