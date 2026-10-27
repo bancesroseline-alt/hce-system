@@ -46,11 +46,11 @@ export class SincronizacionComponent implements OnInit {
       .then(data => this.pendientes = data)
       .catch(err => console.error(err));
 
-    this.indexedDb.obtenerTodos('syncErrors')
+    this.indexedDb.obtenerErroresSync()
       .then(data => this.errores = data)
       .catch(err => console.error(err));
 
-    this.indexedDb.obtenerTodos('conflicts')
+    this.indexedDb.obtenerConflictos()
       .then(data => this.conflictos = data)
       .catch(err => console.error(err));
   }

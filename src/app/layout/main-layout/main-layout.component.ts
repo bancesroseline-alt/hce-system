@@ -134,8 +134,8 @@ export class MainLayoutComponent implements OnInit {
     try {
       const [pendientes, errores, conflictos] = await Promise.all([
         this.indexedDb.obtenerPendientes(),
-        this.indexedDb.obtenerTodos('syncErrors'),
-        this.indexedDb.obtenerTodos('conflicts')
+        this.indexedDb.obtenerErroresSync(),
+        this.indexedDb.obtenerConflictos()
       ]);
 
       this.notificaciones = [];

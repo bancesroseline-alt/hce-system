@@ -67,8 +67,8 @@ export class ReportesComponent implements OnInit {
       this.indexedDb.obtenerTodos('citas'),
       this.indexedDb.obtenerTodos('atenciones'),
       this.indexedDb.obtenerTodos('predicciones'),
-      this.indexedDb.obtenerTodos('syncQueue'),
-      this.indexedDb.obtenerTodos('syncErrors')
+      this.indexedDb.obtenerPendientes(),
+      this.indexedDb.obtenerErroresSync()
     ]);
 
     const hoy = new Date().toISOString().split('T')[0];

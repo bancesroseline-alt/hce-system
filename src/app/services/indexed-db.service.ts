@@ -109,6 +109,7 @@ export class IndexedDbService {
   async agregarPendiente(entidad: string, accion: string, data: any): Promise<any> {
     const pendiente = {
       uuidLocal: crypto.randomUUID(),
+      propietarioId: this.usuarioActualId(),
       entidad,
       accion,
       data,
@@ -119,9 +120,39 @@ export class IndexedDbService {
     return this.guardar('syncQueue', pendiente);
   }
 
+  /** Id del usuario con sesion iniciada (propietario de lo que se registra en este dispositivo). */
+  usuarioActualId(): number | null {
+    try {
+      const id = JSON.parse(localStorage.getItem('usuario') || '{}')?.id;
+      return id === undefined || id === null ? null : Number(id);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Un registro es visible solo para quien lo creo. Los registros anteriores a este
+   * control (sin propietario) siguen visibles para no perderlos.
+   */
+  private esDelUsuarioActual(item: any): boolean {
+    return item?.propietarioId === undefined ||
+           item?.propietarioId === null ||
+           item.propietarioId === this.usuarioActualId();
+  }
+
   async obtenerPendientes(): Promise<any[]> {
     const pendientes = await this.obtenerTodos('syncQueue');
-    return pendientes.filter(p => p.estado === 'PENDIENTE');
+    return pendientes.filter(p => p.estado === 'PENDIENTE' && this.esDelUsuarioActual(p));
+  }
+
+  async obtenerErroresSync(): Promise<any[]> {
+    const errores = await this.obtenerTodos('syncErrors');
+    return errores.filter(e => this.esDelUsuarioActual(e));
+  }
+
+  async obtenerConflictos(): Promise<any[]> {
+    const conflictos = await this.obtenerTodos('conflicts');
+    return conflictos.filter(c => this.esDelUsuarioActual(c));
   }
 
   async marcarSincronizado(uuidLocal: string): Promise<any> {
@@ -150,6 +181,7 @@ export class IndexedDbService {
 
     await this.guardar('syncErrors', {
       uuidLocal,
+      propietarioId: pendiente.propietarioId,
       entidad: pendiente.entidad,
       accion: pendiente.accion,
       data: pendiente.data,
@@ -164,6 +196,7 @@ export class IndexedDbService {
   async registrarConflicto(pendiente: any, remoto: any, motivo: string): Promise<any> {
     const conflicto = {
       uuidLocal: pendiente.uuidLocal,
+      propietarioId: pendiente.propietarioId,
       entidad: pendiente.entidad,
       accion: pendiente.accion,
       local: pendiente.data,
