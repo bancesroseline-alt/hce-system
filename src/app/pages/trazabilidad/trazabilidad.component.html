@@ -3,11 +3,11 @@
   <section class="page-header">
     <div>
       <h1>Trazabilidad</h1>
-      <p>Evidencias de integridad de los registros clínicos: hashes SHA-256 y metadatos de trazabilidad.</p>
+      <p>Evidencias de integridad de los registros clínicos: confirma que un dato no cambió sin quedar registrado.</p>
     </div>
   </section>
 
-  <section class="net-panel" *ngIf="estadoLedger?.canal">
+  <section class="net-panel" *ngIf="esAdmin && estadoLedger?.canal">
     <div class="net-grid">
       <div><span>Canal</span><strong>{{ estadoLedger.canal }}</strong></div>
       <div><span>Contrato</span><strong>{{ estadoLedger.contrato }}</strong></div>
@@ -75,84 +75,126 @@
 
   <div *ngIf="mensaje" class="alert error">{{ mensaje }}</div>
 
-  <section class="detail-panel" *ngIf="seleccionado">
+</div>
 
-    <div class="detail-head">
-      <div>
-        <h2>{{ seleccionado.titulo }}</h2>
-        <p>{{ seleccionado.detalle }}</p>
-      </div>
+<!-- Panel lateral con el detalle del registro -->
+<div class="drawer-backdrop" *ngIf="seleccionado" (click)="cerrar()"></div>
 
-      <button type="button" class="verify" (click)="verificar()" [disabled]="verificando || cargandoDetalle">
-        {{ verificando ? 'Verificando...' : 'Verificar integridad' }}
-      </button>
+<aside class="drawer" *ngIf="seleccionado" role="dialog" aria-modal="true" [attr.aria-label]="'Trazabilidad de ' + seleccionado.titulo">
+
+  <header class="drawer-head">
+    <div>
+      <h2>{{ seleccionado.titulo }}</h2>
+      <p>{{ seleccionado.detalle }}</p>
     </div>
+    <button type="button" class="close" (click)="cerrar()" aria-label="Cerrar">×</button>
+  </header>
 
-    <div class="result" *ngIf="resultado" [ngClass]="claseEstado(resultado.estado)">
-      <div class="result-title">
-        <strong>{{ etiquetaEstado(resultado.estado) }}</strong>
-        <span *ngIf="resultado.version">Versión {{ resultado.version }} · bloque {{ resultado.numeroBloque }}</span>
+  <div class="drawer-body">
+
+    <div *ngIf="mensajeDetalle" class="alert error">{{ mensajeDetalle }}</div>
+
+    <!-- Estado de integridad -->
+    <section class="status-card" [ngClass]="claseEstado(resultado?.estado)">
+      <div class="status-icon">{{ iconoEstado(resultado?.estado) }}</div>
+
+      <div class="status-text">
+        <strong>{{ resultado ? etiquetaEstado(resultado.estado) : 'Verificando integridad...' }}</strong>
+        <p *ngIf="resultado">{{ mensajeEstado(resultado.estado) }}</p>
+        <small *ngIf="ultimaVerificacion">
+          Última verificación: {{ ultimaVerificacion | date:'HH:mm:ss' }}
+        </small>
       </div>
-      <p>{{ resultado.mensaje }}</p>
 
-      <div class="hash-compare" *ngIf="resultado.hashRegistrado">
+      <button type="button" class="verify" [class.done]="recienVerificado"
+              (click)="verificar()" [disabled]="verificando || cargandoDetalle">
+        <span class="spin" *ngIf="verificando"></span>
+        {{ verificando ? 'Verificando...' : (recienVerificado ? '✓ Verificado' : 'Verificar de nuevo') }}
+      </button>
+    </section>
+
+    <!-- Datos clínicos (personal de salud) -->
+    <section class="block" *ngIf="!esAdmin && resumen.length > 0">
+      <h3>Datos del registro</h3>
+      <dl class="facts">
+        <div *ngFor="let c of resumen" [class.wide]="c.valor.length > 40">
+          <dt>{{ c.etiqueta }}</dt>
+          <dd>{{ c.valor }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- Historial -->
+    <section class="block">
+      <h3>Historial de cambios</h3>
+
+      <p class="empty small" *ngIf="cargandoDetalle">Consultando el historial...</p>
+      <p class="empty small" *ngIf="!cargandoDetalle && bloques.length === 0">
+        Este registro aún no tiene evidencias.
+      </p>
+
+      <ol class="timeline" *ngIf="bloques.length > 0">
+        <li *ngFor="let b of bloques" [class.invalid]="!b.bloqueValido">
+          <div class="dot"></div>
+          <div class="event">
+            <div class="event-head">
+              <strong>{{ descripcionAccion(b.action) }}</strong>
+              <span class="chip">v{{ b.version }}</span>
+            </div>
+            <div class="meta">
+              {{ b.fecha | date:'dd/MM/yyyy HH:mm' }} · por {{ b.actorNombre }}
+            </div>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Detalles técnicos (desplegable) -->
+    <details class="tech" [open]="esAdmin" *ngIf="bloques.length > 0 || resultado">
+      <summary>Detalles técnicos (hashes y bloques)</summary>
+
+      <div class="hash-compare" *ngIf="resultado?.hashRegistrado">
         <div>
           <span>Hash recalculado (base de datos)</span>
           <code>{{ resultado.hashActual }}</code>
         </div>
         <div>
-          <span>Hash registrado en el ledger</span>
+          <span>Hash registrado en la evidencia</span>
           <code>{{ resultado.hashRegistrado }}</code>
         </div>
       </div>
-    </div>
 
-    <h3 class="timeline-title">Historial de evidencias</h3>
+      <div class="tech-event" *ngFor="let b of bloques">
+        <div class="event-head">
+          <strong>Versión {{ b.version }} · {{ b.action }}</strong>
+          <span class="chip" [class.ok]="b.bloqueValido" [class.bad]="!b.bloqueValido">
+            {{ b.bloqueValido ? 'Bloque válido' : 'Bloque alterado' }}
+          </span>
+        </div>
 
-    <p class="empty" *ngIf="cargandoDetalle">Consultando el ledger...</p>
-    <p class="empty" *ngIf="!cargandoDetalle && bloques.length === 0">
-      Este registro aún no tiene evidencias en el ledger.
-    </p>
+        <div class="meta">
+          {{ b.fecha | date:'dd/MM/yyyy HH:mm:ss' }} · Bloque {{ b.numeroBloque }} · Endoso: {{ b.endosos }}
+        </div>
 
-    <ol class="timeline" *ngIf="bloques.length > 0">
-      <li *ngFor="let b of bloques" [class.invalid]="!b.bloqueValido">
-        <div class="dot"></div>
-
-        <div class="event">
-          <div class="event-head">
-            <strong>Versión {{ b.version }} · {{ b.action }}</strong>
-            <span class="chip" [class.ok]="b.bloqueValido" [class.bad]="!b.bloqueValido">
-              {{ b.bloqueValido ? 'Bloque válido' : 'Bloque alterado' }}
-            </span>
+        <div class="hashes">
+          <div>
+            <span>Hash del registro</span>
+            <code [title]="b.hash">{{ corto(b.hash) }}</code>
+            <button type="button" class="copy" (click)="copiar(b.hash)">Copiar</button>
           </div>
-
-          <div class="meta">
-            <span>{{ b.fecha | date:'dd/MM/yyyy HH:mm:ss' }}</span>
-            <span>Responsable: {{ b.actorNombre }}</span>
-            <span>Bloque {{ b.numeroBloque }}</span>
-            <span>Endoso: {{ b.endosos }}</span>
+          <div>
+            <span>ID de transacción</span>
+            <code [title]="b.txId">{{ corto(b.txId) }}</code>
+            <button type="button" class="copy" (click)="copiar(b.txId)">Copiar</button>
           </div>
-
-          <div class="hashes">
-            <div>
-              <span>Hash del registro</span>
-              <code [title]="b.hash">{{ corto(b.hash) }}</code>
-              <button type="button" class="copy" (click)="copiar(b.hash)" title="Copiar hash completo">Copiar</button>
-            </div>
-            <div>
-              <span>ID de transacción</span>
-              <code [title]="b.txId">{{ corto(b.txId) }}</code>
-              <button type="button" class="copy" (click)="copiar(b.txId)" title="Copiar ID completo">Copiar</button>
-            </div>
-            <div>
-              <span>Hash del bloque</span>
-              <code [title]="b.hashBloque">{{ corto(b.hashBloque) }}</code>
-            </div>
+          <div>
+            <span>Hash del bloque</span>
+            <code [title]="b.hashBloque">{{ corto(b.hashBloque) }}</code>
+            <button type="button" class="copy" (click)="copiar(b.hashBloque)">Copiar</button>
           </div>
         </div>
-      </li>
-    </ol>
+      </div>
+    </details>
 
-  </section>
-
-</div>
+  </div>
+</aside>

@@ -30,6 +30,13 @@ export class TrazabilidadService {
     return this.http.get<any[]>(`${this.api}/registros`, { params }).pipe(timeout(TIMEOUT_MS));
   }
 
+  /** Datos clinicos del registro (vacio para el administrador). */
+  resumen(entityType: string, entityId: string | number): Observable<{ etiqueta: string; valor: string }[]> {
+    return this.http
+      .get<{ etiqueta: string; valor: string }[]>(`${this.api}/resumen/${entityType}/${entityId}`)
+      .pipe(timeout(TIMEOUT_MS));
+  }
+
   estadoLedger(): Observable<any> {
     return this.http.get<any>(`${this.api}/ledger/estado`).pipe(timeout(TIMEOUT_MS));
   }
