@@ -243,7 +243,7 @@ a[class*="btn-"],
 
 /* ---- Page layout alignment (single scale for every page) ---- */
 :root {
-  --hce-page-padding: 22px;
+  --hce-page-padding: 18px;
   --hce-page-max-width: 1400px;
   --hce-page-gap: 14px;
   --hce-title-size: 24px;
@@ -269,7 +269,7 @@ a[class*="btn-"],
   width: 100% !important;
   max-width: var(--hce-page-max-width) !important;
   margin: 0 auto !important;
-  padding: var(--hce-page-padding) !important;
+  padding: 10px var(--hce-page-padding) var(--hce-page-padding) !important;
   background: var(--hce-bg) !important;
   font-family: inherit;
 }
@@ -321,7 +321,7 @@ header.page-header,
   align-items: flex-start !important;
   justify-content: space-between !important;
   gap: 24px !important;
-  margin: 0 0 14px !important;
+  margin: 0 0 12px !important;
 }
 
 .support-page .tabs,
@@ -558,7 +558,7 @@ main table {
 main thead th {
   background: #f1f5f9 !important;
   border: 0 !important;
-  padding: 10px 16px !important;
+  padding: 10px 12px !important;
   text-align: left;
   color: #475569 !important;
 }
@@ -566,7 +566,7 @@ main thead th {
 main tbody td {
   border-top: 1px solid #eef2f7 !important;
   border-bottom: 0 !important;
-  padding: 10px 16px !important;
+  padding: 10px 12px !important;
   font-size: 14px;
   color: #334155 !important;
   vertical-align: middle;
@@ -886,7 +886,7 @@ main label {
 
 /* Sidebar-adjacent spacing */
 .route-header {
-  padding: 8px 22px !important;
+  padding: 4px 18px !important;
 }
 
 
@@ -1079,4 +1079,159 @@ main .activity-list {
 main .activity p {
   margin: 2px 0 !important;
   font-size: 13px;
+}
+
+
+/* =====================================================================
+   Shared list card (Pacientes, Historias clinicas): one design, any data
+   ===================================================================== */
+.data-card {
+  background: var(--hce-surface) !important;
+  border: 1px solid var(--hce-border) !important;
+  border-radius: var(--hce-radius) !important;
+  box-shadow: var(--hce-card-shadow) !important;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.data-card .toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.data-card .search-box {
+  flex: 1;
+  max-width: 520px;
+  height: 38px !important;
+}
+
+.data-card .btn-filter {
+  height: 38px;
+}
+
+.data-card .patient-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.data-card .patient-cell .avatar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 9px !important;
+  background: linear-gradient(135deg, #bae6fd, #0ea5e9);
+  color: #082f49;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.data-card .patient-cell strong {
+  display: block;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.data-card .patient-cell small {
+  display: block;
+  margin-top: 1px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.data-card .dni {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.data-card .estado.activo {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.data-card .estado.inactivo {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.data-card .acciones {
+  display: flex;
+  gap: 6px;
+}
+
+.data-card .btn-icon {
+  border: 0;
+  background: #f1f5f9;
+  cursor: pointer;
+}
+
+.data-card .btn-icon:hover {
+  background: #e2e8f0;
+}
+
+.data-card .text-center {
+  text-align: center;
+}
+
+.data-card .empty-state {
+  padding: 24px !important;
+  text-align: center;
+  color: #64748b;
+}
+
+.data-card .empty-state strong {
+  display: block;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+
+.data-card .empty-state span {
+  display: block;
+  font-size: 13px;
+}
+
+/* Rows a bit tighter inside shared list cards */
+.data-card tbody td {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+
+/* Same spacing under every page header, whatever the page */
+section.page-header {
+  margin: 0 !important;
+}
+
+.historial-page {
+  display: grid;
+  gap: var(--hce-page-gap);
+  align-content: start;
+}
+
+/* Lists never wrap into tall rows; the wrapper scrolls if it really does not fit */
+.data-card .table-wrapper {
+  overflow-x: auto;
+}
+
+.data-card td,
+.data-card th {
+  white-space: nowrap;
+}
+
+/* Medium windows (laptops with display scaling): drop the least useful column */
+@media (max-width: 1200px) {
+  .col-telefono {
+    display: none;
+  }
 }

@@ -11,7 +11,7 @@
     </button>
   </section>
 
-  <section class="patient-card">
+  <section class="data-card">
 
     <div class="toolbar">
       <div class="search-box">
@@ -37,7 +37,7 @@
             <th>Paciente</th>
             <th>DNI</th>
             <th>Edad</th>
-            <th>Teléfono</th>
+            <th class="col-telefono">Teléfono</th>
             <th>Estado</th>
             <th>Sync</th>
             <th class="text-center">Acciones</th>
@@ -67,7 +67,7 @@
 
             <td>{{ p.edad || '-' }}</td>
 
-            <td>{{ p.telefono || '-' }}</td>
+            <td class="col-telefono">{{ p.telefono || '-' }}</td>
 
             <td>
               <span class="estado" [class.activo]="p.estado" [class.inactivo]="!p.estado">

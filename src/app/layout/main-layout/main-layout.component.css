@@ -246,7 +246,7 @@
 
 /* HEADER */
 .top-header {
-  height: 66px;
+  height: 54px;
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
@@ -496,6 +496,22 @@ main {
 }
 
 /* RESPONSIVE */
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 208px;
+    padding: 18px 12px;
+  }
+
+  .menu a {
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+
+  .top-header {
+    padding: 0 18px;
+  }
+}
+
 @media (max-width: 768px) {
   .sidebar {
     width: 82px;

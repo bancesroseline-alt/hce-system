@@ -3,68 +3,104 @@
   <!-- LISTADO GENERAL -->
   <ng-container *ngIf="modoListado">
 
-    <div class="page-header">
+    <section class="page-header">
       <div>
-        <h1>Historias Clínicas</h1>
-        <p>Listado general de pacientes registrados</p>
+        <h1>Historias clínicas</h1>
+        <p>Listado general de pacientes registrados en el sistema HCE.</p>
       </div>
-    </div>
+    </section>
 
-    <section class="list-card">
+    <section class="data-card">
 
-      <div class="table-header">
-        <input
-          type="text"
-          placeholder="Buscar paciente por nombre o DNI ..."
-          [(ngModel)]="busquedaPaciente" />
+      <div class="toolbar">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input
+            type="text"
+            placeholder="Buscar paciente por nombre, apellido o DNI..."
+            [(ngModel)]="busquedaPaciente"
+          />
+        </div>
 
-        <button class="btn-secondary" type="button">
+        <button class="btn-filter" type="button">
           Filtros
         </button>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Paciente</th>
-            <th>DNI</th>
-            <th>Edad</th>
-            <th>Sexo</th>
-            <th>Estado</th>
-            <th>Historial</th>
-          </tr>
-        </thead>
+      <div class="table-wrapper">
 
-        <tbody>
-          <tr *ngFor="let p of pacientesFiltrados">
-            <td>{{ p.nombres }} {{ p.apellidos }}</td>
-            <td>{{ p.numeroDocumento }}</td>
-            <td>{{ p.edad }}</td>
-            <td>{{ p.sexo }}</td>
-            <td>
-              <span class="estado-activo-mini" *ngIf="p.estado">Activo</span>
-              <span class="estado-inactivo-mini" *ngIf="!p.estado">Inactivo</span>
-            </td>
-            <td>
-              <button
-                class="btn-historial"
-                type="button"
-                [routerLink]="['/historias-clinicas', p.id]">
+        <table>
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>DNI</th>
+              <th>Edad</th>
+              <th class="col-telefono">Teléfono</th>
+              <th>Estado</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
 
-                <span class="icon-btn">📋</span>
-                Ver historial
+          <tbody>
 
-              </button>
-            </td>
-          </tr>
+            <tr *ngFor="let p of pacientesFiltrados">
 
-          <tr *ngIf="pacientesFiltrados.length === 0">
-            <td colspan="6" class="empty">
-              {{ busquedaPaciente ? 'No se encontraron pacientes con esa busqueda.' : 'No hay pacientes registrados.' }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <td>
+                <div class="patient-cell">
+                  <div class="avatar">
+                    {{ (p.nombres || 'P').charAt(0) }}
+                  </div>
+
+                  <div>
+                    <strong>{{ p.nombres }} {{ p.apellidos }}</strong>
+                    <small>{{ p.sexo || 'Sin sexo registrado' }}</small>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <span class="dni">{{ p.numeroDocumento }}</span>
+              </td>
+
+              <td>{{ p.edad || '-' }}</td>
+
+              <td class="col-telefono">{{ p.telefono || '-' }}</td>
+
+              <td>
+                <span class="estado" [class.activo]="p.estado" [class.inactivo]="!p.estado">
+                  {{ p.estado ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+
+              <td>
+                <div class="acciones">
+                  <button
+                    class="btn-icon view"
+                    type="button"
+                    title="Ver historia clínica"
+                    aria-label="Ver historia clínica"
+                    [routerLink]="['/historias-clinicas', p.id]">
+                    📋
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+
+            <tr *ngIf="pacientesFiltrados.length === 0">
+              <td colspan="6">
+                <div class="empty-state">
+                  <div class="empty-icon">👤</div>
+                  <strong>{{ busquedaPaciente ? 'No se encontraron pacientes' : 'No hay pacientes registrados' }}</strong>
+                  <span>{{ busquedaPaciente ? 'Prueba con otro nombre o DNI.' : 'Cuando registres pacientes aparecerán en esta tabla.' }}</span>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+
+      </div>
 
     </section>
 
