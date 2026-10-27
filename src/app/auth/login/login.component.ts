@@ -22,6 +22,7 @@ export class LoginComponent implements OnInit {
   error = '';
   loading = false;
   estado = '';
+  verPassword = false;
 
   constructor(
     private authService: AuthService,
@@ -40,14 +41,14 @@ export class LoginComponent implements OnInit {
 
   textoConexion(): string {
     if (this.conexion.estado === 'online') {
-      return 'Conectado al servidor. Puedes iniciar sesion con normalidad.';
+      return 'Conectado al servidor.';
     }
 
     if (this.conexion.estado === 'offline') {
-      return 'Sin conexion. Solo podras ingresar con un usuario que ya haya iniciado sesion con internet en este dispositivo.';
+      return 'Sin conexión: solo podrás ingresar con un usuario que ya haya iniciado sesión con internet en este dispositivo.';
     }
 
-    return 'Verificando la conexion con el servidor. Si estaba inactivo puede tardar hasta un minuto.';
+    return 'Verificando la conexión con el servidor (puede tardar si estaba inactivo).';
   }
 
   login(): void {

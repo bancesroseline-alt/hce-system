@@ -1,70 +1,97 @@
 <div class="login-page">
 
   <!-- PANEL IZQUIERDO -->
-  <div class="login-left">
+  <aside class="login-left">
 
-    <div class="overlay"></div>
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
 
     <div class="brand">
 
-      <h1>HCE System</h1>
+      <div class="brand-row">
+        <span class="brand-mark">H</span>
+        <span class="brand-name">HCE System</span>
+      </div>
 
-      <p>
-        Sistema de Historia Clínica Electrónica
+      <h1>Historia clínica electrónica</h1>
+
+      <p class="lead">
+        Registro clínico digital para el personal de salud, disponible incluso sin conexión.
       </p>
+
+      <ul class="features">
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2Z"/></svg>
+          <span>Historias clínicas, pacientes y citas en un solo lugar</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2Z"/></svg>
+          <span>Trabaja sin conexión y sincroniza al reconectar</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2Z"/></svg>
+          <span>Trazabilidad que verifica la integridad de los datos</span>
+        </li>
+      </ul>
 
     </div>
 
-  </div>
+    <small class="left-footer">© 2026 HCE System</small>
+
+  </aside>
 
   <!-- PANEL DERECHO -->
-  <div class="login-right">
+  <section class="login-right">
 
     <div class="login-card">
 
+      <div class="mobile-brand">
+        <span class="brand-mark">H</span>
+        <span>HCE System</span>
+      </div>
+
       <div class="login-header">
-
         <h2>Bienvenido</h2>
-
-        <p>
-          Ingrese sus credenciales para continuar
-        </p>
-
+        <p>Ingresa tus credenciales para continuar</p>
       </div>
 
       <form (ngSubmit)="login()">
 
-        <!-- USER -->
         <div class="input-group">
-
-          <label>Usuario</label>
-
+          <label for="usuario">Usuario</label>
           <input
+            id="usuario"
             type="text"
-            placeholder="Ingrese usuario"
+            placeholder="Ingresa tu usuario"
+            autocomplete="username"
             [(ngModel)]="username"
             name="username"
             required
           />
-
         </div>
 
-        <!-- PASSWORD -->
         <div class="input-group">
-
-          <label>Contraseña</label>
-
-          <input
-            type="password"
-            placeholder="Ingrese contraseña"
-            [(ngModel)]="password"
-            name="password"
-            required
-          />
-
+          <label for="clave">Contraseña</label>
+          <div class="password-field">
+            <input
+              id="clave"
+              [type]="verPassword ? 'text' : 'password'"
+              placeholder="Ingresa tu contraseña"
+              autocomplete="current-password"
+              [(ngModel)]="password"
+              name="password"
+              required
+            />
+            <button
+              type="button"
+              class="toggle"
+              (click)="verPassword = !verPassword"
+              [attr.aria-label]="verPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              {{ verPassword ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
         </div>
 
-        <!-- ERROR -->
         <div class="info" *ngIf="loading && estado">
           {{ estado }}
         </div>
@@ -73,29 +100,20 @@
           {{ error }}
         </div>
 
-        <!-- BUTTON -->
-        <button type="submit" [disabled]="loading">
-
-        {{ loading ? 'Ingresando...' : 'Ingresar' }}
-
+        <button type="submit" class="submit" [disabled]="loading">
+          <span class="spin" *ngIf="loading"></span>
+          {{ loading ? 'Ingresando...' : 'Ingresar' }}
         </button>
 
       </form>
 
-      <div class="connection-section" [ngClass]="conexion.estado">
-        <div class="connection-head">
-          <span>Estado de la conexion</span>
-          <app-connection-badge></app-connection-badge>
-        </div>
-        <p>{{ textoConexion() }}</p>
-      </div>
-
-      <div class="footer">
-        © 2026 HCE System
+      <div class="connection-line" [ngClass]="conexion.estado">
+        <app-connection-badge></app-connection-badge>
+        <span>{{ textoConexion() }}</span>
       </div>
 
     </div>
 
-  </div>
+  </section>
 
 </div>
