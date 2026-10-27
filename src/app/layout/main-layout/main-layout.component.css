@@ -16,12 +16,12 @@
 
 /* SIDEBAR */
 .sidebar {
-  width: 245px;
+  width: 224px;
   background: linear-gradient(180deg, #071528 0%, #0f2238 58%, #122033 100%);
   color: #ffffff;
   display: flex;
   flex-direction: column;
-  padding: 22px 16px;
+  padding: 16px 12px;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   height: 100vh;
   position: relative;
@@ -33,26 +33,26 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 4px 8px 24px;
-  margin-bottom: 12px;
+  padding: 2px 8px 16px;
+  margin-bottom: 6px;
 }
 
 .brand-mark {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   background: #0ea5e9;
   display: grid;
   place-items: center;
   color: white;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
 }
 
 .brand-text h2 {
   margin: 0;
   color: #ffffff;
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 700;
 }
 
@@ -68,7 +68,7 @@
 .menu {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -97,13 +97,13 @@
   flex-shrink: 0;
   text-decoration: none;
   color: #cbd5e1;
-  padding: 11px 12px;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   transition: all 0.18s ease;
 }
 
@@ -115,14 +115,14 @@
 .menu a.active {
   background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
   color: #ffffff;
-  box-shadow: 0 12px 28px rgba(14, 165, 233, 0.30);
+  box-shadow: none;
 }
 
 /* ICONOS DEL SIDEBAR */
 .nav-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
   background: rgba(255, 255, 255, 0.14);
   display: grid;
   place-items: center;
@@ -131,8 +131,8 @@
 }
 
 .nav-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   display: block;
   fill: #ffffff !important;
   color: #ffffff !important;
@@ -496,22 +496,6 @@ main {
 }
 
 /* RESPONSIVE */
-@media (max-width: 1200px) {
-  .sidebar {
-    width: 208px;
-    padding: 18px 12px;
-  }
-
-  .menu a {
-    padding: 9px 10px;
-    font-size: 13px;
-  }
-
-  .top-header {
-    padding: 0 18px;
-  }
-}
-
 @media (max-width: 768px) {
   .sidebar {
     width: 82px;
@@ -553,29 +537,50 @@ main {
   }
 }
 
+/* Selector de tamano de la interfaz (menu del usuario) */
+.size-picker {
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid #eef2f7;
+  background: #f8fafc;
+}
 
-/* Pantallas bajas: menú compacto para que quepan todas las opciones */
-@media (max-height: 900px) {
-  .brand {
-    padding-bottom: 14px;
-    margin-bottom: 4px;
-  }
+.size-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
 
-  .menu {
-    gap: 3px;
-  }
+.dropdown .size-options {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: #e2e8f0;
+  border-radius: 10px;
+}
 
-  .menu a {
-    padding: 7px 12px;
-  }
+.dropdown .size-options button {
+  flex: 1;
+  width: auto;
+  justify-content: center;
+  padding: 6px 4px;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
 
-  .nav-icon {
-    width: 30px;
-    height: 30px;
-  }
+.dropdown .size-options button:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
 
-  .sidebar-user-card {
-    margin-top: 10px;
-    padding: 10px;
-  }
+.dropdown .size-options button.active {
+  background: #ffffff;
+  color: #2563eb;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
 }

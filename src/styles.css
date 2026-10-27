@@ -1289,3 +1289,10 @@ body {
   font-feature-settings: 'cv11', 'ss01';
   -webkit-font-smoothing: antialiased;
 }
+
+/* ---- Interface scale (see UiScaleService): keep full-height shells filling the window under zoom ---- */
+.layout,
+.sidebar,
+.login-page {
+  height: calc(100vh / var(--ui-zoom, 1)) !important;
+}

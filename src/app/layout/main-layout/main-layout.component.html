@@ -25,6 +25,22 @@
     <div class="sidebar-user">
 
       <div class="dropdown" *ngIf="mostrarMenuUsuario">
+        <div class="size-picker">
+          <span class="size-label">Tamaño de la interfaz</span>
+          <div class="size-options" role="radiogroup" aria-label="Tamaño de la interfaz">
+            <button
+              type="button"
+              *ngFor="let opcion of escala.opciones"
+              role="radio"
+              [class.active]="escala.preferencia === opcion.valor"
+              [attr.aria-checked]="escala.preferencia === opcion.valor"
+              [attr.title]="opcion.ayuda"
+              (click)="escala.preferencia = opcion.valor">
+              {{ opcion.etiqueta }}
+            </button>
+          </div>
+        </div>
+
         <button type="button" class="logout" (click)="logout()">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M10 17v-2h4v-6h-4V7h6v10h-6Zm-6 3V4h8v2H6v12h6v2H4Zm13.6-5.6L16.2 13l1-1H10v-2h7.2l-1-1 1.4-1.4L21 12l-3.4 3.4Z" transform="translate(0 0)"></path>

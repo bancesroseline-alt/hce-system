@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter } from 'rxjs';
+import { UiScaleService } from './services/ui-scale.service';
 
 @Component({
   selector: 'app-root',
@@ -14,6 +15,9 @@ export class AppComponent {
   title = 'hce-frontend';
 
   private readonly swUpdate = inject(SwUpdate, { optional: true });
+
+  // Aplica la escala de la interfaz desde el primer momento (tambien en el login).
+  private readonly escala = inject(UiScaleService);
 
   constructor() {
     if (!this.swUpdate?.isEnabled) return;
