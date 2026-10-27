@@ -22,12 +22,32 @@
       </a>
     </nav>
 
-    <div class="sidebar-user-card">
-      <span class="sidebar-user-avatar">{{ inicialUsuario() }}</span>
-      <div>
-        <strong>{{ nombreUsuario() }}</strong>
-        <small>{{ rolUsuarioSidebar() }}</small>
+    <div class="sidebar-user">
+
+      <div class="dropdown" *ngIf="mostrarMenuUsuario">
+        <button type="button" class="logout" (click)="logout()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 17v-2h4v-6h-4V7h6v10h-6Zm-6 3V4h8v2H6v12h6v2H4Zm13.6-5.6L16.2 13l1-1H10v-2h7.2l-1-1 1.4-1.4L21 12l-3.4 3.4Z" transform="translate(0 0)"></path>
+          </svg>
+          Cerrar sesion
+        </button>
       </div>
+
+      <button
+        type="button"
+        class="sidebar-user-card"
+        [class.open]="mostrarMenuUsuario"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="mostrarMenuUsuario"
+        (click)="toggleUserMenu()">
+        <span class="sidebar-user-avatar">{{ inicialUsuario() }}</span>
+        <span class="sidebar-user-info">
+          <strong>{{ nombreUsuario() }}</strong>
+          <small>{{ rolUsuarioSidebar() }}</small>
+        </span>
+        <span class="chevron">⌃</span>
+      </button>
+
     </div>
 
   </aside>
@@ -76,32 +96,6 @@
               <small>No hay registros pendientes, errores ni conflictos.</small>
             </div>
           </div>
-        </div>
-
-        <div class="user-menu">
-
-          <button class="user-menu-btn" (click)="toggleUserMenu()">
-            <span class="user-avatar">
-              {{ inicialUsuario() }}
-            </span>
-
-            <span class="user-name">
-              {{ nombreUsuario() }}
-            </span>
-
-            <span class="chevron">⌄</span>
-          </button>
-
-          <div class="dropdown" *ngIf="mostrarMenuUsuario">
-            <div class="dropdown-user">
-              <span class="dropdown-avatar">{{ inicialUsuario() }}</span>
-              <strong>{{ nombreUsuario() }}</strong>
-              <small>{{ usuario?.rol || 'Usuario' }}</small>
-            </div>
-
-            <button class="logout" (click)="logout()">Cerrar sesion</button>
-          </div>
-
         </div>
 
       </div>

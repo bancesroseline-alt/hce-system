@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
@@ -112,6 +112,19 @@ export class MainLayoutComponent implements OnInit {
 
     window.addEventListener('online', () => this.cargarNotificaciones());
     window.addEventListener('focus', () => this.cargarNotificaciones());
+  }
+
+  @HostListener('document:click', ['$event'])
+  cerrarMenusAlHacerClicFuera(event: Event): void {
+    const destino = event.target as HTMLElement | null;
+
+    if (!destino?.closest('.sidebar-user')) {
+      this.mostrarMenuUsuario = false;
+    }
+
+    if (!destino?.closest('.notification-menu')) {
+      this.mostrarNotificaciones = false;
+    }
   }
 
   toggleUserMenu(): void {
