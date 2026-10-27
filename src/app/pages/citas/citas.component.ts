@@ -214,14 +214,19 @@ export class CitasComponent implements OnInit {
     this.mensaje = '';
     this.tipoMensaje = '';
 
-    if (!this.cita.paciente.id || !this.cita.medico.id) {
-      this.mensaje = 'Paciente y profesional son obligatorios';
-      this.tipoMensaje = 'error';
-      return;
-    }
+    const c: any = this.cita;
+    const faltantes = [
+      !c.paciente?.id ? 'Paciente' : null,
+      !c.medico?.id ? 'Profesional' : null,
+      !c.tipoCita ? 'Tipo de cita' : null,
+      !c.fecha ? 'Fecha' : null,
+      !c.hora ? 'Hora' : null,
+      !String(c.especialidad || '').trim() ? 'Especialidad' : null,
+      !String(c.motivoConsulta || '').trim() ? 'Motivo de consulta' : null
+    ].filter((campo): campo is string => !!campo);
 
-    if (!this.cita.fecha || !this.cita.hora) {
-      this.mensaje = 'Fecha y hora son obligatorias';
+    if (faltantes.length > 0) {
+      this.mensaje = `Complete los campos obligatorios: ${faltantes.join(', ')}.`;
       this.tipoMensaje = 'error';
       return;
     }

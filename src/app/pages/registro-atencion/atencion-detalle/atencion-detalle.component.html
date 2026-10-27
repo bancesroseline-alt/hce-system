@@ -16,7 +16,8 @@
     </div>
 
     <div class="header-actions">
-      <button type="button" class="btn-primary" *ngIf="!editando" (click)="iniciarEdicion()">Editar atencion</button>
+      <button type="button" class="btn-primary" *ngIf="!editando && puedeEditar" (click)="iniciarEdicion()">Editar atencion</button>
+      <span class="solo-autor" *ngIf="!editando && !puedeEditar && atencion">Solo el médico que registró esta atención puede editarla.</span>
       <span class="modo-badge cita" *ngIf="citaId()">Atención desde cita</span>
       <span class="modo-badge emergencia" *ngIf="!citaId() && atencion?.tipoAtencion === 'EMERGENCIA'">Emergencia</span>
     </div>

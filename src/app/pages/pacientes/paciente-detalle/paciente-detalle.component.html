@@ -61,6 +61,8 @@
     </div>
 
     <!-- BOTONES -->
+    <div class="aviso-ok" *ngIf="mensajeOk">{{ mensajeOk }}</div>
+
     <div class="buttons">
 
       <button routerLink="/pacientes" class="btn-cancel">
@@ -97,8 +99,27 @@
         Atención de emergencia
       </button>
 
+      <button
+        class="btn-baja"
+        type="button"
+        *ngIf="paciente?.estado"
+        (click)="confirmandoBaja = true">
+        Dar de baja
+      </button>
+
     </div>
 
   </div>
 
 </div>
+
+<app-confirm-dialog
+  [abierto]="confirmandoBaja"
+  titulo="Dar de baja al paciente"
+  [mensaje]="'¿Seguro que deseas dar de baja a ' + (paciente?.nombres || '') + ' ' + (paciente?.apellidos || '') + '? Su estado pasará a Inactivo.'"
+  textoConfirmar="Sí, dar de baja"
+  textoCancelar="No, volver"
+  [procesando]="bajaEnCurso"
+  (confirmar)="confirmarBaja()"
+  (cancelar)="confirmandoBaja = false">
+</app-confirm-dialog>

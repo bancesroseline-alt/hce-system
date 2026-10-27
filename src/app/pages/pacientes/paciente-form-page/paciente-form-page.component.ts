@@ -85,19 +85,41 @@ export class PacienteFormPageComponent {
     this.paciente.edad = edad;
   }
 
+  errorValidacion = '';
+  camposFaltantes: string[] = [];
+
+  /** Campos obligatorios sin completar, con el nombre que ve el usuario. */
+  private validarObligatorios(): { clave: string; etiqueta: string }[] {
+    const p: any = this.paciente;
+    const reglas = [
+      { clave: 'tipoDocumento', etiqueta: 'Tipo de documento', falta: !p.tipoDocumento },
+      { clave: 'numeroDocumento', etiqueta: 'Número de documento', falta: !String(p.numeroDocumento || '').trim() },
+      { clave: 'nombres', etiqueta: 'Nombres', falta: !String(p.nombres || '').trim() },
+      { clave: 'apellidos', etiqueta: 'Apellidos', falta: !String(p.apellidos || '').trim() },
+      { clave: 'fechaNacimiento', etiqueta: 'Fecha de nacimiento', falta: !p.fechaNacimiento },
+      { clave: 'sexo', etiqueta: 'Sexo', falta: !p.sexo },
+      { clave: 'estadoCivil', etiqueta: 'Estado civil', falta: !p.estadoCivil }
+    ];
+
+    return reglas.filter(r => r.falta);
+  }
+
   guardar(): void {
 
-    if (
-      !this.paciente.numeroDocumento ||
-      !this.paciente.nombres ||
-      !this.paciente.apellidos
-    ) {
-      alert('Complete los campos obligatorios');
+    this.errorValidacion = '';
+    this.camposFaltantes = [];
+
+    const faltantes = this.validarObligatorios();
+
+    if (faltantes.length > 0) {
+      this.camposFaltantes = faltantes.map(f => f.clave);
+      this.errorValidacion = `Complete los campos obligatorios: ${faltantes.map(f => f.etiqueta).join(', ')}.`;
       return;
     }
 
     if (this.paciente.tipoDocumento === 'DNI' && !/^\d{8}$/.test(this.paciente.numeroDocumento)) {
-      alert('El DNI debe contener exactamente 8 digitos numericos');
+      this.camposFaltantes = ['numeroDocumento'];
+      this.errorValidacion = 'El DNI debe contener exactamente 8 dígitos numéricos.';
       return;
     }
 

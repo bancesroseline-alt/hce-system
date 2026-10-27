@@ -6,11 +6,12 @@ import { PacienteService } from '../../services/paciente.service';
 import { CitaOfflineService } from '../../services/cita-offline.service';
 import { PrediccionService } from '../../services/prediccion.service';
 import { claseEstadoSync, etiquetaEstadoSync } from '../../utils/sync-status.util';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-paciente-citas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ConfirmDialogComponent],
   templateUrl: './paciente-citas.component.html',
   styleUrl: './paciente-citas.component.css'
 })
@@ -31,6 +32,7 @@ export class PacienteCitasComponent implements OnInit {
   filtroEstado = 'TODOS';
 
   citaEditando: any = null;
+  confirmandoCancelacion = false;
   modoEditar = false;
   modoReprogramar = false;
   citaOrigenReprogramacion: any = null;
@@ -309,6 +311,18 @@ export class PacienteCitasComponent implements OnInit {
           this.cargandoPrediccion = false;
         }
       });
+  }
+
+  /** Cancela la cita despues de que el usuario confirme en el dialogo. */
+  confirmarCancelacion(): void {
+    this.confirmandoCancelacion = false;
+
+    if (!this.citaEditando || this.esCitaBloqueada()) {
+      return;
+    }
+
+    this.citaEditando.estado = 'CANCELADA';
+    this.guardarCambios();
   }
 
   iniciarReprogramacion(): void {

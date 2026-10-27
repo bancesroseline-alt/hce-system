@@ -158,38 +158,18 @@ export class RegistroAtencionComponent implements OnInit {
   guardarAtencion(): void {
     this.mensaje = '';
 
-    if (!this.atencion.pacienteId) {
-      this.mensaje = 'El paciente es obligatorio';
-      return;
-    }
+    const faltantes = [
+      !this.atencion.pacienteId ? 'Paciente' : null,
+      !this.atencion.usuarioId ? 'Profesional de salud' : null,
+      !this.atencion.fechaHora ? 'Fecha y hora' : null,
+      !this.atencion.tipoAtencion ? 'Tipo de atención' : null,
+      !this.atencion.motivoConsulta?.trim() ? 'Motivo de consulta' : null,
+      !this.atencion.diagnostico?.trim() ? 'Diagnóstico' : null,
+      !this.atencion.tratamientoIndicado?.trim() ? 'Tratamiento indicado' : null
+    ].filter((campo): campo is string => !!campo);
 
-    if (!this.atencion.usuarioId) {
-      this.mensaje = 'El profesional de salud es obligatorio';
-      return;
-    }
-
-    if (!this.atencion.fechaHora) {
-      this.mensaje = 'La fecha y hora son obligatorias';
-      return;
-    }
-
-    if (!this.atencion.tipoAtencion) {
-      this.mensaje = 'El tipo de atención es obligatorio';
-      return;
-    }
-
-    if (!this.atencion.motivoConsulta?.trim()) {
-      this.mensaje = 'El motivo de consulta es obligatorio';
-      return;
-    }
-
-    if (!this.atencion.diagnostico?.trim()) {
-      this.mensaje = 'El diagnóstico es obligatorio';
-      return;
-    }
-
-    if (!this.atencion.tratamientoIndicado?.trim()) {
-      this.mensaje = 'El tratamiento indicado es obligatorio';
+    if (faltantes.length > 0) {
+      this.mensaje = `Complete los campos obligatorios: ${faltantes.join(', ')}.`;
       return;
     }
 

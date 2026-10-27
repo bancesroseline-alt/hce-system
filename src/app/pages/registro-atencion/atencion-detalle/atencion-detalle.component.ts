@@ -99,7 +99,24 @@ export class AtencionDetalleComponent implements OnInit {
     return claseEstadoSync(valor);
   }
 
+  /** Solo el profesional que registro la atencion puede editarla. */
+  get puedeEditar(): boolean {
+    try {
+      const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+      const autorId = this.atencion?.usuarioId ?? this.atencion?.usuario?.id;
+
+      return !!usuario?.id && autorId !== undefined && autorId !== null && Number(usuario.id) === Number(autorId);
+    } catch {
+      return false;
+    }
+  }
+
   iniciarEdicion(): void {
+    if (!this.puedeEditar) {
+      this.mensaje = 'Solo el médico que registró esta atención puede editarla.';
+      return;
+    }
+
     this.copiaOriginal = JSON.parse(JSON.stringify(this.atencion));
     this.editando = true;
     this.mensaje = '';
@@ -112,9 +129,13 @@ export class AtencionDetalleComponent implements OnInit {
   }
 
   guardarCambios(): void {
-    if (!String(this.atencion?.motivoConsulta || '').trim() ||
-        !String(this.atencion?.diagnostico || '').trim()) {
-      this.mensaje = 'Motivo de consulta y diagnostico son obligatorios.';
+    const faltantes: string[] = [];
+
+    if (!String(this.atencion?.motivoConsulta || '').trim()) faltantes.push('Motivo de consulta');
+    if (!String(this.atencion?.diagnostico || '').trim()) faltantes.push('Diagnóstico');
+
+    if (faltantes.length > 0) {
+      this.mensaje = `Complete los campos obligatorios: ${faltantes.join(', ')}.`;
       return;
     }
 
@@ -129,9 +150,11 @@ export class AtencionDetalleComponent implements OnInit {
           ? 'Atencion medica actualizada correctamente.'
           : 'Cambio guardado offline. Se sincronizara al recuperar conexion.';
       },
-      error: () => {
+      error: (err: any) => {
         this.guardando = false;
-        this.mensaje = 'No se pudo actualizar la atencion medica.';
+        this.mensaje = err?.status === 403
+          ? 'Solo el médico que registró esta atención puede editarla.'
+          : 'No se pudo actualizar la atencion medica.';
       }
     });
   }

@@ -11,6 +11,10 @@
     </button>
   </section>
 
+  <div class="aviso" *ngIf="mensaje" [class.error]="tipoMensaje === 'error'">
+    {{ mensaje }}
+  </div>
+
   <section class="data-card">
 
     <div class="toolbar">
@@ -96,6 +100,15 @@
                   [routerLink]="['/pacientes/editar', p.id || p.uuidLocal]">
                   ✏️
                 </button>
+
+                <button
+                  *ngIf="p.estado"
+                  class="btn-icon baja"
+                  title="Dar de baja"
+                  aria-label="Dar de baja"
+                  (click)="pedirBaja(p)">
+                  🚫
+                </button>
               </div>
             </td>
 
@@ -117,5 +130,16 @@
     </div>
 
   </section>
+
+  <app-confirm-dialog
+    [abierto]="!!pacienteBaja"
+    titulo="Dar de baja al paciente"
+    [mensaje]="'¿Seguro que deseas dar de baja a ' + (pacienteBaja?.nombres || '') + ' ' + (pacienteBaja?.apellidos || '') + '? Su estado pasará a Inactivo.'"
+    textoConfirmar="Sí, dar de baja"
+    textoCancelar="No, volver"
+    [procesando]="bajaEnCurso"
+    (confirmar)="confirmarBaja()"
+    (cancelar)="cancelarBaja()">
+  </app-confirm-dialog>
 
 </div>

@@ -283,11 +283,21 @@
           class="btn-danger"
           type="button"
           *ngIf="!esCitaBloqueada() && !modoReprogramar"
-          (click)="citaEditando.estado = 'CANCELADA'; guardarCambios()">
+          (click)="confirmandoCancelacion = true">
           Cancelar cita
         </button>
       </div>
     </aside>
+
+    <app-confirm-dialog
+      [abierto]="confirmandoCancelacion"
+      titulo="Cancelar cita"
+      [mensaje]="'¿Seguro que deseas cancelar la cita del ' + (citaEditando?.fecha || '') + ' a las ' + (citaEditando?.hora || '') + '? El espacio quedará libre en la agenda.'"
+      textoConfirmar="Sí, cancelar cita"
+      textoCancelar="No, volver"
+      (confirmar)="confirmarCancelacion()"
+      (cancelar)="confirmandoCancelacion = false">
+    </app-confirm-dialog>
 
   </section>
 

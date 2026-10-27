@@ -984,6 +984,14 @@ main .historia-header .breadcrumb {
   }
 }
 
+/* Campo con error de validacion */
+input.invalid,
+select.invalid,
+textarea.invalid {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+}
+
 /* Fields: min-height must include padding and border (inputs defaulted to content-box and grew to ~55px) */
 input,
 select,

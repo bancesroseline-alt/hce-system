@@ -17,6 +17,11 @@
 
   </div>
 
+  <!-- VALIDACION -->
+  <div class="alert-error" *ngIf="errorValidacion" role="alert">
+    {{ errorValidacion }}
+  </div>
+
   <!-- ALERT -->
   <div class="alert-success" *ngIf="mensaje">
     {{ mensaje }}
@@ -50,18 +55,19 @@
             [attr.maxlength]="paciente.tipoDocumento === 'DNI' ? 8 : 20"
             [attr.pattern]="paciente.tipoDocumento === 'DNI' ? '[0-9]{8}' : null"
             inputmode="numeric"
+            [class.invalid]="camposFaltantes.includes('numeroDocumento')"
             required
           >
         </div>
 
         <div class="field">
           <label>Nombres *</label>
-          <input type="text" [(ngModel)]="paciente.nombres">
+          <input type="text" [(ngModel)]="paciente.nombres" [class.invalid]="camposFaltantes.includes('nombres')">
         </div>
 
         <div class="field">
           <label>Apellidos *</label>
-          <input type="text" [(ngModel)]="paciente.apellidos">
+          <input type="text" [(ngModel)]="paciente.apellidos" [class.invalid]="camposFaltantes.includes('apellidos')">
         </div>
 
         <div class="field">

@@ -161,3 +161,29 @@ button {
   background: #b91c1c !important;
   transform: translateY(-1px);
 }
+
+
+.aviso-ok {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 14px;
+}
+
+.btn-baja {
+  padding: 0 16px;
+  height: 36px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-baja:hover {
+  background: #fef2f2;
+}

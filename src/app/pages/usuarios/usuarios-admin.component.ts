@@ -172,33 +172,17 @@ export class UsuariosAdminComponent implements OnInit {
   }
 
   private validarFormulario(): boolean {
-    if (!this.usuario.nombres.trim()) {
-      this.mostrarError('Nombre obligatorio');
-      return false;
-    }
+    const faltantes = [
+      !this.usuario.nombres.trim() ? 'Nombre' : null,
+      !this.usuario.apellidos.trim() ? 'Apellido' : null,
+      !this.usuario.username.trim() ? 'Username' : null,
+      !this.modoEdicion && !this.usuario.password?.trim() ? 'Contraseña' : null,
+      !this.usuario.rol ? 'Rol' : null,
+      this.usuario.estado === null || this.usuario.estado === undefined ? 'Estado' : null
+    ].filter((campo): campo is string => !!campo);
 
-    if (!this.usuario.apellidos.trim()) {
-      this.mostrarError('Apellido obligatorio');
-      return false;
-    }
-
-    if (!this.usuario.username.trim()) {
-      this.mostrarError('Username obligatorio');
-      return false;
-    }
-
-    if (!this.modoEdicion && !this.usuario.password?.trim()) {
-      this.mostrarError('Contrasena obligatoria');
-      return false;
-    }
-
-    if (!this.usuario.rol) {
-      this.mostrarError('Rol obligatorio');
-      return false;
-    }
-
-    if (this.usuario.estado === null || this.usuario.estado === undefined) {
-      this.mostrarError('Estado obligatorio');
+    if (faltantes.length > 0) {
+      this.mostrarError(`Complete los campos obligatorios: ${faltantes.join(', ')}.`);
       return false;
     }
 
