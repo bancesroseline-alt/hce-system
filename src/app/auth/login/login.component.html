@@ -1,34 +1,28 @@
 <div class="login-page">
 
-  <!-- PANEL IZQUIERDO: imagen de fondo y nombre del sistema -->
-  <aside class="login-left">
+  <!-- Fotos que se suceden (colores reales) y se difuminan hacia el azul del sistema -->
+  <div class="slides" aria-hidden="true">
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="slide"></div>
+  </div>
 
-    <div class="brand">
-      <h1>HCE System</h1>
-      <p>Sistema de Historia Clínica Electrónica</p>
-    </div>
-
-  </aside>
-
-  <!-- PANEL DERECHO -->
   <section class="login-right">
 
     <div class="login-card">
 
-      <div class="mobile-brand">
-        <span class="brand-mark">H</span>
-        <span>HCE System</span>
-      </div>
-
-      <div class="login-header">
-        <h2>Bienvenido</h2>
-        <p>Ingresa tus credenciales para continuar</p>
+      <div class="logo">
+        <span class="logo-mark">H</span>
+        <strong class="logo-name">HCE System</strong>
+        <small class="logo-tag">Historia clínica electrónica</small>
       </div>
 
       <form (ngSubmit)="login()">
 
         <div class="input-group">
-          <label for="usuario">Usuario</label>
+          <label for="usuario">Usuario <span class="req">*</span></label>
           <input
             id="usuario"
             type="text"
@@ -41,7 +35,7 @@
         </div>
 
         <div class="input-group">
-          <label for="clave">Contraseña</label>
+          <label for="clave">Contraseña <span class="req">*</span></label>
           <div class="password-field">
             <input
               id="clave"
@@ -72,7 +66,7 @@
 
         <button type="submit" class="submit" [disabled]="loading">
           <span class="spin" *ngIf="loading"></span>
-          {{ loading ? 'Ingresando...' : 'Ingresar' }}
+          {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
         </button>
 
       </form>
@@ -85,5 +79,7 @@
     </div>
 
   </section>
+
+  <small class="page-footer">© 2026 HCE System. Todos los derechos reservados.</small>
 
 </div>
