@@ -152,7 +152,6 @@ export class TrazabilidadComponent implements OnInit {
           this.resultado = data;
           this.ultimaVerificacion = new Date();
           this.verificando = false;
-          this.cargarEstado();
 
           if (avisar) {
             this.recienVerificado = true;
@@ -170,6 +169,19 @@ export class TrazabilidadComponent implements OnInit {
           this.verificando = false;
         }
       });
+  }
+
+  get primeraVersion(): any {
+    return this.bloques[0] || null;
+  }
+
+  get ultimaVersion(): any {
+    return this.bloques.length ? this.bloques[this.bloques.length - 1] : null;
+  }
+
+  /** Cantidad de modificaciones posteriores a la creacion. */
+  get modificaciones(): number {
+    return Math.max(this.bloques.length - 1, 0);
   }
 
   cerrar(): void {

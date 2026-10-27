@@ -418,7 +418,7 @@ input.search-input {
 
 /* ---- Unified design layer: same type, cards, tables and buttons on every panel ---- */
 :root {
-  --hce-font: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --hce-font: 'Inter Variable', 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
 }
 
 html,
@@ -1234,4 +1234,58 @@ section.page-header {
   .col-telefono {
     display: none;
   }
+}
+
+
+/* La historia clinica ya no lleva un marco externo: las tarjetas van directamente sobre la pagina */
+main .historia-card {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Panel "Resumen" de Citas: filas compactas */
+.resumen-card {
+  padding: 14px 16px !important;
+}
+
+main .summary-card.resumen-card h2 {
+  margin: 0 0 6px !important;
+  font-size: 16px !important;
+}
+
+.resumen-card p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 !important;
+  padding: 6px 0;
+  border-top: 1px solid #eef2f7;
+  font-size: 14px !important;
+}
+
+.resumen-card p:first-of-type {
+  border-top: 0;
+}
+
+.resumen-card p span {
+  color: #475569;
+}
+
+.resumen-card p strong {
+  color: #0f172a;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+
+/* One typeface everywhere (Inter, bundled locally so it also works offline) */
+body *:not(code):not(pre) {
+  font-family: var(--hce-font) !important;
+}
+
+body {
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
 }

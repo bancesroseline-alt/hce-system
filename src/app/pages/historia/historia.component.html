@@ -195,19 +195,19 @@
       </div>
 
       <!-- ATENCIONES -->
-      <section class="timeline" *ngIf="tab === 'atenciones'">
+      <section class="records" *ngIf="tab === 'atenciones'">
 
-        <div class="timeline-item" *ngFor="let atencion of atenciones">
+        <article class="record" *ngFor="let atencion of atenciones">
 
-          <div class="icon success">
-            ✓
-          </div>
+          <header class="record-head">
+            <div class="record-title">
+              <span class="record-icon ok">✓</span>
+              <strong>{{ atencion.tipoAtencion }}</strong>
+              <span class="record-meta">{{ atencion.fechaHora | date:'dd/MM/yyyy HH:mm' }}</span>
+              <span class="record-meta" *ngIf="atencion.profesionalSalud">· {{ atencion.profesionalSalud }}</span>
+            </div>
 
-          <div class="timeline-content">
-
-            <div class="timeline-head">
-              <h3>{{ atencion.tipoAtencion }}</h3>
-
+            <div class="record-side">
               <span
                 class="estado-cita"
                 [ngClass]="{
@@ -218,54 +218,53 @@
                 }">
                 {{ atencion.estado }}
               </span>
-            </div>
 
-            <p><strong>Fecha:</strong> {{ atencion.fechaHora | date:'dd/MM/yyyy HH:mm' }}</p>
-            <p><strong>Motivo:</strong> {{ atencion.motivoConsulta }}</p>
-            <p><strong>Diagnóstico:</strong> {{ atencion.diagnostico }}</p>
-            <p><strong>Tratamiento:</strong> {{ atencion.tratamientoIndicado }}</p>
-            <p><strong>Profesional:</strong> {{ atencion.profesionalSalud }}</p>
-
-            <div class="timeline-actions">
               <a
                 class="btn-detalle-atencion"
                 [routerLink]="['/atenciones', atencion.id || atencion.uuidLocal]">
                 Ver detalle
               </a>
             </div>
+          </header>
 
-          </div>
+          <dl class="record-grid">
+            <div>
+              <dt>Motivo</dt>
+              <dd>{{ atencion.motivoConsulta || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Diagnóstico</dt>
+              <dd>{{ atencion.diagnostico || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Tratamiento</dt>
+              <dd>{{ atencion.tratamientoIndicado || '—' }}</dd>
+            </div>
+          </dl>
 
-        </div>
+        </article>
 
         <div class="empty-state" *ngIf="atenciones.length === 0">
-
           <div class="empty-icon">📄</div>
-
-          <h3>No existen atenciones médicas registradas</h3>
-
-          <p>
-            El paciente todavía no cuenta con registros clínicos.
-          </p>
-
+          <strong>No existen atenciones médicas registradas</strong>
+          <span>El paciente todavía no cuenta con registros clínicos.</span>
         </div>
 
       </section>
 
       <!-- CITAS -->
-      <section class="timeline" *ngIf="tab === 'citas'">
+      <section class="records" *ngIf="tab === 'citas'">
 
-        <div class="timeline-item" *ngFor="let cita of citasProgramadas">
+        <article class="record" *ngFor="let cita of citasProgramadas">
 
-          <div class="icon info">
-            📅
-          </div>
+          <header class="record-head">
+            <div class="record-title">
+              <span class="record-icon info">📅</span>
+              <strong>{{ cita.tipoCita }}</strong>
+              <span class="record-meta">{{ cita.fecha }} {{ cita.hora }}</span>
+            </div>
 
-          <div class="timeline-content">
-
-            <div class="timeline-head">
-              <h3>{{ cita.tipoCita }}</h3>
-
+            <div class="record-side">
               <span
                 class="estado-cita"
                 [ngClass]="{
@@ -277,66 +276,63 @@
                 {{ cita.estado }}
               </span>
             </div>
+          </header>
 
-            <p><strong>Fecha:</strong> {{ cita.fecha }} {{ cita.hora }}</p>
-            <p><strong>Especialidad:</strong> {{ cita.especialidad }}</p>
-            <p><strong>Motivo:</strong> {{ cita.motivoConsulta }}</p>
+          <dl class="record-grid two">
+            <div>
+              <dt>Especialidad</dt>
+              <dd>{{ cita.especialidad || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Motivo</dt>
+              <dd>{{ cita.motivoConsulta || '—' }}</dd>
+            </div>
+          </dl>
 
-          </div>
-
-        </div>
+        </article>
 
         <div class="empty-state" *ngIf="citasProgramadas.length === 0">
-
           <div class="empty-icon">📅</div>
-
-          <h3>No existen citas programadas</h3>
-
-          <p>
-            El paciente no cuenta con citas registradas o pendientes.
-          </p>
-
+          <strong>No existen citas programadas</strong>
+          <span>El paciente no cuenta con citas registradas o pendientes.</span>
         </div>
 
       </section>
 
       <!-- INASISTENCIAS -->
-      <section class="timeline" *ngIf="tab === 'inasistencias'">
+      <section class="records" *ngIf="tab === 'inasistencias'">
 
-        <div class="timeline-item" *ngFor="let cita of citasNoAsistidas">
+        <article class="record" *ngFor="let cita of citasNoAsistidas">
 
-          <div class="icon danger">
-            !
-          </div>
-
-          <div class="timeline-content">
-
-            <div class="timeline-head">
-              <h3>{{ cita.tipoCita }}</h3>
-
-              <span class="estado-cita estado-no-asistio">
-                NO_ASISTIO
-              </span>
+          <header class="record-head">
+            <div class="record-title">
+              <span class="record-icon danger">!</span>
+              <strong>{{ cita.tipoCita }}</strong>
+              <span class="record-meta">{{ cita.fecha }} {{ cita.hora }}</span>
             </div>
 
-            <p><strong>Fecha:</strong> {{ cita.fecha }} {{ cita.hora }}</p>
-            <p><strong>Especialidad:</strong> {{ cita.especialidad }}</p>
-            <p><strong>Motivo:</strong> {{ cita.motivoConsulta }}</p>
+            <div class="record-side">
+              <span class="estado-cita estado-no-asistio">NO_ASISTIO</span>
+            </div>
+          </header>
 
-          </div>
+          <dl class="record-grid two">
+            <div>
+              <dt>Especialidad</dt>
+              <dd>{{ cita.especialidad || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Motivo</dt>
+              <dd>{{ cita.motivoConsulta || '—' }}</dd>
+            </div>
+          </dl>
 
-        </div>
+        </article>
 
         <div class="empty-state" *ngIf="citasNoAsistidas.length === 0">
-
           <div class="empty-icon">✅</div>
-
-          <h3>Sin inasistencias registradas</h3>
-
-          <p>
-            El paciente no tiene inasistencias registradas.
-          </p>
-
+          <strong>Sin inasistencias registradas</strong>
+          <span>El paciente no tiene inasistencias registradas.</span>
         </div>
 
       </section>

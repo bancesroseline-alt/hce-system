@@ -113,6 +113,25 @@
       </button>
     </section>
 
+    <!-- Resumen del registro (personal de salud) -->
+    <section class="tiles" *ngIf="!esAdmin && bloques.length > 0">
+      <div class="tile">
+        <span>Creado</span>
+        <strong>{{ primeraVersion.fecha | date:'dd/MM/yyyy HH:mm' }}</strong>
+        <small>por {{ primeraVersion.actorNombre }}</small>
+      </div>
+      <div class="tile">
+        <span>Última modificación</span>
+        <strong>{{ ultimaVersion.fecha | date:'dd/MM/yyyy HH:mm' }}</strong>
+        <small>por {{ ultimaVersion.actorNombre }}</small>
+      </div>
+      <div class="tile">
+        <span>Modificaciones</span>
+        <strong>{{ modificaciones }}</strong>
+        <small>{{ bloques.length }} {{ bloques.length === 1 ? 'versión' : 'versiones' }} registradas</small>
+      </div>
+    </section>
+
     <!-- Datos clínicos (personal de salud) -->
     <section class="block" *ngIf="!esAdmin && resumen.length > 0">
       <h3>Datos del registro</h3>
@@ -144,6 +163,22 @@
             <div class="meta">
               {{ b.fecha | date:'dd/MM/yyyy HH:mm' }} · por {{ b.actorNombre }}
             </div>
+
+            <ul class="cambios" *ngIf="!esAdmin && b.cambios && b.cambios.length > 0">
+              <li *ngFor="let c of b.cambios">
+                <span class="campo">{{ c.etiqueta }}</span>
+                <span class="antes">{{ c.antes || '—' }}</span>
+                <span class="flecha">→</span>
+                <span class="despues">{{ c.despues || '—' }}</span>
+              </li>
+            </ul>
+
+            <p class="nota" *ngIf="!esAdmin && b.cambios && b.cambios.length === 0">
+              Sin cambios en los datos clínicos (por ejemplo, una sincronización).
+            </p>
+            <p class="nota" *ngIf="!esAdmin && !b.cambios && b.version > 1">
+              Sin detalle de cambios para esta versión.
+            </p>
           </div>
         </li>
       </ol>

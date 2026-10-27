@@ -555,3 +555,93 @@ button.copy {
     flex-wrap: wrap;
   }
 }
+
+
+/* Resumen del registro */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tile {
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.tile span {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.tile strong {
+  display: block;
+  margin-top: 2px;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.tile small {
+  display: block;
+  margin-top: 1px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* Que cambio en cada version */
+.cambios {
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 10px;
+}
+
+.cambios li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-size: 13px;
+}
+
+.cambios .campo {
+  color: #475569;
+  font-weight: 600;
+}
+
+.cambios .antes {
+  color: #b91c1c;
+  text-decoration: line-through;
+  text-decoration-color: rgba(185, 28, 28, 0.4);
+}
+
+.cambios .flecha {
+  color: #94a3b8;
+}
+
+.cambios .despues {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.nota {
+  margin: 6px 0 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+@media (max-width: 700px) {
+  .tiles {
+    grid-template-columns: 1fr;
+  }
+}
