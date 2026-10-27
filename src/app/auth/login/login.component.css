@@ -184,3 +184,39 @@ button:hover {
   border-radius: 10px;
   font-size: 14px;
 }
+
+/* CONEXION */
+.connection-section {
+  margin-top: 22px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.connection-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.connection-section p {
+  margin: 10px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.connection-section.offline {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.connection-section.verificando {
+  border-color: #fde68a;
+  background: #fffbeb;
+}

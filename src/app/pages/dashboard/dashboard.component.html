@@ -16,10 +16,7 @@
       </p>
     </div>
 
-    <div class="hero-badge" [class.offline]="sistemaOffline()">
-      <span class="pulse"></span>
-      {{ sistemaOffline() ? 'Sistema offline' : 'Sistema online' }}
-    </div>
+    <app-connection-badge></app-connection-badge>
   </section>
 
   <!-- TARJETAS RESUMEN -->

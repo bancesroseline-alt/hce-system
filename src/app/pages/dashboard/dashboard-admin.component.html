@@ -7,10 +7,7 @@
       <p>Resumen del uso, los usuarios y el estado del sistema.</p>
     </div>
 
-    <div class="hero-badge" [class.offline]="sinConexion">
-      <span class="pulse"></span>
-      {{ sinConexion ? 'Datos incompletos' : 'Sistema online' }}
-    </div>
+    <app-connection-badge></app-connection-badge>
   </section>
 
   <p class="aviso" *ngIf="sinConexion && !cargando">

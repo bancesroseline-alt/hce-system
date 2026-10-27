@@ -4,11 +4,12 @@ import { RouterLink } from '@angular/router';
 import { Observable, catchError, forkJoin, of } from 'rxjs';
 import { SoporteService } from '../../services/soporte.service';
 import { UsuarioService } from '../../services/usuario.service';
+import { ConnectionBadgeComponent } from '../../shared/connection-badge/connection-badge.component';
 
 @Component({
   selector: 'app-dashboard-admin',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ConnectionBadgeComponent],
   templateUrl: './dashboard-admin.component.html',
   styleUrl: './dashboard-admin.component.css'
 })

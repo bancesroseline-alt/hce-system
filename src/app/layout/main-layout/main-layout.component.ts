@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { IndexedDbService } from '../../services/indexed-db.service';
 import { AuthService } from '../../services/auth.service';
 import { SyncQueueService } from '../../services/sync-queue.service';
+import { ConnectionService } from '../../services/connection.service';
 
 const INTERVALO_SYNC_AUTO_MS = 60000;
 
@@ -98,7 +99,8 @@ export class MainLayoutComponent implements OnInit {
     private router: Router,
     private indexedDb: IndexedDbService,
     private authService: AuthService,
-    private syncQueue: SyncQueueService
+    private syncQueue: SyncQueueService,
+    private conexion: ConnectionService
   ) {}
 
   ngOnInit(): void {
@@ -125,6 +127,14 @@ export class MainLayoutComponent implements OnInit {
     window.addEventListener('focus', () => this.cargarNotificaciones());
 
     this.syncQueue.sincronizacionTerminada$.subscribe(() => this.cargarNotificaciones());
+
+    // El estado real (ping al servidor) es mas fiable que el evento 'online' del navegador.
+    this.conexion.online$.subscribe(online => {
+      if (online) {
+        this.sincronizarAutomaticamente();
+        this.cargarNotificaciones();
+      }
+    });
 
     // HU016: al detectar conexion se envian los pendientes sin que el usuario abra ninguna pantalla.
     // Tambien se reintenta periodicamente por si el servidor aun estaba despertando.

@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { AuthService } from '../../services/auth.service';
+import { ConnectionService } from '../../services/connection.service';
+import { ConnectionBadgeComponent } from '../../shared/connection-badge/connection-badge.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, ConnectionBadgeComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -23,7 +25,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    public conexion: ConnectionService
   ) {}
 
   ngOnInit(): void {
@@ -32,9 +35,19 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    if (navigator.onLine) {
-      this.authService.precalentarServidor();
+    // ConnectionService ya consulta al servidor al iniciar, lo que tambien lo despierta si estaba dormido.
+  }
+
+  textoConexion(): string {
+    if (this.conexion.estado === 'online') {
+      return 'Conectado al servidor. Puedes iniciar sesion con normalidad.';
     }
+
+    if (this.conexion.estado === 'offline') {
+      return 'Sin conexion. Solo podras ingresar con un usuario que ya haya iniciado sesion con internet en este dispositivo.';
+    }
+
+    return 'Verificando la conexion con el servidor. Si estaba inactivo puede tardar hasta un minuto.';
   }
 
   login(): void {

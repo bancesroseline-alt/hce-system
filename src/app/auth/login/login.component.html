@@ -82,6 +82,14 @@
 
       </form>
 
+      <div class="connection-section" [ngClass]="conexion.estado">
+        <div class="connection-head">
+          <span>Estado de la conexion</span>
+          <app-connection-badge></app-connection-badge>
+        </div>
+        <p>{{ textoConexion() }}</p>
+      </div>
+
       <div class="footer">
         © 2026 HCE System
       </div>

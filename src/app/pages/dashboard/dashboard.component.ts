@@ -6,11 +6,12 @@ import { IndexedDbService } from '../../services/indexed-db.service';
 import { timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DashboardAdminComponent } from './dashboard-admin.component';
+import { ConnectionBadgeComponent } from '../../shared/connection-badge/connection-badge.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, DashboardAdminComponent],
+  imports: [CommonModule, RouterLink, DashboardAdminComponent, ConnectionBadgeComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

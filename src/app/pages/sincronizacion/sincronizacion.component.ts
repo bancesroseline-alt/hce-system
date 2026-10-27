@@ -3,13 +3,15 @@ import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 import { IndexedDbService } from '../../services/indexed-db.service';
+import { ConnectionService } from '../../services/connection.service';
+import { ConnectionBadgeComponent } from '../../shared/connection-badge/connection-badge.component';
 import { SyncQueueService } from '../../services/sync-queue.service';
 import { claseEstadoSync, etiquetaEstadoSync } from '../../utils/sync-status.util';
 
 @Component({
   selector: 'app-sincronizacion',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConnectionBadgeComponent],
   templateUrl: './sincronizacion.component.html',
   styleUrl: './sincronizacion.component.css'
 })
@@ -28,12 +30,13 @@ export class SincronizacionComponent implements OnInit, OnDestroy {
   reintentandoUuid: string | null = null;
 
   get online(): boolean {
-    return navigator.onLine;
+    return this.conexion.online;
   }
 
   constructor(
     private indexedDb: IndexedDbService,
-    private syncQueue: SyncQueueService
+    private syncQueue: SyncQueueService,
+    private conexion: ConnectionService
   ) {}
 
   ngOnInit(): void {

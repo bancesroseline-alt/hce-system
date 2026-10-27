@@ -411,5 +411,6 @@ input.search-input {
   flex-direction: column !important;
   align-items: center !important;
   text-align: center;
-  margin-bottom: 20px !important;
+  gap: 0 !important;
+  margin-bottom: 16px !important;
 }

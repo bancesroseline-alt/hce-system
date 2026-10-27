@@ -7,9 +7,7 @@
     </div>
 
     <div class="sync-actions">
-      <span class="connection" [class.offline]="!online">
-        {{ online ? 'Con conexion' : 'Modo offline' }}
-      </span>
+      <app-connection-badge></app-connection-badge>
 
       <button type="button" class="primary-action" (click)="sincronizar()" [disabled]="sincronizando || !online">
         {{ sincronizando ? 'Sincronizando...' : 'Sincronizar pendientes' }}
