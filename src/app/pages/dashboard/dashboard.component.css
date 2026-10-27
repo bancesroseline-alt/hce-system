@@ -4,7 +4,7 @@
     radial-gradient(circle at top left, rgba(14, 165, 233, 0.14), transparent 28%),
     linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%) !important;
   min-height: calc(100vh - 70px);
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', system-ui, sans-serif;
   color: #0f172a;
 }
 
@@ -12,7 +12,7 @@
 
 .dashboard-hero {
   background: linear-gradient(135deg, #0f172a 0%, #123b63 58%, #0ea5e9 100%);
-  border-radius: 26px;
+  border-radius: 16px;
   padding: 30px 34px;
   color: white;
   display: flex;
@@ -42,15 +42,15 @@
   padding: 7px 13px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   margin-bottom: 13px;
 }
 
 .dashboard-hero h1 {
   margin: 0;
   color: #ffffff !important;
-  font-size: 38px;
-  font-weight: 900 !important;
+  font-size: 30px;
+  font-weight: 700 !important;
   letter-spacing: -0.8px !important;
 }
 
@@ -68,7 +68,7 @@
   padding: 11px 16px;
   border-radius: 999px;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -105,12 +105,12 @@
 .summary-card {
   background: rgba(255, 255, 255, 0.92) !important;
   border: 1px solid #dbe7f3 !important;
-  border-radius: 22px !important;
+  border-radius: 16px !important;
   padding: 22px;
   display: flex;
   align-items: center;
   gap: 18px;
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.09) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06) !important;
   transition: 0.22s ease;
 }
 
@@ -144,21 +144,21 @@
   margin: 0;
   font-size: 14px;
   color: #475569;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 .summary-card strong {
   display: block;
   margin: 5px 0;
   font-size: 34px;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   color: #0f172a;
 }
 
 .summary-card span {
   font-size: 12px;
   color: #64748b;
-  font-weight: 800 !important;
+  font-weight: 600 !important;
 }
 
 /* CONTENT */
@@ -172,9 +172,9 @@
 .panel {
   background: rgba(255, 255, 255, 0.96) !important;
   border: 1px solid #dbe7f3 !important;
-  border-radius: 24px !important;
+  border-radius: 16px !important;
   padding: 24px;
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.09) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06) !important;
 }
 
 .citas-panel,
@@ -193,7 +193,7 @@
 .panel-header h2 {
   margin: 0;
   font-size: 21px;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   color: #0f172a;
 }
 
@@ -211,7 +211,7 @@
   border-radius: 999px;
   padding: 10px 18px;
   font-size: 13px;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   cursor: pointer;
   box-shadow: 0 10px 20px rgba(14, 165, 233, 0.24);
   transition: 0.2s ease;
@@ -240,7 +240,7 @@ thead th {
   padding: 13px 12px;
   text-align: left;
   color: #475569;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 thead th:first-child {
@@ -268,7 +268,7 @@ td {
 }
 
 .hora {
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   color: #0f172a;
 }
 
@@ -286,7 +286,7 @@ td {
   place-items: center;
   background: #dbeafe;
   color: #1d4ed8;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 .paciente-cell strong {
@@ -307,7 +307,7 @@ td {
   border-radius: 999px;
   padding: 7px 12px;
   font-size: 11px;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   display: inline-block;
 }
 
@@ -337,7 +337,7 @@ td {
   border-radius: 999px;
   padding: 7px 12px;
   font-size: 11px;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   display: inline-block;
 }
 
@@ -368,7 +368,7 @@ td {
   height: 32px;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 .btn-more:hover {
@@ -438,7 +438,7 @@ td {
 
 .activity strong {
   color: #0f172a;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   font-size: 13px;
 }
 
@@ -452,7 +452,7 @@ td {
 .activity span {
   color: #94a3b8;
   font-size: 11px;
-  font-weight: 800 !important;
+  font-weight: 600 !important;
 }
 
 .link {
@@ -461,7 +461,7 @@ td {
   margin-top: 18px;
   font-size: 13px;
   color: #0284c7;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   text-decoration: none;
 }
 

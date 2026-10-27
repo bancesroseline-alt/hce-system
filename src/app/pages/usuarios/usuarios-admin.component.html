@@ -3,13 +3,10 @@
   <section class="usuarios-header">
     <div>
       <h1>Gestion de usuarios</h1>
-      <p>Inicio &gt; Gestion de usuarios</p>
+      <p>Registra usuarios y asigna sus roles de acceso.</p>
     </div>
 
-    <div class="system-status">
-      <span></span>
-      Sistema: Online
-    </div>
+    <app-connection-badge></app-connection-badge>
   </section>
 
   <div
@@ -119,7 +116,7 @@
             <td>{{ u.nombres }}</td>
             <td>{{ u.apellidos }}</td>
             <td>{{ u.username }}</td>
-            <td>{{ etiquetaRol(u.rol) }}</td>
+            <td><span class="rol-chip">{{ etiquetaRol(u.rol) }}</span></td>
             <td>
               <span class="status" [class.inactive]="u.estado === false">
                 {{ u.estado === false ? 'INACTIVO' : 'ACTIVO' }}

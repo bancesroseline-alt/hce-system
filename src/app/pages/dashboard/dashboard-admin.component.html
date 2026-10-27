@@ -1,9 +1,11 @@
-<div class="dashboard-container admin-dash">
+<div class="dashboard-container">
 
-  <section class="admin-hero">
+  <section class="dashboard-hero">
     <div>
-      <span class="eyebrow">Panel de administracion</span>
+      <span class="eyebrow">Panel de administración</span>
+
       <h1>Bienvenido, Administrador {{ nombreUsuario }}</h1>
+
       <p>Resumen del uso, los usuarios y el estado del sistema.</p>
     </div>
 
@@ -11,84 +13,135 @@
   </section>
 
   <p class="aviso" *ngIf="sinConexion && !cargando">
-    No se pudo obtener toda la informacion del servidor. Los datos mostrados pueden estar incompletos.
+    No se pudo obtener toda la información del servidor. Los datos mostrados pueden estar incompletos.
     <button type="button" (click)="cargar()">Reintentar</button>
   </p>
 
-  <div class="kpis">
-    <div class="summary-card">
-      <h3>Usuarios</h3>
-      <strong>{{ usuarios.length || metricas.totalUsuarios || 0 }}</strong>
-      <span>{{ usuariosActivos() }} activos</span>
+  <div class="summary-cards">
+
+    <div class="summary-card card-pacientes">
+      <div class="card-icon">👥</div>
+
+      <div>
+        <h3>Usuarios</h3>
+        <strong>{{ usuarios.length || metricas.totalUsuarios || 0 }}</strong>
+        <span>{{ usuariosActivos() }} activos</span>
+      </div>
     </div>
-    <div class="summary-card">
-      <h3>Acciones registradas</h3>
-      <strong>{{ metricas.totalLogs || 0 }}</strong>
-      <span>Logs de uso</span>
+
+    <div class="summary-card card-citas">
+      <div class="card-icon">📈</div>
+
+      <div>
+        <h3>Acciones registradas</h3>
+        <strong>{{ metricas.totalLogs || 0 }}</strong>
+        <span>Tiempo activo {{ uptime() }}</span>
+      </div>
     </div>
-    <div class="summary-card">
-      <h3>Errores reportados</h3>
-      <strong>{{ metricas.totalErrores || 0 }}</strong>
-      <span>Tasa {{ metricas.tasaErrores || 0 }}%</span>
+
+    <div class="summary-card card-riesgo">
+      <div class="card-icon">⚠️</div>
+
+      <div>
+        <h3>Errores reportados</h3>
+        <strong>{{ metricas.totalErrores || 0 }}</strong>
+        <span>Tasa de errores {{ metricas.tasaErrores || 0 }}%</span>
+      </div>
     </div>
-    <div class="summary-card">
-      <h3>Feedback</h3>
-      <strong>{{ metricas.totalFeedback || 0 }}</strong>
-      <span>Promedio {{ promedioFeedback() }} / 5</span>
-    </div>
-    <div class="summary-card">
-      <h3>Tiempo activo</h3>
-      <strong>{{ uptime() }}</strong>
-      <span>{{ metricas.memoriaUsadaMb || 0 }} / {{ metricas.memoriaDisponibleMb || 0 }} MB</span>
-    </div>
+
   </div>
 
-  <div class="admin-grid">
+  <div class="content-grid">
 
     <section class="panel">
-      <div class="panel-title"><h2>Usuarios por rol</h2></div>
+
+      <div class="panel-header">
+        <div>
+          <h2>Usuarios por rol</h2>
+          <p>Distribución de las cuentas del sistema</p>
+        </div>
+      </div>
+
       <div class="rol-row" *ngFor="let rol of roles">
         <span class="rol-name">{{ rol }}</span>
         <div class="rol-bar"><div [style.width.%]="porcentajeRol(rol)"></div></div>
         <strong>{{ usuariosPorRol(rol) }}</strong>
       </div>
-      <p class="vacio" *ngIf="!usuarios.length && !cargando">Sin usuarios para mostrar.</p>
-    </section>
 
-    <section class="panel">
-      <div class="panel-title"><h2>Accesos rapidos</h2></div>
+      <p class="vacio" *ngIf="!usuarios.length && !cargando">Sin usuarios para mostrar.</p>
+
+      <div class="panel-header accesos-title">
+        <div>
+          <h2>Accesos rápidos</h2>
+          <p>Las tareas de administración más frecuentes</p>
+        </div>
+      </div>
+
       <div class="accesos">
         <a *ngFor="let a of accesos" [routerLink]="a.ruta" class="acceso">
           <strong>{{ a.titulo }}</strong>
           <span>{{ a.detalle }}</span>
         </a>
       </div>
+
     </section>
 
-    <section class="panel">
-      <div class="panel-title">
-        <h2>Errores recientes</h2>
-        <a routerLink="/monitoreo">Ver todos</a>
-      </div>
-      <article class="item" *ngFor="let e of errores | slice:0:4">
-        <strong>{{ e.modulo }}</strong>
-        <p>{{ e.descripcion }}</p>
-        <small>{{ e.fechaRegistro | date:'short' }}</small>
-      </article>
-      <p class="vacio" *ngIf="!errores.length">Sin errores reportados.</p>
-    </section>
+    <section class="panel activity-panel">
 
-    <section class="panel">
-      <div class="panel-title">
-        <h2>Feedback reciente</h2>
-        <a routerLink="/monitoreo">Ver todos</a>
+      <div class="panel-header simple">
+        <div>
+          <h2>Errores recientes</h2>
+          <p>Últimos reportes de los usuarios</p>
+        </div>
       </div>
-      <article class="item" *ngFor="let f of feedback | slice:0:4">
-        <strong>{{ f.calificacion }} / 5</strong>
-        <p>{{ f.comentario }}</p>
-        <small>{{ f.fechaRegistro | date:'short' }}</small>
-      </article>
-      <p class="vacio" *ngIf="!feedback.length">Sin feedback registrado.</p>
+
+      <div class="activity-list" *ngIf="errores.length > 0">
+        <div class="activity" *ngFor="let e of errores | slice:0:3">
+          <div class="activity-dot"></div>
+
+          <div>
+            <strong>{{ e.modulo }}</strong>
+            <p>{{ e.descripcion }}</p>
+            <span>{{ e.fechaRegistro | date:'short' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty activity-empty" *ngIf="errores.length === 0">
+        <div class="empty-icon">✅</div>
+        <strong>Sin errores reportados</strong>
+        <span>Todo funciona con normalidad.</span>
+      </div>
+
+      <div class="panel-header simple feedback-title">
+        <div>
+          <h2>Feedback reciente</h2>
+          <p>Calificación promedio {{ promedioFeedback() }} / 5</p>
+        </div>
+      </div>
+
+      <div class="activity-list" *ngIf="feedback.length > 0">
+        <div class="activity" *ngFor="let f of feedback | slice:0:3">
+          <div class="activity-dot"></div>
+
+          <div>
+            <strong>{{ f.calificacion }} / 5</strong>
+            <p>{{ f.comentario }}</p>
+            <span>{{ f.fechaRegistro | date:'short' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty activity-empty" *ngIf="feedback.length === 0">
+        <div class="empty-icon">💬</div>
+        <strong>Sin feedback registrado</strong>
+        <span>Aún no hay comentarios de los usuarios.</span>
+      </div>
+
+      <a class="link" routerLink="/monitoreo">
+        Ver monitoreo completo →
+      </a>
+
     </section>
 
   </div>

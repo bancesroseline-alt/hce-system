@@ -245,7 +245,7 @@ a[class*="btn-"],
 :root {
   --hce-page-padding: 28px;
   --hce-page-max-width: 1400px;
-  --hce-page-gap: 22px;
+  --hce-page-gap: 20px;
   --hce-title-size: 28px;
   --hce-subtitle-size: 14px;
 }
@@ -321,7 +321,7 @@ header.page-header,
   align-items: flex-start !important;
   justify-content: space-between !important;
   gap: 24px !important;
-  margin: 0 0 24px !important;
+  margin: 0 0 20px !important;
 }
 
 .support-page .tabs,
@@ -413,4 +413,137 @@ input.search-input {
   text-align: center;
   gap: 0 !important;
   margin-bottom: 16px !important;
+}
+
+
+/* ---- Unified design layer: same type, cards, tables and buttons on every panel ---- */
+:root {
+  --hce-font: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+}
+
+html,
+body,
+input,
+select,
+textarea,
+button {
+  font-family: var(--hce-font);
+}
+
+.dashboard-container,
+.reportes-page,
+.login-page,
+.support-page,
+.monitor {
+  font-family: var(--hce-font) !important;
+}
+
+/* Admin pages: plain page header (like Pacientes) instead of a boxed card */
+.usuarios-header,
+.trazabilidad-page .page-header,
+.report-hero {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.usuarios-header {
+  align-items: flex-start !important;
+  gap: 24px;
+}
+
+.usuarios-header p,
+.trazabilidad-page .page-header p,
+.report-hero p {
+  color: var(--hce-muted) !important;
+  font-size: var(--hce-subtitle-size) !important;
+  margin: 6px 0 0 !important;
+}
+
+.usuarios-header h1,
+.trazabilidad-page .page-header h1 {
+  font-size: var(--hce-title-size) !important;
+  line-height: 1.2 !important;
+}
+
+/* Same card for every content block */
+.form-shell,
+.list-panel,
+.query-panel,
+.history-panel,
+.kpi-card,
+.report-card,
+.support-page .card {
+  background: var(--hce-surface) !important;
+  border: 1px solid var(--hce-border) !important;
+  border-radius: var(--hce-radius) !important;
+  box-shadow: var(--hce-card-shadow) !important;
+}
+
+/* Section titles inside cards */
+.panel-title h2,
+.form-column h2,
+.history-panel h2 {
+  font-size: 17px !important;
+}
+
+/* Tables: same header style everywhere */
+thead th,
+th {
+  font-size: 12px !important;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Admin action buttons: primary blue / secondary outline, like the clinical panels */
+.usuarios-page .actions button,
+.trazabilidad-page .actions button {
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  min-height: 40px;
+  min-width: 0 !important;
+  padding: 0 18px !important;
+}
+
+.trazabilidad-page .actions button {
+  background: var(--hce-primary) !important;
+  border: 1px solid var(--hce-primary) !important;
+  color: #ffffff !important;
+}
+
+.trazabilidad-page .actions button.secondary {
+  background: #ffffff !important;
+  border: 1px solid var(--hce-border) !important;
+  color: #334155 !important;
+}
+
+.trazabilidad-page .actions button:disabled {
+  background: #94a3b8 !important;
+  border-color: #94a3b8 !important;
+  color: #ffffff !important;
+}
+
+.usuarios-page .actions .primary {
+  border-color: var(--hce-primary) !important;
+}
+
+.usuarios-page .actions .secondary {
+  border-color: var(--hce-border) !important;
+  color: #334155 !important;
+}
+
+/* Texto claro sobre el banner oscuro del dashboard */
+.dashboard-hero p {
+  color: #dbeafe !important;
+}
+
+/* Tablas de administracion: filas continuas con separador fino */
+.list-panel table,
+.history-panel table,
+.monitor table {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
 }

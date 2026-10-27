@@ -235,6 +235,22 @@ td {
   text-align: center;
   color: #64748b;
 }
+
+.empty-state .empty-icon {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.empty-state strong {
+  display: block;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.empty-state span {
+  display: block;
+  font-size: 13px;
+}
 .sync-badge {
   display: inline-flex;
   align-items: center;

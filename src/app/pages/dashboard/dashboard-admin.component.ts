@@ -11,7 +11,7 @@ import { ConnectionBadgeComponent } from '../../shared/connection-badge/connecti
   standalone: true,
   imports: [CommonModule, RouterLink, ConnectionBadgeComponent],
   templateUrl: './dashboard-admin.component.html',
-  styleUrl: './dashboard-admin.component.css'
+  styleUrls: ['./dashboard.component.css', './dashboard-admin.component.css']
 })
 export class DashboardAdminComponent implements OnInit {
 
