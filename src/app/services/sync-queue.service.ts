@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { timeout } from 'rxjs';
+import { Subject, timeout } from 'rxjs';
 import { IndexedDbService } from './indexed-db.service';
 import { environment } from '../../environments/environment';
+
+// Render puede tardar en despertar: un timeout corto marcaria como error datos que si se pueden enviar.
+const TIMEOUT_SYNC_MS = 20000;
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +19,24 @@ export class SyncQueueService {
     private indexedDb: IndexedDbService
   ) {}
 
-  async sincronizarPendientes(): Promise<void> {
+  /** Se emite cada vez que termina una sincronizacion (manual o automatica). */
+  readonly sincronizacionTerminada$ = new Subject<void>();
+
+  private enCurso: Promise<void> | null = null;
+
+  /** Evita ejecuciones simultaneas: si ya hay una en curso, se reutiliza. */
+  sincronizarPendientes(): Promise<void> {
+    if (!this.enCurso) {
+      this.enCurso = this.ejecutarSincronizacion().finally(() => {
+        this.enCurso = null;
+        this.sincronizacionTerminada$.next();
+      });
+    }
+
+    return this.enCurso;
+  }
+
+  private async ejecutarSincronizacion(): Promise<void> {
     if (!navigator.onLine) {
       console.warn('Sin internet. No se puede sincronizar.');
       return;
@@ -47,12 +67,26 @@ export class SyncQueueService {
         await this.marcarEntidadSincronizada(pendiente, respuestaRemota);
         await this.indexedDb.marcarSincronizado(pendiente.uuidLocal);
       } catch (error) {
+        if (this.esFalloTransitorio(error)) {
+          // Servidor dormido, sin red o sesion vencida: el registro sigue pendiente y se reintenta luego.
+          console.warn('Sincronizacion pausada, se reintentara:', error);
+          return;
+        }
+
         await this.marcarEntidadConError(pendiente, error);
         await this.indexedDb.marcarErrorSync(pendiente.uuidLocal, error);
         await this.registrarConflictoSiAplica(pendiente, error);
         console.error('Error sincronizando pendiente:', pendiente, error);
       }
     }
+  }
+
+  /** Fallos que no son culpa del registro: red, timeout, servidor no disponible o token vencido. */
+  private esFalloTransitorio(error: any): boolean {
+    if (error?.name === 'TimeoutError') return true;
+
+    const status = error?.status;
+    return status === 0 || status === 401 || status === 403 || status === 502 || status === 503 || status === 504;
   }
 
   async reintentarPendiente(pendiente: any): Promise<void> {
@@ -89,7 +123,7 @@ export class SyncQueueService {
     if (pendiente.accion === 'ACTUALIZAR_ESTADO' && cita.id) {
       return this.http
         .patch(`${this.api}/citas/${cita.id}/estado?estado=${cita.estado}`, {})
-        .pipe(timeout(4000))
+        .pipe(timeout(TIMEOUT_SYNC_MS))
         .toPromise();
     }
 
@@ -98,7 +132,7 @@ export class SyncQueueService {
 
       return this.http
         .put(`${this.api}/citas/${cita.id}`, payload)
-        .pipe(timeout(4000))
+        .pipe(timeout(TIMEOUT_SYNC_MS))
         .toPromise();
     }
 
@@ -108,7 +142,7 @@ export class SyncQueueService {
         uuidLocal: cita.uuidLocal,
         origenRegistro: 'INDEXEDDB'
       })
-      .pipe(timeout(4000))
+      .pipe(timeout(TIMEOUT_SYNC_MS))
       .toPromise();
   }
 
@@ -139,13 +173,13 @@ export class SyncQueueService {
     if (pendiente.accion === 'ACTUALIZAR' && a.id) {
       return this.http
         .put(`${this.api}/atenciones/${a.id}`, payload)
-        .pipe(timeout(4000))
+        .pipe(timeout(TIMEOUT_SYNC_MS))
         .toPromise();
     }
 
     return this.http
       .post(`${this.api}/sincronizacion`, payload)
-      .pipe(timeout(4000))
+      .pipe(timeout(TIMEOUT_SYNC_MS))
       .toPromise();
   }
 
@@ -155,20 +189,20 @@ export class SyncQueueService {
     if (pendiente.accion === 'ACTUALIZAR' && paciente.id) {
       return this.http
         .put(`${this.api}/pacientes/${paciente.id}`, paciente)
-        .pipe(timeout(4000))
+        .pipe(timeout(TIMEOUT_SYNC_MS))
         .toPromise();
     }
 
     if (pendiente.accion === 'BAJA' && paciente.id) {
       return this.http
         .patch(`${this.api}/pacientes/${paciente.id}/baja`, {})
-        .pipe(timeout(4000))
+        .pipe(timeout(TIMEOUT_SYNC_MS))
         .toPromise();
     }
 
     return this.http
       .post(`${this.api}/sincronizacion/pacientes`, paciente)
-      .pipe(timeout(4000))
+      .pipe(timeout(TIMEOUT_SYNC_MS))
       .toPromise();
   }
 

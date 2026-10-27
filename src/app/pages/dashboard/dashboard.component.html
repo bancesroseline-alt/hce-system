@@ -1,4 +1,6 @@
-<div class="dashboard-container">
+<app-dashboard-admin *ngIf="esAdmin"></app-dashboard-admin>
+
+<div class="dashboard-container" *ngIf="!esAdmin">
 
   <!-- HERO -->
   <section class="dashboard-hero">
@@ -67,7 +69,7 @@
           <p>Pacientes programados para la fecha actual</p>
         </div>
 
-        <button routerLink="/citas" *ngIf="!esAdmin">
+        <button routerLink="/citas">
           Ver todas
         </button>
       </div>
@@ -155,7 +157,7 @@
 
       </div>
 
-      <a class="link" routerLink="/citas" *ngIf="!esAdmin">
+      <a class="link" routerLink="/citas">
         Ver más citas →
       </a>
 

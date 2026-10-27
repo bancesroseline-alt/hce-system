@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 import { IndexedDbService } from '../../services/indexed-db.service';
@@ -12,7 +13,9 @@ import { claseEstadoSync, etiquetaEstadoSync } from '../../utils/sync-status.uti
   templateUrl: './sincronizacion.component.html',
   styleUrl: './sincronizacion.component.css'
 })
-export class SincronizacionComponent implements OnInit {
+export class SincronizacionComponent implements OnInit, OnDestroy {
+
+  private suscripcion?: Subscription;
 
   pendientes: any[] = [];
   errores: any[] = [];
@@ -36,9 +39,12 @@ export class SincronizacionComponent implements OnInit {
   ngOnInit(): void {
     this.cargarDatos();
 
-    window.addEventListener('online', () => {
-      this.sincronizar();
-    });
+    // La sincronizacion automatica es global (MainLayout); aqui solo se refresca la vista.
+    this.suscripcion = this.syncQueue.sincronizacionTerminada$.subscribe(() => this.cargarDatos());
+  }
+
+  ngOnDestroy(): void {
+    this.suscripcion?.unsubscribe();
   }
 
   cargarDatos(): void {

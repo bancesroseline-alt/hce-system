@@ -4,6 +4,9 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { filter } from 'rxjs';
 import { IndexedDbService } from '../../services/indexed-db.service';
 import { AuthService } from '../../services/auth.service';
+import { SyncQueueService } from '../../services/sync-queue.service';
+
+const INTERVALO_SYNC_AUTO_MS = 60000;
 
 @Component({
   selector: 'app-main-layout',
@@ -13,6 +16,9 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./main-layout.component.css']
 })
 export class MainLayoutComponent implements OnInit {
+
+  /** Solo el personal de salud registra datos offline que luego hay que subir. */
+  private sincronizaOffline = false;
 
   usuario: any;
   mostrarMenuUsuario = false;
@@ -91,13 +97,15 @@ export class MainLayoutComponent implements OnInit {
   constructor(
     private router: Router,
     private indexedDb: IndexedDbService,
-    private authService: AuthService
+    private authService: AuthService,
+    private syncQueue: SyncQueueService
   ) {}
 
   ngOnInit(): void {
     this.usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
     const rol = this.normalizarRol(this.usuario?.rol);
     this.menuItems = this.items.filter(item => item.roles.includes(rol));
+    this.sincronizaOffline = rol === 'MEDICO' || rol === 'ENFERMERO';
     this.actualizarBreadcrumb(this.router.url);
     this.cargarNotificaciones();
 
@@ -110,8 +118,26 @@ export class MainLayoutComponent implements OnInit {
         this.cargarNotificaciones();
       });
 
-    window.addEventListener('online', () => this.cargarNotificaciones());
+    window.addEventListener('online', () => {
+      this.sincronizarAutomaticamente();
+      this.cargarNotificaciones();
+    });
     window.addEventListener('focus', () => this.cargarNotificaciones());
+
+    this.syncQueue.sincronizacionTerminada$.subscribe(() => this.cargarNotificaciones());
+
+    // HU016: al detectar conexion se envian los pendientes sin que el usuario abra ninguna pantalla.
+    // Tambien se reintenta periodicamente por si el servidor aun estaba despertando.
+    this.sincronizarAutomaticamente();
+    window.setInterval(() => this.sincronizarAutomaticamente(), INTERVALO_SYNC_AUTO_MS);
+  }
+
+  private sincronizarAutomaticamente(): void {
+    if (!this.sincronizaOffline || !navigator.onLine) {
+      return;
+    }
+
+    this.syncQueue.sincronizarPendientes().catch(err => console.error('Sincronizacion automatica fallida', err));
   }
 
   @HostListener('document:click', ['$event'])

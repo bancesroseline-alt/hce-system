@@ -5,11 +5,12 @@ import { RouterLink } from '@angular/router';
 import { IndexedDbService } from '../../services/indexed-db.service';
 import { timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { DashboardAdminComponent } from './dashboard-admin.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, DashboardAdminComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -37,6 +38,13 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const sesion = JSON.parse(localStorage.getItem('usuario') || '{}');
+    this.esAdmin = ['ADMIN', 'ADMINISTRADOR'].includes(String(sesion.rol || '').replace('ROLE_', '').toUpperCase());
+
+    if (this.esAdmin) {
+      return;
+    }
+
     this.actualizarEstadoConexion();
 
     window.addEventListener('online', () => {
@@ -58,8 +66,6 @@ export class DashboardComponent implements OnInit {
     this.rolUsuario =
       usuario.rol ||
       'Medico';
-
-    this.esAdmin = ['ADMIN', 'ADMINISTRADOR'].includes(String(usuario.rol || '').replace('ROLE_', '').toUpperCase());
 
     const medicoId = usuario.id || 2;
 
