@@ -46,7 +46,7 @@ export class CitaOfflineService {
         console.warn('Backend no disponible. Cargando citas offline...', err);
 
         const citas = await this.indexedDb.obtenerTodos('citas');
-        observer.next(citas);
+        observer.next(await this.completarPacientesLocales(citas));
         observer.complete();
       }
     });
@@ -84,7 +84,7 @@ export class CitaOfflineService {
             Number(c.paciente?.id) === Number(pacienteId)
           );
 
-          observer.next(filtradas);
+          observer.next(await this.completarPacientesLocales(filtradas));
           observer.complete();
         }
       });
@@ -112,6 +112,7 @@ export class CitaOfflineService {
         error: async (err) => {
           console.warn('Backend no disponible. Guardando cita offline...', err);
 
+          await this.completarPacientesLocales([cita]);
           await this.indexedDb.guardar('citas', cita);
           await this.indexedDb.agregarPendiente('CITA', 'CREAR', cita);
 
@@ -242,6 +243,27 @@ export class CitaOfflineService {
         }
       });
     });
+  }
+
+  private async completarPacientesLocales(citas: any[]): Promise<any[]> {
+    const pacientes = await this.indexedDb.obtenerTodos('pacientes');
+    const porId = new Map(pacientes
+      .filter(p => p.id != null || p.pacienteId != null)
+      .map(p => [String(p.id ?? p.pacienteId), p]));
+
+    for (const cita of citas) {
+      const paciente = porId.get(String(cita.pacienteId ?? cita.paciente?.id));
+      if (!paciente) continue;
+
+      cita.paciente = {
+        ...cita.paciente,
+        id: paciente.id ?? paciente.pacienteId,
+        nombres: paciente.nombres,
+        apellidos: paciente.apellidos
+      };
+      cita.pacienteNombre = `${paciente.nombres || ''} ${paciente.apellidos || ''}`.trim();
+    }
+    return citas;
   }
 
   private normalizarCita(cita: any): void {

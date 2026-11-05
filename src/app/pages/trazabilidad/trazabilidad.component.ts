@@ -16,6 +16,7 @@ export class TrazabilidadComponent implements OnInit {
 
   readonly tiposEntidad = [
     { value: 'ATENCION', label: 'Atenciones' },
+    { value: 'HISTORIA_CLINICA', label: 'Historia clínica' },
     { value: 'PACIENTE', label: 'Pacientes' },
     { value: 'CITA', label: 'Citas' }
   ];

@@ -117,8 +117,14 @@ export class SyncQueueService {
     await this.indexedDb.eliminarErrorSync(pendiente.uuidLocal);
   }
 
-  private sincronizarCita(pendiente: any): Promise<any> {
-    const cita = pendiente.data;
+  private async sincronizarCita(pendiente: any): Promise<any> {
+    // La cola puede contener CREAR y varias ediciones de la misma cita.
+    // Enviar siempre la versión local vigente evita restaurar un estado antiguo,
+    // incluso si IndexedDB devuelve los pendientes en otro orden.
+    const local = pendiente.data?.uuidLocal
+      ? await this.indexedDb.obtenerPorUuid('citas', pendiente.data.uuidLocal)
+      : null;
+    const cita = { ...pendiente.data, ...(local || {}) };
 
     if (pendiente.accion === 'ACTUALIZAR_ESTADO' && cita.id) {
       return this.http

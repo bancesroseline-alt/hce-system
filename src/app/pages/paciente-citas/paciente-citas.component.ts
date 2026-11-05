@@ -155,6 +155,7 @@ export class PacienteCitasComponent implements OnInit {
 
   abrirDetalle(cita: any): void {
     this.citaEditando = {
+      ...cita,
       id: cita.id,
       pacienteId: cita.pacienteId || this.pacienteId,
       medicoId: cita.medicoId,

@@ -15,7 +15,7 @@ interface Alerta {
   apellidos?: string;
   nivelRiesgo: 'ALTO' | 'MEDIO' | 'BAJO';
   probabilidadInasistencia: number;
-  recomendacion: string;
+  recomendacion?: string | null;
   cantidadCitasPrevias?: number;
   cantidadInasistenciasPrevias?: number;
   cantidadReprogramaciones?: number;
@@ -124,6 +124,21 @@ export class PrediccionComponent implements OnInit {
     return (alerta.nivelRiesgo || 'BAJO').toLowerCase();
   }
 
+  textoRecomendacion(alerta: Alerta): string {
+    const recomendacion = alerta.recomendacion?.trim() || '';
+
+    if (alerta.nivelRiesgo !== 'BAJO') return recomendacion;
+
+    const mensaje = 'No se requiere recomendación de reprogramación.';
+    if (alerta.modoOffline || recomendacion.includes('(ultimo resultado guardado)')) {
+      return `${mensaje} (ultimo resultado guardado)`;
+    }
+    if (recomendacion.includes('(estimacion local)')) {
+      return `${mensaje} (estimacion local)`;
+    }
+    return mensaje;
+  }
+
   exportarExcel(): void {
     const encabezados = [
       'Paciente',
@@ -142,7 +157,7 @@ export class PrediccionComponent implements OnInit {
       alerta.cantidadReprogramaciones || 0,
       alerta.nivelRiesgo,
       `${this.porcentajeRiesgo(alerta)}%`,
-      alerta.recomendacion || ''
+      this.textoRecomendacion(alerta)
     ]);
 
     const contenido = [encabezados, ...filas]

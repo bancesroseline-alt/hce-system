@@ -16,6 +16,8 @@ import { PacienteService } from '../../services/paciente.service';
 export class ReportesComponent implements OnInit {
 
   cargando = true;
+  exportando = false;
+  errorExportacion = '';
 
   resumen = {
     pacientes: 0,
@@ -190,45 +192,65 @@ export class ReportesComponent implements OnInit {
   }
 
   async exportarCitasXlsx(): Promise<void> {
-    const { Workbook } = await import('exceljs');
-    const workbook = new Workbook();
-    const hoja = workbook.addWorksheet('Citas');
+    if (this.cargando || this.exportando) return;
 
-    hoja.columns = [
-      { header: 'Fecha', key: 'fecha', width: 14 },
-      { header: 'Hora', key: 'hora', width: 12 },
-      { header: 'Paciente', key: 'paciente', width: 30 },
-      { header: 'Profesional', key: 'profesional', width: 30 },
-      { header: 'Especialidad', key: 'especialidad', width: 24 },
-      { header: 'Tipo', key: 'tipo', width: 18 },
-      { header: 'Estado', key: 'estado', width: 18 }
-    ];
+    this.exportando = true;
+    this.errorExportacion = '';
+    const citas = this.citasFiltradas();
 
-    this.citasFiltradas().forEach(c => hoja.addRow({
-      fecha: c.fecha,
-      hora: c.hora,
-      paciente: `${c.paciente?.nombres || ''} ${c.paciente?.apellidos || ''}`.trim() || c.pacienteNombre || c.pacienteId,
-      profesional: `${c.medico?.nombres || ''} ${c.medico?.apellidos || ''}`.trim() || c.medicoNombre || c.medicoId,
-      especialidad: c.especialidad,
-      tipo: c.tipoCita,
-      estado: c.estado
-    }));
+    try {
+      // ExcelJS publica su API del navegador como un módulo CommonJS.
+      const { default: ExcelJS } = await import('exceljs');
+      const workbook = new ExcelJS.Workbook();
+      const hoja = workbook.addWorksheet('Citas');
 
-    const encabezado = hoja.getRow(1);
-    encabezado.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    encabezado.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2563EB' } };
-    encabezado.alignment = { vertical: 'middle' };
-    hoja.autoFilter = { from: 'A1', to: 'G1' };
-    hoja.views = [{ state: 'frozen', ySplit: 1 }];
+      hoja.columns = [
+        { header: 'Fecha', key: 'fecha', width: 14 },
+        { header: 'Hora', key: 'hora', width: 12 },
+        { header: 'Paciente', key: 'paciente', width: 30 },
+        { header: 'Profesional', key: 'profesional', width: 30 },
+        { header: 'Especialidad', key: 'especialidad', width: 24 },
+        { header: 'Tipo', key: 'tipo', width: 18 },
+        { header: 'Estado', key: 'estado', width: 18 }
+      ];
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `reporte-citas-${new Date().toISOString().slice(0, 10)}.xlsx`;
-    link.click();
-    URL.revokeObjectURL(url);
+      citas.forEach(c => hoja.addRow({
+        fecha: c.fecha,
+        hora: c.hora,
+        paciente: `${c.paciente?.nombres || ''} ${c.paciente?.apellidos || ''}`.trim() || c.pacienteNombre || c.pacienteId,
+        profesional: `${c.medico?.nombres || ''} ${c.medico?.apellidos || ''}`.trim() || c.medicoNombre || c.medicoId,
+        especialidad: c.especialidad,
+        tipo: c.tipoCita,
+        estado: c.estado
+      }));
+
+      const encabezado = hoja.getRow(1);
+      encabezado.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      encabezado.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2563EB' } };
+      encabezado.alignment = { vertical: 'middle' };
+      hoja.autoFilter = { from: 'A1', to: 'G1' };
+      hoja.views = [{ state: 'frozen', ySplit: 1 }];
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `reporte-citas-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(link);
+      try {
+        link.click();
+      } finally {
+        link.remove();
+        // La descarga debe poder consumir el Blob antes de liberar su URL.
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      }
+    } catch (error) {
+      console.error('No se pudo exportar el reporte de citas.', error);
+      this.errorExportacion = 'No se pudo generar el archivo Excel. Intente exportar nuevamente.';
+    } finally {
+      this.exportando = false;
+    }
   }
 
   estadosPrincipales(): Array<{ estado: string; total: number; porcentaje: number }> {

@@ -222,8 +222,12 @@
       <label>Especialidad<input [(ngModel)]="filtroEspecialidad" (ngModelChange)="reiniciarPagina()" placeholder="Buscar..."></label>
       <label>Profesional<input [(ngModel)]="filtroProfesional" (ngModelChange)="reiniciarPagina()" placeholder="Buscar..."></label>
       <button type="button" (click)="limpiarFiltros()">Limpiar</button>
-      <button type="button" (click)="exportarCitasXlsx()">Exportar XLSX</button>
+      <button type="button" (click)="exportarCitasXlsx()" [disabled]="cargando || exportando">
+        {{ exportando ? 'Exportando...' : 'Exportar XLSX' }}
+      </button>
     </div>
+
+    <p *ngIf="errorExportacion" role="alert">{{ errorExportacion }}</p>
 
     <div class="table-wrap">
       <table *ngIf="citasFiltradas().length > 0">

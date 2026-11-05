@@ -262,7 +262,7 @@
             <td>{{ c.hora }}</td>
 
             <td>
-              {{ c.paciente?.nombres || c.pacienteNombre || 'Sin nombre' }}
+              {{ ((c.paciente?.nombres || '') + ' ' + (c.paciente?.apellidos || '')).trim() || c.pacienteNombre || 'Sin nombre' }}
             </td>
 
             <td>
